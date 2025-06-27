@@ -22,6 +22,7 @@
     --shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     --border-radius: 0.375rem;
     --success-color: #28a745;
+    --background-color: #F4F6FA;
 }
 
 
@@ -46,8 +47,15 @@ textarea {
     all: unset;
 }
 
+a {
+    text-decoration: none;
+    color: inherit;
+}
 
-
+ol,
+ul {
+    list-style: none;
+}
 
 
 /*---------------------------- -------------------------*/
@@ -107,21 +115,12 @@ textarea {
     box-sizing: border-box;
 }
 
-
-.header {
-    width: 100%;           /* 전체 화면 너비 차지 */
-    min-width: 100%;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-}
-
 .width-fit {
     width: fit-content;
 }
 
 .main-back {
-    background-color: #F4F6FA;
+    background-color: var(--background-color);
 }
 
 .margin-y-10 {
@@ -138,6 +137,13 @@ textarea {
 
 /*---------------------------------------------------------*/
 
+.header {
+    width: 100%;           /* 전체 화면 너비 차지 */
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
 
 .header-text {
     font-size: 20px;
@@ -154,9 +160,14 @@ textarea {
 }
 
 .menu-item {
+    color: black;
+    font-weight: bold;
     font-size: 20px;
     position: relative;
     display: inline-block;
+    /*border-right-style: solid;*/
+    /*border-right-width: 1px;*/
+    white-space: nowrap;
 }
 
 .menu-item:hover .submenu,
@@ -168,14 +179,14 @@ textarea {
 }
 
 .menu-item:hover .menu-title {
-    color: #b8bcc3;
+    color: #026CCA;
 }
 
 .submenu {
     position: absolute;
     left: 0;
     top: 100%;
-    min-width: 160px;
+    min-width: 200px;
     background-color: #F4F6FA;
     border-radius: 0 0 8px 8px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
@@ -192,21 +203,19 @@ textarea {
 }
 
 .submenu-item {
+    color: #000;
     padding: 12px 24px;
-    color: #fff;
     background-color: #F4F6FA;
     font-size: 15px;
     border-radius: 8px;
     transition: background 0.2s, color 0.2s;
     cursor: pointer;
     white-space: nowrap;
-    text-decoration: underline;
-    text-decoration-color: #F4F6FA;
 }
 
 .submenu-item:hover {
-    background: #b8bcc3;
-    color: #000;
+    background: #C0D5FF;
+    color: #000000;
 }
 
 .navigation_bar {
