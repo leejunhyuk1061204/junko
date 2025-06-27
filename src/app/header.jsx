@@ -114,7 +114,7 @@ const Header = () => {
 
     return (
         <div className="header wrap">
-            <div className="flex justify-content-between" >
+            <div className="flex justify-content-between main-back" >
                     <img src='/logo.png' alt ='Logo' width={200} className="logo box-sizing" />
                 {token ? (
                     <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_10">
@@ -126,7 +126,8 @@ const Header = () => {
                         <button onClick={handleLogout}>로그아웃</button>
                     </div>
                 ):(
-                    <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_10">
+                    <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_10 margin-right-4
+                    ">
                         <div className="header-date-text">{date_time}</div>
                         <div><img src='/run.png' alt='run' width={22}/></div>
                         <div><IoMailOutline/></div>
@@ -138,16 +139,16 @@ const Header = () => {
             </div>
             <nav className='navigation_bar flex'>
                 {mainMenus.map((menu, idx) => (
-                    <div key={idx}>
+                    <div className='menu-item margin-y-10 flex' key={idx}>
                         <Link href={menu.href}>
-                            <p>
+                            <p className='menu-title'>
                                 {menu.title}
                             </p>
                         </Link>
-                        <div>
+                        <div className='submenu'>
                             {menu.submenu.map((sub, subIdx) => (
                                 <Link href={sub.href} key={subIdx}>
-                                    <p>{sub.label}</p>
+                                    <p className="submenu-item">{sub.label}</p>
                                 </Link>
                             ))}
                         </div>

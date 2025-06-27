@@ -67,6 +67,14 @@ textarea {
     display: flex;
 }
 
+.flex-direction-row {
+    flex-direction: row;
+}
+
+.flex-direction-col {
+    flex-direction: column;
+}
+
 .gap_5 {
     gap: 5px;
 }
@@ -101,6 +109,8 @@ textarea {
 
 
 .header {
+    width: 100%;           /* 전체 화면 너비 차지 */
+    min-width: 100%;
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
@@ -110,6 +120,21 @@ textarea {
     width: fit-content;
 }
 
+.main-back {
+    background-color: #F4F6FA;
+}
+
+.margin-y-10 {
+    margin: 10px 0 ;
+}
+
+.margin-bottom-10 {
+    margin-bottom: 10px;
+}
+
+.margin-right-4 {
+    margin-right: 4%;
+}
 
 /*---------------------------------------------------------*/
 
@@ -128,6 +153,62 @@ textarea {
     transition: color 0.2s;
 }
 
-.submenu {
+.menu-item {
+    font-size: 20px;
+    position: relative;
+    display: inline-block;
+}
 
+.menu-item:hover .submenu,
+.menu-item:focus-within .submenu {
+    opacity: 1;
+    max-height: 500px;
+    transform: translateY(0);
+    visibility: visible;
+}
+
+.menu-item:hover .menu-title {
+    color: #b8bcc3;
+}
+
+.submenu {
+    position: absolute;
+    left: 0;
+    top: 100%;
+    min-width: 160px;
+    background-color: #F4F6FA;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    overflow: hidden;
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    visibility: hidden;
+    z-index: 100;
+    padding: 10px;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.submenu-item {
+    padding: 12px 24px;
+    color: #fff;
+    background-color: #F4F6FA;
+    font-size: 15px;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    white-space: nowrap;
+    text-decoration: underline;
+    text-decoration-color: #F4F6FA;
+}
+
+.submenu-item:hover {
+    background: #b8bcc3;
+    color: #000;
+}
+
+.navigation_bar {
+    box-shadow: 4px 4px 5px rgba(0,0,0,0.15);
 }
