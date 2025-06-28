@@ -153,27 +153,26 @@ const Header = () => {
 
 
     return (
-        <div className="header wrap">
-            <div className="flex justify-content-between main-back" >
+        <div className="header wrap main-back">
+            <div className="flex justify-content-between " >
                     <img src='/logo.png' alt ='Logo' width={200} className="logo box-sizing" />
                 {token ? (
                     <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_10 margin-right-4">
                         <div className="header-date-text">{date_time}</div>
-                        <div></div>
-                        <div><IoMailOutline/></div>
-                        <div><BsPersonCircle/></div>
-                        <div><IoSettingsOutline/></div>
-                        <button onClick={handleLogout}>로그아웃</button>
+                        <div className='cursor-pointer'><img src='/run.png' alt='run' width={22}/></div>
+                        <div className='cursor-pointer'><IoMailOutline/></div>
+                        <div className='cursor-pointer'><BsPersonCircle/></div>
+                        <div className='cursor-pointer'><IoSettingsOutline/></div>
+                        <button className='cursor-pointer' onClick={handleLogout}>로그아웃</button>
                     </div>
                 ):(
-                    <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_10 margin-right-4
-                    ">
+                    <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_10 margin-right-4">
                         <div className="header-date-text">{date_time}</div>
-                        <div><img src='/run.png' alt='run' width={22}/></div>
-                        <div><IoMailOutline/></div>
-                        <div><BsPersonCircle/></div>
-                        <div><IoSettingsOutline/></div>
-                        <button>로그인</button>
+                        <div className='cursor-pointer'><img src='/run.png' alt='run' width={22}/></div>
+                        <div className='cursor-pointer'><IoMailOutline/></div>
+                        <div className='cursor-pointer'><BsPersonCircle/></div>
+                        <div className='cursor-pointer'><IoSettingsOutline/></div>
+                        <button className='cursor-pointer'>로그인</button>
                     </div>
                 )}
             </div>

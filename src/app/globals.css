@@ -41,11 +41,15 @@ div{
     width : 100%;
 }
 
-button,
-input,
-textarea {
-    all: unset;
+body {
+    display: block;
 }
+
+/*button,*/
+/*input:not([type="checkbox"]):not([type="radio"]),*/
+/*textarea {*/
+/*    all: unset;*/
+/*}*/
 
 a {
     text-decoration: none;
@@ -57,6 +61,62 @@ ul {
     list-style: none;
 }
 
+table {
+    width: 100%;
+    color: var(--dark-color);
+    border-collapse: collapse;
+}
+
+table th,
+table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    white-space: nowrap;
+}
+
+table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid var(--border-color);
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+table tr.selected {
+    background-color: rgba(74, 144, 226, 0.1);
+}
+
+input[type='checkbox'],input[type='radio']{
+    all : revert !important;
+}
+
+input[type='text']{
+    width: 100%;
+    margin : 10px 0;
+    border : 1px solid var(--border-color);
+    border-radius : var(--border-radius);
+}
+input[type='text']:focus{
+    outline-color: var(--gray-color);
+}
+
+.content_text {
+    font-family: "Noto Sans", sans-serif;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 29px;
+    letter-spacing: -1px;
+    word-break: keep-all;
+}
+
+.width-80{
+    width: 80px;
+}
+
+.width-100{
+    width: 100px;
+}
 
 /*---------------------------- -------------------------*/
 
@@ -65,6 +125,8 @@ ul {
     max-width: 1400px;
     margin: 0 auto;
     box-sizing: border-box;
+    background: var(--background-color);
+    padding-bottom: 30px;
 }
 
 .white-space-nowrap{
@@ -89,6 +151,14 @@ ul {
 
 .gap_10 {
     gap: 10px;
+}
+
+.gap_15 {
+    gap: 15px;
+}
+
+.gap_20 {
+    gap: 20px;
 }
 
 .align-center {
@@ -123,17 +193,47 @@ ul {
     background-color: var(--background-color);
 }
 
+.margin-auto {
+    margin: auto;
+}
+
 .margin-y-10 {
     margin: 10px 0 ;
+}
+
+.margin-y-20 {
+    margin: 20px 0 ;
 }
 
 .margin-bottom-10 {
     margin-bottom: 10px;
 }
 
+.margin-bottom-20 {
+    margin-bottom: 20px;
+}
+
 .margin-right-4 {
     margin-right: 4%;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.text-align-left {
+    margin-left: 20px;
+    text-align: left;
+}
+
+.text-align-center {
+    text-align: center;
+}
+
 
 /*---------------------------------------------------------*/
 
@@ -146,7 +246,7 @@ ul {
 }
 
 .header-text {
-    font-size: 20px;
+    font-size: 30px;
     font-weight: bold;
 }
 
@@ -219,5 +319,116 @@ ul {
 }
 
 .navigation_bar {
+    background: white;
     box-shadow: 4px 4px 5px rgba(0,0,0,0.15);
+    margin:2px;
+    /*box-shadow: var(--shadow);*/
+}
+
+.product-wrap{
+    margin : 30px 60px;
+    width: auto;
+    box-sizing: border-box;
+}
+
+.product-list-back{
+    width: auto;
+    background-color: white;
+    border-radius: 0 0 8px 8px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+}
+
+.select-container{
+    position: relative;
+    width: fit-content;
+    cursor: pointer;
+}
+
+.select-btn{
+    padding: 5px 20px;
+    text-align: left;
+    border-radius: 6px;
+    margin-right: 10px;
+    box-shadow: var(--shadow);
+    font-size: 14px;
+}
+
+.select-option{
+    position: absolute;
+    top: 100%;
+    left: 0;
+    /*overflow-y: auto;*/
+    background-color: white;
+    outline: none;
+    box-shadow: var(--shadow);
+    border-radius: 6px;
+    line-height: 20px;
+    width: 92%;
+    font-size: 14px;
+}
+
+.select-btn:hover {
+    border-radius: 6px;
+    background: #C0D5FF;
+}
+
+.select-btn:focus{
+    background-color: var(--background-color);
+}
+
+.select-option-item {
+    border: none;
+}
+
+.select-option-item:hover{
+    border-radius: 6px;
+    background-color: #C0D5FF;
+}
+
+.product-btn{
+    cursor: pointer;
+    width: fit-content;
+    box-shadow: var(--shadow);
+    background-color: #006CCE;
+    color: white;
+    margin-right: 10px;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+.product-btn-del{
+    cursor: pointer;
+    width: fit-content;
+    box-shadow: var(--shadow);
+    background-color: #E86060;
+    color: white;
+    margin-right: 10px;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+.product-table{
+    width: 100%;
+    min-width: 400px;
+}
+
+.product-modal-select{
+    width: 100%;
+    border: 1px solid var(--border-color);
+}
+
+.product-modal-btn {
+    background-color: #006CCE;
+    padding: 10px 20px;
+    color: white;
+    box-shadow: var(--shadow);
+    border-radius: var(--border-radius);
+}
+
+.product-list {
+    width: 100%;
+    overflow-x: auto;
 }
