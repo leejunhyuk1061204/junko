@@ -1,3 +1,5 @@
+import AlertModal from "@/app/component/alertmodal/page";
+
 export default function Layout({ children }) {
     return(
         <html>
@@ -7,6 +9,7 @@ export default function Layout({ children }) {
         </head>
         <body>
         {children}
+        <AlertModal />
         </body>
         </html>
     );

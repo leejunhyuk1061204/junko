@@ -309,6 +309,84 @@ input[type='text']:focus,input[type='password']:focus{
     /*padding: 20px;*/
 }
 
+/* AlertModal.css */
+
+.alert-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.alert-modal-content {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 24px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    min-width: 320px;
+    max-width: 30vw;
+    text-align: center;
+    position: relative;
+}
+
+.alert-modal-icon {
+    font-size: 2.5rem;
+    color: #4caf50;
+    margin-bottom: 12px;
+}
+
+.alert-modal-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.alert-modal-message {
+    font-size: 1.3rem;
+    line-height: 2rem;
+    color: #444;
+    margin-bottom: 24px;
+}
+
+.alert-modal-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.alert-modal-btn {
+    padding: 8px 24px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: background 0.18s;
+}
+
+.alert-modal-btn.cancel {
+    background: #f3f3f3;
+    color: #888;
+}
+
+.alert-modal-btn.confirm {
+    background: #4caf50;
+    color: #fff;
+}
+
+.alert-modal-btn.cancel:hover {
+    background: #e0e0e0;
+}
+
+.alert-modal-btn.confirm:hover {
+    background: #388e3c;
+}
+
 .header {
     width: 100%;           /* 전체 화면 너비 차지 */
     min-width: 100%;

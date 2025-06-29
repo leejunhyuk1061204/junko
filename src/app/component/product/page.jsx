@@ -6,6 +6,7 @@ import Image from "next/image";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import ExamModal from "@/app/component/modal/ExamModal";
 import ProductModal from "@/app/component/modal/productModal";
+import {useAlertModalStore} from "@/app/zustand/store";
 
 const sampleProducts =[
     {
@@ -141,6 +142,7 @@ const options = [
 
 const ProductPage = () => {
 
+    const { openModal, closeModal } = useAlertModalStore();
     const [selectedOrder, setSelectedOrder] = useState(order_options[1]);
     const [selectedOption, setSelectedOption] = useState(options[0]);
     const [checkedList, setCheckedList] = useState([]);
@@ -178,6 +180,46 @@ const ProductPage = () => {
             setOpen(0);
         }
     }
+
+    // 상품 삭제
+    const DeleteProduct = () => {
+        const success = checkedList>0 ;
+        openModal({
+            svg: '❓',
+            msg1: '삭제 확인',
+            msg2: '정말로 이 상품을 삭제하시겠습니까?',
+            showCancel: true,
+            onConfirm: () => {
+                closeModal();
+                setTimeout(()=>{
+                    try {
+                        if (success) {
+                            openModal({
+                                svg: '✔',
+                                msg1: '삭제 완료',
+                                msg2: '상품이 삭제되었습니다.',
+                                showCancel: false,
+                            });
+                        } else {
+                            openModal({
+                                svg: '❗',
+                                msg1: '삭제 실패',
+                                msg2: '상품 삭제에 실패했습니다.',
+                                showCancel: false,
+                            });
+                        }
+                    } catch (err) {
+                        openModal({
+                            svg: '❗',
+                            msg1: '오류',
+                            msg2: err.response?.data?.message || err.message,
+                            showCancel: false,
+                        });
+                    }
+                },100);
+            }
+        });
+    };
 
     return (
         <div className='productPage wrap page-background'>
@@ -250,7 +292,7 @@ const ProductPage = () => {
                     <div className='flex'>
                         <button className='product-btn' onClick={()=>setProductModalOpen({bool:true,val:'regist'})}>등록</button>
                         <button className='product-btn' onClick={()=>setProductModalOpen({bool:true,val:'update'})}>수정</button>
-                        <button className='product-btn-del'>삭제</button>
+                        <button className='product-btn-del' onClick={()=>DeleteProduct()}>삭제</button>
                     </div>
                 </div>
                 {/*옵션 테이블*/}
