@@ -180,7 +180,7 @@ const ProductPage = () => {
     }
 
     return (
-        <div className='productPage wrap'>
+        <div className='productPage wrap page-background'>
             <Header/>
             <div className='product-wrap'>
                 <div className='text-align-left margin-bottom-20'><span className='header-text'>상품 관리</span></div>
@@ -216,7 +216,7 @@ const ProductPage = () => {
                     <table className='product-table'>
                         <thead>
                             <tr>
-                                <th className='text-align-center'><input type='checkbox' checked={productAll} onChange={()=>setProductAll(!productAll)}/>전체선택</th>
+                                <th className='text-align-center'><input type='checkbox' checked={productAll} onChange={()=>{setProductAll(!productAll);setCheckedList([]);}}/>전체선택</th>
                                 <th>상품코드</th>
                                 <th>상품명</th>
                                 <th>규격</th>
@@ -259,7 +259,7 @@ const ProductPage = () => {
                     <table className='product-table'>
                         <thead>
                         <tr>
-                            <th><input type='checkbox' checked={optionAll} onChange={()=>setOptionAll(!optionAll)}/>전체선택</th>
+                            <th><input type='checkbox' checked={optionAll} onChange={()=>{setOptionAll(!optionAll);setOptionList([]);}}/>전체선택</th>
                             <th>상품명</th>
                             <th>옵션명</th>
                             <th>재고 수량</th>
@@ -284,7 +284,7 @@ const ProductPage = () => {
                 </div>
                 ):''}
             </div>
-            <ProductModal open={productModalOpen.bool} val={productModalOpen.val} onClose={()=>setProductModalOpen({bool:false,val:''})}/>
+            <ProductModal open={productModalOpen.bool} val={productModalOpen.val} onClose={()=>setProductModalOpen({bool:false,val:''})} list={checkedList}/>
         </div>
     );
 };

@@ -155,7 +155,9 @@ const Header = () => {
     return (
         <div className="header wrap main-back">
             <div className="flex justify-content-between " >
-                    <img src='/logo.png' alt ='Logo' width={200} className="logo box-sizing" />
+                <div className='width-fit cursor-pointer'>
+                    <img src='/logo.png' alt ='Logo' width={200} className="header-logo box-sizing" onClick={()=>{window.location.href='/'}}/>
+                </div>
                 {token ? (
                     <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_10 margin-right-4">
                         <div className="header-date-text">{date_time}</div>
@@ -163,6 +165,7 @@ const Header = () => {
                         <div className='cursor-pointer'><IoMailOutline/></div>
                         <div className='cursor-pointer'><BsPersonCircle/></div>
                         <div className='cursor-pointer'><IoSettingsOutline/></div>
+                        <div><span className='header-login-text'>환영합니다 0 0 0 님</span></div>
                         <button className='cursor-pointer' onClick={handleLogout}>로그아웃</button>
                     </div>
                 ):(
@@ -172,7 +175,7 @@ const Header = () => {
                         <div className='cursor-pointer'><IoMailOutline/></div>
                         <div className='cursor-pointer'><BsPersonCircle/></div>
                         <div className='cursor-pointer'><IoSettingsOutline/></div>
-                        <button className='cursor-pointer'>로그인</button>
+                        <button className='cursor-pointer' onClick={()=>{window.location.href='/component/login'}}>로그인</button>
                     </div>
                 )}
             </div>

@@ -1,0 +1,176 @@
+'use client'
+import React, {useState} from 'react';
+import Header from "@/app/header";
+import Link from "next/link";
+import '../../globals.css';
+import FindModal from "@/app/component/modal/FindModal";
+
+const sampleDepart = [
+    {dept_idx:1 , dept_name:'인사부'},
+    {dept_idx:2 , dept_name:'총무부'},
+    {dept_idx:3 , dept_name:'기획부'},
+    {dept_idx:4 , dept_name:'회계부'},
+    {dept_idx:5 , dept_name:'생상관리부'},
+];
+
+const LoginPage = () => {
+
+    const [find,setFind]=useState(false);
+    const [tab, setTab]=useState('id');
+    const [result,setResult]=useState(false);
+    const [login, setLogin] = useState({
+            id: '',
+            pw: '',
+            dept: '',
+        });
+    const [findForm, setFindForm] = useState({
+        id:'',
+        email:'',
+    })
+
+    // 로그인 form 입력
+    const loginChange = (e) => {
+        const {name, value} = e.target;
+        setLogin({
+            ...login,
+            [name]: value
+        });
+    }
+
+    // 찾기 form 입력
+    const findChange = (e) => {
+        const {name, value} = e.target;
+        setFindForm({
+            ...findForm,
+            [name]: value
+        });
+    }
+
+    // 찾기 모드 초기화
+    const findReset = () =>{
+        setFindForm({
+            id : '',
+            email : '',
+        })
+        setFind(false);
+        setResult(false);
+    }
+
+    return (
+        <div className='page-background'>
+            <Header/>
+            <div className='wrap main-back padding-120 flex justify-content-center'>
+                <div className='max-width-400'>
+                    <div>
+                        <img src="/logo.png" alt="logo" />
+                    </div>
+                    {!find ?(
+                        /*로그인 화면*/
+                    <div className='flex flex-direction-col'>
+                        <div><p className='text-align-left '>아이디</p></div>
+                        <div className='margin-bottom-10'><input type='text' placeholder='아이디를 입력하세요' value={login.id} name='id' onChange={e=>loginChange(e)}/></div>
+                        <div><p className='text-align-left '>비밀번호</p></div>
+                        <div className='margin-bottom-10'><input type='password' placeholder='비밀번호를 입력하세요' value={login.pw} name='pw' onChange={e=>loginChange(e)}/></div>
+                        <div><p className='text-align-left '>부서</p></div>
+                        <div className='margin-y-10'>
+                            <select className='width-100 login-select' id='dept' onChange={e=>loginChange(e)}>
+                                {sampleDepart && sampleDepart.map(dept => (
+                                    <option key={dept.dept_idx} value={dept.dept_idx}>{dept.dept_name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className='margin-bottom-10'>
+                            <div className='flex flex-direction-row justify-right gap_10'>
+                                <Link href='/component/join'><p className='login-link'>회원가입</p></Link>
+                                <p className='login-link cursor-pointer' onClick={()=>setFind(true)}>아이디/비밀번호 찾기</p>
+                            </div>
+                        </div>
+                        <div className='flex justify-content-center'>
+                            <button className='login-btn white-space-nowrap'>로그인</button>
+                        </div>
+                    </div>
+                    ):(
+                    <>
+                    {!result ? (
+                        <>
+                            {/* 탭 버튼 */}
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '12px',
+                                marginBottom: '24px'
+                            }}>
+                                <button
+                                    className={`btn label white_color ${tab === 'id' ? 'bg_primary_color_2' : 'bg_primary_color_2'}`}
+                                    style={{
+                                        padding: '8px 20px',
+                                        cursor: 'pointer',
+                                        fontWeight: tab === 'id' ? 'bold' : 'normal'
+                                    }}
+                                    onClick={() => setTab('id')}
+                                >
+                                    아이디 찾기
+                                </button>
+                                <button
+                                    className={`btn label white_color ${tab === 'pw' ? 'bg_primary_color_1' : 'bg_primary_color_2'}`}
+                                    style={{
+                                        padding: '8px 20px',
+                                        cursor: 'pointer',
+                                        fontWeight: tab === 'pw' ? 'bold' : 'normal'
+                                    }}
+                                    onClick={() => setTab('pw')}
+                                >
+                                    비밀번호 찾기
+                                </button>
+                            </div>
+                                {/*아이디 / 비밀번호 찾기 화면*/}
+                            <div className='flex flex-direction-col'>
+                                {/*비밀번호 찾기면 아이디도 입력*/}
+                                {tab === 'pw' &&
+                                    (<>
+                                        <div><p className='text-align-left margin-0'>아이디</p></div>
+                                        <div className='margin-bottom-10'><input type='text' placeholder='아이디를 입력하세요' value={findForm.id} name='id' onChange={e=>findChange(e)}/></div>
+                                    </>)}
+                                <div><p className='text-align-left margin-0'>이메일</p></div>
+                                <div className='margin-bottom-10'><input type='text' placeholder='이메일을 입력하세요' value={findForm.email} name='email' onChange={e=>findChange(e)}/></div>
+                                <div className='flex justify-content-center gap_20'>
+                                    <button className='login-find-btn' onClick={()=>setFind(false)}>뒤로가기</button>
+                                    <button className='login-find-btn' onClick={()=>setResult(true)}>본인 인증</button>
+                                </div>
+                            </div>
+                        </>
+                            ) : (
+                            /*결과 화면*/
+                            <>
+                                {/*아이디 찾기 일 경우*/}
+                                {tab === 'id' &&
+                                    <div className='flex flex-direction-col gap_10'>
+                                        <div><p>아이디</p></div>
+                                        <div><p>12345</p></div>
+                                        <div className='flex justify-content-center'><button className='login-btn cursor-pointer' onClick={()=>findReset()}>로그인하기</button></div>
+                                    </div>
+                                }
+                                {/*비밀번호 찾기 일 경우*/}
+                                {tab === 'pw' &&
+                                    <div className='flex flex-direction-col gap_10'>
+                                        <div>
+                                            <p className='text-align-left'>새 비밀번호</p>
+                                            <input type='password'/>
+                                        </div>
+                                        <div>
+                                            <p className='text-align-left'>비밀번호 확인</p>
+                                            <input type='password'/>
+                                        </div>
+                                        <div className='flex justify-content-center'><button className='login-btn cursor-pointer' onClick={()=>findReset()}>비밀번호 변경하기</button></div>
+                                    </div>}
+                            </>
+                            )}
+                    </>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default LoginPage;

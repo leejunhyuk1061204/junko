@@ -45,11 +45,11 @@ body {
     display: block;
 }
 
-/*button,*/
+button,
 /*input:not([type="checkbox"]):not([type="radio"]),*/
-/*textarea {*/
-/*    all: unset;*/
-/*}*/
+textarea {
+    all: unset;
+}
 
 a {
     text-decoration: none;
@@ -91,13 +91,13 @@ input[type='checkbox'],input[type='radio']{
     all : revert !important;
 }
 
-input[type='text']{
+input[type='text'],input[type='password']{
     width: 100%;
     margin : 10px 0;
     border : 1px solid var(--border-color);
     border-radius : var(--border-radius);
 }
-input[type='text']:focus{
+input[type='text']:focus,input[type='password']:focus{
     outline-color: var(--gray-color);
 }
 
@@ -114,15 +114,43 @@ input[type='text']:focus{
     width: 80px;
 }
 
-.width-100{
+.width-100px{
     width: 100px;
+}
+
+.width-100 {
+    width: 100%;
+}
+
+.padding-30{
+    padding: 30px;
+}
+
+.padding-120 {
+    padding: 120px;
 }
 
 /*---------------------------- -------------------------*/
 
+.btn{
+    padding: 3px 15px;
+    box-sizing: border-box;
+    border : 1px solid var(--border-color);
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #fff ;
+    box-shadow: var(--shadow);
+}
+
+.btn:hover{
+    background-color:#b8bcc3;
+    border : 1px solid #b8bcc3;
+}
+
 .wrap{
     width: 100%;
-    max-width: 1400px;
+    /*max-width: 1400px;*/
     margin: 0 auto;
     box-sizing: border-box;
     background: var(--background-color);
@@ -193,6 +221,14 @@ input[type='text']:focus{
     background-color: var(--background-color);
 }
 
+.margin-0 {
+    margin: 0;
+}
+
+.margin-20 {
+    margin: 20px;
+}
+
 .margin-auto {
     margin: auto;
 }
@@ -226,16 +262,52 @@ input[type='text']:focus{
 }
 
 .text-align-left {
-    margin-left: 20px;
     text-align: left;
+}
+
+.margin-left-20 {
+    margin-left: 20px;
 }
 
 .text-align-center {
     text-align: center;
 }
 
+.back-shadow {
+    box-shadow: 4px 4px 5px rgba(0,0,0,0.15);
+}
+
+.back-radius {
+    border-radius: 34px;
+}
+
+.outline-gray {
+    outline-color: var(--gray-color);
+}
+
+.border-gray {
+    border-color: var(--gray-color);
+}
+
+.max-width-500 {
+    max-width: 500px;
+}
+
+.max-width-400 {
+    max-width: 400px;
+}
+
+.max-width-300 {
+    max-width: 300px;
+}
 
 /*---------------------------------------------------------*/
+
+.page-background {
+    min-height: 100vh;
+    background-color: var(--background-color);
+    /*padding: 20px;*/
+}
 
 .header {
     width: 100%;           /* 전체 화면 너비 차지 */
@@ -245,9 +317,17 @@ input[type='text']:focus{
     box-sizing: border-box;
 }
 
+.header-logo {
+    padding: 5px;
+}
+
 .header-text {
     font-size: 30px;
     font-weight: bold;
+}
+
+.header-login-text {
+    font-size: 20px;
 }
 
 .header-date-text {
@@ -334,9 +414,10 @@ input[type='text']:focus{
 .product-list-back{
     width: auto;
     background-color: white;
-    border-radius: 0 0 8px 8px;
-    padding: 20px;
-    box-shadow: var(--shadow);
+    border-radius: 49px;
+    padding: 40px;
+    box-shadow: 4px 4px 5px rgba(0,0,0,0.15);
+    overflow-x: auto;
 }
 
 .select-container{
@@ -374,7 +455,7 @@ input[type='text']:focus{
 }
 
 .select-btn:focus{
-    background-color: var(--background-color);
+    background-color: #C0D5FF;
 }
 
 .select-option-item {
@@ -412,12 +493,12 @@ input[type='text']:focus{
 
 .product-table{
     width: 100%;
-    min-width: 400px;
 }
 
 .product-modal-select{
     width: 100%;
     border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
 }
 
 .product-modal-btn {
@@ -430,5 +511,41 @@ input[type='text']:focus{
 
 .product-list {
     width: 100%;
-    overflow-x: auto;
+}
+
+.login-select {
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.login-btn {
+    cursor: pointer;
+    width: fit-content;
+    border: 1px solid var(--border-color);
+    background-color: #C9C9C9;
+    padding: 10px 100px;
+    border-radius: var(--border-radius);
+}
+
+.login-link {
+    font-size: 13px;
+    text-decoration: underline;
+}
+
+.login-find-btn {
+    padding: 7px 12px;
+    background-color: #C9C9C9;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+}
+
+.login-find-btn:hover {
+    background-color: var(--primary-color-2);
+}
+
+.join-overRay-btn {
+    padding: 2px 12px;
+    font-size: 12px;
+    background-color: #C9C9C9;
+    border-radius: var(--border-radius);
 }

@@ -10,7 +10,7 @@ const sampleCategory = [
     { id:5, name:'기타' },
 ]
 
-const ExamModal = ({open,val,onClose}) => {
+const ExamModal = ({open,val,onClose,list}) => {
 
     const [category,setCategory] = useState(sampleCategory);
     const [product,setProduct] = useState({
@@ -83,8 +83,9 @@ const ExamModal = ({open,val,onClose}) => {
                 <>
 
                     {/* 탭 내용 */}
-                    <div style={{ display: 'flex',flexDirection:'column', gap: '16px', background:'#fff', padding:'20px'}}>
+                    <div className='back-shadow back-radius' style={{ display: 'flex',flexDirection:'column', gap: '16px', background:'#fff', padding:'20px'}}>
                         {val === 'regist' ? (
+                            // 등록일 때
                         <>
                             <div className='flex white-space-nowrap align-center gap_20'>
                                 <p className='content_text width-100'>상품명</p>
@@ -114,10 +115,12 @@ const ExamModal = ({open,val,onClose}) => {
                                     ))}
                                 </select>
                             </div>
-
-
                         </>
-                        ):'' }
+                        ):(
+                            // 수정일 때
+                            <>
+                            </>
+                        )}
                     </div>
                 </>
                 <div style={{marginTop: '20px'}}>
