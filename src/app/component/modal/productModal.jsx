@@ -10,8 +10,11 @@ const sampleCategory = [
     { id:5, name:'기타' },
 ]
 
-const ExamModal = ({open,val,onClose,list}) => {
+const ExamModal = ({open,val,onClose,productList}) => {
 
+    const [allSelect, setAllSelect] = useState(false);
+    const [selectColumn, setSelectColumn] = useState(false);
+    const [updateColumns,setUpdateColumns]= useState([]);
     const [category,setCategory] = useState(sampleCategory);
     const [product,setProduct] = useState({
         product_name:'',
@@ -24,6 +27,9 @@ const ExamModal = ({open,val,onClose,list}) => {
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
+        setAllSelect(false);
+        setSelectColumn(false);
+        setUpdateColumns([]);
         onClose();
     };
 
@@ -34,6 +40,45 @@ const ExamModal = ({open,val,onClose,list}) => {
             ...product,
             [name]:value
         })
+    }
+
+    // 수정항목 선택
+    const makeUpdateColumns = (str) => {
+        if(updateColumns.includes(str)){
+            const filteredList = updateColumns.filter((item) => item !== str);
+            setUpdateColumns(filteredList);
+        } else {
+            setUpdateColumns((prev)=>[...prev, str]);
+        }
+    }
+
+    //
+    const allColumns = () => {
+        if(!allSelect) {
+            let col = ['상품명', '규격', '입고단가', '판매단가', '할인율', '카테고리'];
+            setAllSelect(true);
+            setUpdateColumns(col);
+        } else {
+            setAllSelect(false);
+            setUpdateColumns([]);
+        }
+    }
+    //
+    const whatIsColumn = (p,column) => {
+        switch (column) {
+            case '상품명':
+                return p.product_name;
+            case '규격':
+                return p.product_standard;
+            case '입고단가':
+                return p.purchase_price;
+            case '판매단가':
+                return p.selling_price;
+            case '할인율':
+                return p.discount_rate;
+            case '카테고리':
+                return p.category;
+        }
     }
 
     if (!open) return null;
@@ -84,8 +129,8 @@ const ExamModal = ({open,val,onClose,list}) => {
 
                     {/* 탭 내용 */}
                     <div className='back-shadow back-radius' style={{ display: 'flex',flexDirection:'column', gap: '16px', background:'#fff', padding:'20px'}}>
-                        {val === 'regist' ? (
-                            // 등록일 때
+                        {/*등록일 때*/}
+                        {val === 'regist' && (
                         <>
                             <div className='flex white-space-nowrap align-center gap_20'>
                                 <p className='content_text width-100'>상품명</p>
@@ -116,15 +161,81 @@ const ExamModal = ({open,val,onClose,list}) => {
                                 </select>
                             </div>
                         </>
-                        ):(
-                            // 수정일 때
+                        )}
+                        {/*수정일 때*/}
+                        {val === 'update' && (
                             <>
+                                {!selectColumn ?
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>수정 항목</th>
+                                            <th>전체 선택<input type='checkbox' checked={allSelect} onChange={()=>allColumns()}/></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>상품명</td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('상품명')} onChange={()=>makeUpdateColumns('상품명')}/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>규격</td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('규격')} onChange={()=>makeUpdateColumns('규격')}/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>입고단가</td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('입고단가')} onChange={()=>makeUpdateColumns('입고단가')}/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>판매단가</td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('판매단가')} onChange={()=>makeUpdateColumns('판매단가')}/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>할인율</td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('할인율')} onChange={()=>makeUpdateColumns('할인율')}/></td>
+                                        </tr>
+                                        <tr>
+                                            <td>카테고리</td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('카테고리')} onChange={()=>makeUpdateColumns('카테고리')}/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                    :
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th>상품코드</th>
+                                            {updateColumns.map((c,idx) => (
+                                                <th key={idx}>{c}</th>
+                                            ))}
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {productList.map(p => (
+                                            <tr>
+                                                <td>{p.product_idx}</td>
+                                                {updateColumns.map((c,idx) => (
+                                                    <td key={idx}>{whatIsColumn(p,c)}</td>
+                                                ))}
+                                            </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                }
                             </>
                         )}
                     </div>
                 </>
                 <div style={{marginTop: '20px'}}>
-                    <button className='product-modal-btn'>{val==='regist'?'등록':'수정'}</button>
+                    {val ==='regist' &&
+                        <button className='product-modal-btn cursor-pointer'>등록</button>
+                    }
+                    {val ==='update' &&(
+                        !selectColumn ?
+                        <button className='product-modal-btn cursor-pointer' onClick={()=>setSelectColumn(true)}>선택</button>
+                            :
+                        <button className='product-modal-btn cursor-pointer'>수정</button>
+                    )}
                 </div>
             </div>
         </div>

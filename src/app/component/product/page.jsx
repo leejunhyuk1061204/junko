@@ -153,12 +153,12 @@ const ProductPage = () => {
     const [productModalOpen, setProductModalOpen] = useState({bool : false, val : ''});
 
     // 상품 체크박스 선택
-    const makeCheckedList = (idx) => {
-        if(checkedList.includes(idx)){
-            const filteredList = checkedList.filter((item) => item !== idx);
+    const makeCheckedList = (p) => {
+        if(checkedList.includes(p)){
+            const filteredList = checkedList.filter((item) => item.product_idx !== p.product_idx);
             setCheckedList(filteredList);
         } else {
-            setCheckedList((prev)=>[...prev, idx]);
+            setCheckedList((prev)=>[...prev, p]);
         }
     }
 
@@ -179,6 +179,19 @@ const ProductPage = () => {
         } else {
             setOpen(0);
         }
+    }
+
+    // 상품 전체선택
+    const productAllSelect = () => {
+        if(!productAll) {
+            setCheckedList([]);
+            sampleProducts?.map((item) => {
+                setCheckedList((prev)=>[...prev, item]);
+            })
+        } else {
+            setCheckedList([]);
+        }
+        setProductAll(!productAll);
     }
 
     // 상품 삭제
@@ -258,7 +271,7 @@ const ProductPage = () => {
                     <table className='product-table'>
                         <thead>
                             <tr>
-                                <th className='text-align-center'><input type='checkbox' checked={productAll} onChange={()=>{setProductAll(!productAll);setCheckedList([]);}}/>전체선택</th>
+                                <th className='text-align-center'><input type='checkbox' checked={productAll} onChange={()=>productAllSelect()}/>전체선택</th>
                                 <th>상품코드</th>
                                 <th>상품명</th>
                                 <th>규격</th>
@@ -274,7 +287,7 @@ const ProductPage = () => {
                         {sampleProducts &&
                             sampleProducts?.map(p => (
                                 <tr key={p.product_idx} onClick={()=>optionOpen(p.product_idx)} className='cursor-pointer'>
-                                    <td><input type='checkbox' checked={productAll ? true : checkedList.includes(p.product_idx)} onChange={()=>makeCheckedList(p.product_idx)} onClick={(e)=>e.stopPropagation()}/></td>
+                                    <td><input type='checkbox' checked={checkedList.includes(p)} onChange={()=>makeCheckedList(p)} onClick={(e)=>e.stopPropagation()}/></td>
                                     <td>{p.product_idx}</td>
                                     <td>{p.product_name}</td>
                                     <td>{p.product_standard}</td>
@@ -326,7 +339,7 @@ const ProductPage = () => {
                 </div>
                 ):''}
             </div>
-            <ProductModal open={productModalOpen.bool} val={productModalOpen.val} onClose={()=>setProductModalOpen({bool:false,val:''})} list={checkedList}/>
+            <ProductModal open={productModalOpen.bool} val={productModalOpen.val} onClose={()=>setProductModalOpen({bool:false,val:''})} productList={checkedList}/>
         </div>
     );
 };

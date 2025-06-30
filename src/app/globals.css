@@ -569,8 +569,24 @@ input[type='text']:focus,input[type='password']:focus{
     font-size: 14px;
 }
 
-.product-table{
+.product-table {
+    /*border-collapse: separate;*/
+    border-spacing: 0 8px; /* 위아래 간격 줌 */
     width: 100%;
+}
+
+.product-table th {
+    position: relative;
+}
+
+.product-table th:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 8px;     /* 위쪽 여백 */
+    bottom: 8px;  /* 아래쪽 여백 */
+    right: 0;
+    width: 1px;
+    background: #ccc;
 }
 
 .product-modal-select{

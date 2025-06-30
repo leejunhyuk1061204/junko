@@ -145,9 +145,12 @@ const LoginPage = () => {
                                 {/*아이디 찾기 일 경우*/}
                                 {tab === 'id' &&
                                     <div className='flex flex-direction-col gap_10'>
-                                        <div><p>아이디</p></div>
-                                        <div><p>12345</p></div>
-                                        <div className='flex justify-content-center'><button className='login-btn cursor-pointer' onClick={()=>findReset()}>로그인하기</button></div>
+                                        <div className='flex justify-content-center gap_10 padding-30 white-space-nowrap' style={{fontSize:'20px',textAlign:'center'}}>
+                                            <p>회원님의 아이디는</p>
+                                            <p style={{fontSize:'25px', textAlign:'center', color:'#006DCC'}}>12345</p>
+                                            <p>입니다</p>
+                                        </div>
+                                        <div className='flex justify-content-center'><button className='login-btn cursor-pointer' style={{background:'#006DCC', color:'#fff'}} onClick={()=>findReset()}>로그인하기</button></div>
                                     </div>
                                 }
                                 {/*비밀번호 찾기 일 경우*/}
