@@ -23,6 +23,8 @@
     --border-radius: 0.375rem;
     --success-color: #28a745;
     --background-color: #F4F6FA;
+    --red-color: #E86060;
+    --blue-btn-color: #026CC7;
 }
 
 
@@ -85,6 +87,28 @@ table thead th {
 
 table tr.selected {
     background-color: rgba(74, 144, 226, 0.1);
+}
+
+/* 옆 세로선 */
+table {
+    /*border-collapse: separate;*/
+    border-spacing: 0 8px; /* 위아래 간격 줌 */
+    width: 100%;
+}
+
+table th {
+    position: relative;
+}
+
+table th:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 8px;     /* 위쪽 여백 */
+    bottom: 8px;  /* 아래쪽 여백 */
+    right: 0;
+    width: 1px;
+    background: #ccc;
+    z-index: 1;
 }
 
 input[type='checkbox'],input[type='radio']{
@@ -265,6 +289,14 @@ input[type='text']:focus,input[type='password']:focus{
     text-align: left;
 }
 
+.margin-left-5 {
+    margin-left: 5px;
+}
+
+.margin-left-10 {
+    margin-left: 10px;
+}
+
 .margin-left-20 {
     margin-left: 20px;
 }
@@ -299,6 +331,10 @@ input[type='text']:focus,input[type='password']:focus{
 
 .max-width-300 {
     max-width: 300px;
+}
+
+.font-color-red {
+    color: var(--red-color);
 }
 
 /*---------------------------------------------------------*/
@@ -525,6 +561,7 @@ input[type='text']:focus,input[type='password']:focus{
     line-height: 20px;
     width: 92%;
     font-size: 14px;
+    z-index: 2;
 }
 
 .select-btn:hover {
@@ -567,26 +604,6 @@ input[type='text']:focus,input[type='password']:focus{
     border-radius: 6px;
     padding: 5px 15px;
     font-size: 14px;
-}
-
-.product-table {
-    /*border-collapse: separate;*/
-    border-spacing: 0 8px; /* 위아래 간격 줌 */
-    width: 100%;
-}
-
-.product-table th {
-    position: relative;
-}
-
-.product-table th:not(:last-child)::after {
-    content: "";
-    position: absolute;
-    top: 8px;     /* 위쪽 여백 */
-    bottom: 8px;  /* 아래쪽 여백 */
-    right: 0;
-    width: 1px;
-    background: #ccc;
 }
 
 .product-modal-select{
