@@ -4,9 +4,9 @@ import Header from "@/app/header";
 import '../../globals.css';
 import Image from "next/image";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
-import ExamModal from "@/app/component/modal/ExamModal";
 import ProductModal from "@/app/component/modal/productModal";
 import {useAlertModalStore} from "@/app/zustand/store";
+import OptionModal from "@/app/component/modal/OptionModal";
 
 const sampleProducts =[
     {
@@ -145,25 +145,26 @@ const ProductPage = () => {
     const { openModal, closeModal } = useAlertModalStore();
     const [selectedOrder, setSelectedOrder] = useState(order_options[1]);
     const [selectedOption, setSelectedOption] = useState(options[0]);
-    const [checkedList, setCheckedList] = useState([]);
+    const [productList, setProductList] = useState([]);
     const [optionList, setOptionList] = useState([]);
     const [open, setOpen] = useState(0);
     const [productAll,setProductAll] = useState(false);
     const [optionAll, setOptionAll] = useState(false);
     const [productModalOpen, setProductModalOpen] = useState({bool : false, val : ''});
+    const [optionModalOpen, setOptionModalOpen] = useState({bool : false, val : ''});
 
     // 상품 체크박스 선택
-    const makeCheckedList = (p) => {
-        if(checkedList.includes(p)){
-            const filteredList = checkedList.filter((item) => item.product_idx !== p.product_idx);
-            setCheckedList(filteredList);
+    const makeProductList = (p) => {
+        if(productList.includes(p)){
+            const filteredList = productList.filter((item) => item.product_idx !== p.product_idx);
+            setProductList(filteredList);
         } else {
-            setCheckedList((prev)=>[...prev, p]);
+            setProductList((prev)=>[...prev, p]);
         }
     }
 
     // 옵션 체크박스 선택
-    const makeOptionCheckedList = (idx) => {
+    const makeOptionProductList = (idx) => {
         if(optionList.includes(idx)){
             const filteredList = optionList.filter((item) => item !== idx);
             setOptionList(filteredList);
@@ -184,19 +185,19 @@ const ProductPage = () => {
     // 상품 전체선택
     const productAllSelect = () => {
         if(!productAll) {
-            setCheckedList([]);
+            setProductList([]);
             sampleProducts?.map((item) => {
-                setCheckedList((prev)=>[...prev, item]);
+                setProductList((prev)=>[...prev, item]);
             })
         } else {
-            setCheckedList([]);
+            setProductList([]);
         }
         setProductAll(!productAll);
     }
 
     // 상품 삭제
     const DeleteProduct = () => {
-        const success = checkedList>0 ;
+        const success = productList>0 ;
         openModal({
             svg: '❓',
             msg1: '삭제 확인',
@@ -287,7 +288,7 @@ const ProductPage = () => {
                         {sampleProducts &&
                             sampleProducts?.map(p => (
                                 <tr key={p.product_idx} onClick={()=>optionOpen(p.product_idx)} className='cursor-pointer'>
-                                    <td><input type='checkbox' checked={checkedList.includes(p)} onChange={()=>makeCheckedList(p)} onClick={(e)=>e.stopPropagation()}/></td>
+                                    <td><input type='checkbox' checked={productList.includes(p)} onChange={()=>makeProductList(p)} onClick={(e)=>e.stopPropagation()}/></td>
                                     <td>{p.product_idx}</td>
                                     <td>{p.product_name}</td>
                                     <td>{p.product_standard}</td>
@@ -323,7 +324,7 @@ const ProductPage = () => {
                         <tbody>
                         {sampleOptions && sampleOptions?.map(o=>(
                             <tr key={o.option_idx}>
-                                <td><input type='checkbox' key={o.option_idx} checked={optionAll ? true : optionList.includes(o.option_idx)} onChange={()=>makeOptionCheckedList(o.option_idx)}/></td>
+                                <td><input type='checkbox' key={o.option_idx} checked={optionAll ? true : optionList.includes(o.option_idx)} onChange={()=>makeOptionProductList(o.option_idx)}/></td>
                                 <td>{o.product_name}</td>
                                 <td>{o.option_name}</td>
                                 <td>{o.stock_quantity}</td>
@@ -332,14 +333,15 @@ const ProductPage = () => {
                         </tbody>
                     </table>
                     <div className='flex'>
-                        <button className='product-btn'>등록</button>
-                        <button className='product-btn'>수정</button>
+                        <button className='product-btn' onClick={()=>{setOptionModalOpen({bool:true,val:'regist'})}}>등록</button>
+                        <button className='product-btn' onClick={()=>{setOptionModalOpen({bool:true,val:'update'})}}>수정</button>
                         <button className='product-btn-del'>삭제</button>
                     </div>
                 </div>
                 ):''}
             </div>
-            <ProductModal open={productModalOpen.bool} val={productModalOpen.val} onClose={()=>setProductModalOpen({bool:false,val:''})} productList={checkedList}/>
+            <ProductModal open={productModalOpen.bool} val={productModalOpen.val} onClose={()=>setProductModalOpen({bool:false,val:''})} productList={productList}/>
+            <OptionModal open={optionModalOpen.bool} val={optionModalOpen.val} onClose={()=>setOptionModalOpen({bool:false,val:''})} optionList={optionList}/>
         </div>
     );
 };

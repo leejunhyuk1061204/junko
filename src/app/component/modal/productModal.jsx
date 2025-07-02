@@ -1,5 +1,5 @@
 'use client'
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 
 const sampleCategory = [
@@ -16,6 +16,7 @@ const ExamModal = ({open,val,onClose,productList}) => {
     const [selectColumn, setSelectColumn] = useState(false);
     const [updateColumns,setUpdateColumns]= useState([]);
     const [category,setCategory] = useState(sampleCategory);
+    const [products,setProducts] = useState(productList);
     const [product,setProduct] = useState({
         product_name:'',
         product_standard:'',
@@ -24,6 +25,10 @@ const ExamModal = ({open,val,onClose,productList}) => {
         discount_rate:0,
         category:'',
     });
+
+    useEffect(() => {
+        setProducts(productList);
+    }, [productList]);
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
@@ -38,24 +43,25 @@ const ExamModal = ({open,val,onClose,productList}) => {
         const {name, value} = e.target;
         setProduct({
             ...product,
-            [name]:value
-        })
+            [name]: value
+        });
+
     }
 
     // 수정항목 선택
-    const makeUpdateColumns = (str) => {
-        if(updateColumns.includes(str)){
-            const filteredList = updateColumns.filter((item) => item !== str);
+    const makeUpdateColumns = (col) => {
+        if(updateColumns.includes(col)){
+            const filteredList = updateColumns.filter((item) => item !== col);
             setUpdateColumns(filteredList);
         } else {
-            setUpdateColumns((prev)=>[...prev, str]);
+            setUpdateColumns((prev)=>[...prev, col]);
         }
     }
 
     //
     const allColumns = () => {
         if(!allSelect) {
-            let col = ['상품명', '규격', '입고단가', '판매단가', '할인율', '카테고리'];
+            let col = ['product_name', 'product_standard', 'purchase_price', 'selling_price', 'discount_rate', 'category'];
             setAllSelect(true);
             setUpdateColumns(col);
         } else {
@@ -63,22 +69,34 @@ const ExamModal = ({open,val,onClose,productList}) => {
             setUpdateColumns([]);
         }
     }
-    //
-    const whatIsColumn = (p,column) => {
+
+    // 선택된 컬럼이 어떤 컬럼인지
+    const whatIsColumn = (column) => {
         switch (column) {
-            case '상품명':
-                return p.product_name;
-            case '규격':
-                return p.product_standard;
-            case '입고단가':
-                return p.purchase_price;
-            case '판매단가':
-                return p.selling_price;
-            case '할인율':
-                return p.discount_rate;
-            case '카테고리':
-                return p.category;
+            case 'product_name':
+                return '상품명';
+            case 'product_standard':
+                return '규격';
+            case 'purchase_price':
+                return '입고단가';
+            case 'selling_price':
+                return '판매단가';
+            case 'discount_rate':
+                return '할인율';
+            case 'category':
+                return '카테고리';
         }
+    }
+
+    // 상품 수정
+    const updateProduct = (e,col,idx) =>{
+        const {value} = e.target;
+        setProducts(prev=>
+            prev.map((item)=>
+                item.product_idx === idx?
+                    {...item,[col]:value} : item
+            )
+        );
     }
 
     if (!open) return null;
@@ -107,7 +125,7 @@ const ExamModal = ({open,val,onClose,productList}) => {
                     padding: '40px 30px',
                     minWidth: '320px',
                     position: 'relative',
-                    width: '700px'
+                    width: '900px'
                 }}
             >
                 <button
@@ -165,8 +183,11 @@ const ExamModal = ({open,val,onClose,productList}) => {
                         {/*수정일 때*/}
                         {val === 'update' && (
                             <>
-                                {!selectColumn ?
-                                <table className='table-th'>
+                                {products && products.length === 0 ? (
+                                    <p>선택된 상품이 없습니다</p>
+                                ):
+                                !selectColumn ?
+                                <table>
                                     <thead>
                                         <tr>
                                             <th>수정 항목</th>
@@ -176,27 +197,27 @@ const ExamModal = ({open,val,onClose,productList}) => {
                                     <tbody>
                                         <tr>
                                             <td>상품명</td>
-                                            <td><input type='checkbox' checked={updateColumns.includes('상품명')} onChange={()=>makeUpdateColumns('상품명')}/></td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('product_name')} onChange={()=>makeUpdateColumns('product_name')}/></td>
                                         </tr>
                                         <tr>
                                             <td>규격</td>
-                                            <td><input type='checkbox' checked={updateColumns.includes('규격')} onChange={()=>makeUpdateColumns('규격')}/></td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('product_standard')} onChange={()=>makeUpdateColumns('product_standard')}/></td>
                                         </tr>
                                         <tr>
                                             <td>입고단가</td>
-                                            <td><input type='checkbox' checked={updateColumns.includes('입고단가')} onChange={()=>makeUpdateColumns('입고단가')}/></td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('purchase_price')} onChange={()=>makeUpdateColumns('purchase_price')}/></td>
                                         </tr>
                                         <tr>
                                             <td>판매단가</td>
-                                            <td><input type='checkbox' checked={updateColumns.includes('판매단가')} onChange={()=>makeUpdateColumns('판매단가')}/></td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('selling_price')} onChange={()=>makeUpdateColumns('selling_price')}/></td>
                                         </tr>
                                         <tr>
                                             <td>할인율</td>
-                                            <td><input type='checkbox' checked={updateColumns.includes('할인율')} onChange={()=>makeUpdateColumns('할인율')}/></td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('discount_rate')} onChange={()=>makeUpdateColumns('discount_rate')}/></td>
                                         </tr>
                                         <tr>
                                             <td>카테고리</td>
-                                            <td><input type='checkbox' checked={updateColumns.includes('카테고리')} onChange={()=>makeUpdateColumns('카테고리')}/></td>
+                                            <td><input type='checkbox' checked={updateColumns.includes('category')} onChange={()=>makeUpdateColumns('category')}/></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -206,17 +227,21 @@ const ExamModal = ({open,val,onClose,productList}) => {
                                         <tr>
                                             <th>상품코드</th>
                                             {updateColumns.map((c,idx) => (
-                                                <th key={idx}>{c}</th>
+                                                <th key={idx}>{whatIsColumn(c)}</th>
                                             ))}
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {productList.map(p => (
+                                        {products.map(p => (
                                             <tr>
                                                 <td>{p.product_idx}</td>
-                                                {updateColumns.map((c,idx) => (
-                                                    <td key={idx}>{whatIsColumn(p,c)}</td>
-                                                ))}
+                                                {updateColumns.map((c,idx) => {
+                                                    return (
+                                                    <td key={idx}><input type='text'
+                                                                         value={p[c] ?? ''} name={c}
+                                                                         onChange={(e)=>updateProduct(e,c,p.product_idx)}/>
+                                                    </td>
+                                                    )})}
                                             </tr>
                                             ))}
                                         </tbody>
@@ -228,13 +253,13 @@ const ExamModal = ({open,val,onClose,productList}) => {
                 </>
                 <div style={{marginTop: '20px'}}>
                     {val ==='regist' &&
-                        <button className='product-modal-btn cursor-pointer'>등록</button>
+                        <button className='product-modal-btn cursor-pointer' onClick={handleClose}>등록</button>
                     }
                     {val ==='update' &&(
-                        !selectColumn ?
+                        products && products?.length > 0 && !selectColumn ?
                         <button className='product-modal-btn cursor-pointer' onClick={()=>setSelectColumn(true)}>선택</button>
                             :
-                        <button className='product-modal-btn cursor-pointer'>수정</button>
+                        <button className='product-modal-btn cursor-pointer' onClick={handleClose}>수정</button>
                     )}
                 </div>
             </div>
