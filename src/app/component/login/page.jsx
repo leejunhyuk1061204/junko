@@ -71,14 +71,14 @@ const LoginPage = () => {
                         <div className='margin-bottom-10'><input type='text' placeholder='아이디를 입력하세요' value={login.id} name='id' onChange={e=>loginChange(e)}/></div>
                         <div><p className='text-align-left '>비밀번호</p></div>
                         <div className='margin-bottom-10'><input type='password' placeholder='비밀번호를 입력하세요' value={login.pw} name='pw' onChange={e=>loginChange(e)}/></div>
-                        <div><p className='text-align-left '>부서</p></div>
-                        <div className='margin-y-10'>
-                            <select className='width-100 login-select' id='dept' onChange={e=>loginChange(e)}>
-                                {sampleDepart && sampleDepart.map(dept => (
-                                    <option key={dept.dept_idx} value={dept.dept_idx}>{dept.dept_name}</option>
-                                ))}
-                            </select>
-                        </div>
+                        {/*<div><p className='text-align-left '>부서</p></div>*/}
+                        {/*<div className='margin-y-10'>*/}
+                        {/*    <select className='width-100 login-select' id='dept' onChange={e=>loginChange(e)}>*/}
+                        {/*        {sampleDepart && sampleDepart.map(dept => (*/}
+                        {/*            <option key={dept.dept_idx} value={dept.dept_idx}>{dept.dept_name}</option>*/}
+                        {/*        ))}*/}
+                        {/*    </select>*/}
+                        {/*</div>*/}
                         <div className='margin-bottom-10'>
                             <div className='flex flex-direction-row justify-right gap_10'>
                                 <Link href='/component/join'><p className='login-link'>회원가입</p></Link>

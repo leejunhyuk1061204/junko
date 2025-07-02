@@ -1,5 +1,5 @@
 'use client'
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {FaP, FaPlus} from "react-icons/fa6";
 import {CiCircleMinus} from "react-icons/ci";
 
@@ -21,12 +21,20 @@ const sampleOption_value = [
     {idx:9,key:3,value:'밸류3'},
 ]
 
+const sampleCombined = [
+    {idx:1,option_name:'R-S-밸류1',cnt:13,min_cnt:5},
+    {idx:1,option_name:'R-M-밸류2',cnt:29,min_cnt:5},
+    {idx:1,option_name:'R-L-밸류3',cnt:33,min_cnt:5},
+]
+
+
 const ExamModal = ({open,onClose,val,optionList}) => {
 
     const [optionKey, setOptionKey] = useState(sampleOption_key);
     const [optionValue, setOptionValue] = useState(sampleOption_value);
     const [selectedValue, setSelectedValue] = useState({});
     const [combined, setCombined] = useState([]);
+    const [options,setOptions]=useState(sampleCombined);
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
@@ -89,7 +97,9 @@ const ExamModal = ({open,onClose,val,optionList}) => {
 
                     {/* 탭 내용 */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                        {val==='regist' && (
                         <>
+
                             <div className='flex'>
                                 {optionKey?.map(key=>
                                     <div key={key.idx} className='flex flex-direction-col gap_10 align-center'>
@@ -122,14 +132,64 @@ const ExamModal = ({open,onClose,val,optionList}) => {
                                         {combined.map((item,idx)=>(
                                             <tr key={idx}>
                                                 <td>{Object.values(item).join('-')}</td>
-                                                <td><input type='number'/></td>
-                                                <td><input type='number'/></td>
+                                                <td><input type='text'/></td>
+                                                <td><input type='text'/></td>
                                             </tr>
                                             ))}
                                     </tbody>
                                 </table>
                             </div>
                         </>
+                        )}
+                        {val==='update' && (
+                            <>
+
+                                <div className='flex'>
+                                    {optionKey?.map(key=>
+                                        <div key={key.idx} className='flex flex-direction-col gap_10 align-center'>
+                                            <div>{key.key}<button className='cursor-pointer font-color-red margin-left-5'>[삭제]</button></div>
+                                            <select key={key.idx} onChange={(e)=>changeValue(e, key.key)}>
+                                                <option>선택</option>
+                                                {optionValue.filter(v=>v.key===key.idx).map(item=>
+                                                    <option key={item.idx} value={item.value}>{item.value}</option>
+                                                )}
+                                            </select>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className='flex'>
+                                    <div className='flex align-center justify-content-center'><button className='cursor-pointer'>옵션<FaPlus className='margin-left-5'/></button></div>
+                                    <div>
+                                        <button className='cursor-pointer' onClick={()=>setCombined(prev=>[...prev,selectedValue])}>등록</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <table>
+                                        <thead>
+                                        <tr>
+                                            <th>옵션명</th>
+                                            <th>현재 재고 수량</th>
+                                            <th>최소 재고 수량</th>
+                                            <th>삭제</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {options.map(item=>(
+                                            <tr key={item.idx}>
+                                                <td>{item.option_name}</td>
+                                                <td><input type='text' value={item.cnt}/></td>
+                                                <td><input type='text' value={item.min_cnt}/></td>
+                                                <td className='cursor-pointer font-color-red margin-left-5'>[삭제]</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
+                        <div>
+                            <button className='cursor-pointer btn btn-back-blue padding-30'>{val==='regist' ? '등록' : '수정'}</button>
+                        </div>
                     </div>
                 </>
             </div>
