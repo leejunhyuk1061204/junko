@@ -166,7 +166,7 @@ const ExamModal = ({open,val,onClose,productList}) => {
                         {val === 'update' && (
                             <>
                                 {!selectColumn ?
-                                <table>
+                                <table className='table-th'>
                                     <thead>
                                         <tr>
                                             <th>수정 항목</th>

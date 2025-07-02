@@ -311,7 +311,7 @@ const ProductPage = () => {
                 {/*옵션 테이블*/}
                 {open !== 0 ?(
                 <div className='product-list-back flex flex-direction-col'>
-                    <table className='product-table'>
+                    <table className='table-th'>
                         <thead>
                         <tr>
                             <th><input type='checkbox' checked={optionAll} onChange={()=>{setOptionAll(!optionAll);setOptionList([]);}}/>전체선택</th>

@@ -569,17 +569,17 @@ input[type='text']:focus,input[type='password']:focus{
     font-size: 14px;
 }
 
-.product-table {
+.table-th {
     /*border-collapse: separate;*/
     border-spacing: 0 8px; /* 위아래 간격 줌 */
     width: 100%;
 }
 
-.product-table th {
+.table-th th {
     position: relative;
 }
 
-.product-table th:not(:last-child)::after {
+.table-th th:not(:last-child)::after {
     content: "";
     position: absolute;
     top: 8px;     /* 위쪽 여백 */
