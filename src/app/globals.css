@@ -68,6 +68,7 @@ table {
     width: 100%;
     color: var(--dark-color);
     border-collapse: collapse;
+    border-bottom: 1px solid var(--border-color);
 }
 
 table th,
@@ -763,4 +764,9 @@ input[type='text']:focus,input[type='password']:focus{
 .order_table_input:focus {
     border : 1px solid var(--border-color);
     border-radius : var(--border-radius);
+}
+
+.order-product-text {
+    font-size: 20px;
+    font-weight: bold;
 }

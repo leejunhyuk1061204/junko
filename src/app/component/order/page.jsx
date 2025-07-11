@@ -68,7 +68,7 @@ const OrderPage = () => {
                         <div></div>
                     </div>
                     <div className='margin-y-20'>
-                        <div>발주 품목</div>
+                        <div className='order-product-text margin-bottom-10 text-align-left'>발주 품목</div>
                         <table className='order-table'>
                             <thead>
                                 <tr>
@@ -87,16 +87,17 @@ const OrderPage = () => {
                                 <tr key={i}>
                                     <td><input type='checkbox'/></td>
                                     <td><input className='order_table_input' type='text' name='product_idx' value={selectProduct[i]?.product_idx||''} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}}/></td>
-                                    <td><input className='order_table_input' type='text' name='product_idx' value={selectProduct[i]?.product_name||''} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}}/></td>
+                                    <td><input className='order_table_input' type='text' name='product_name' value={selectProduct[i]?.product_name||''} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}}/></td>
                                     <td><input className='order_table_input' type='text'/></td>
                                     <td><input className='order_table_input' type='text'/></td>
-                                    <td><input className='order_table_input' type='text'/></td>
+                                    <td><input className='order_table_input' type='text' name='selling_price' value={selectProduct[i]?.selling_price||''}/></td>
                                     <td><input className='order_table_input' type='text'/></td>
                                     <td><input className='order_table_input' type='text'/></td>
                                 </tr>
                             ))}
                             </tbody>
                         </table>
+                        <div className='flex justify-right margin-y-20'><button className='btn' onClick={()=>setRow(row+1)}>상품 추가</button></div>
                     </div>
                 </div>
                 <div className='back-ground-white margin-40-200 width-auto'>2</div>
