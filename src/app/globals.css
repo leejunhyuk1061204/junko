@@ -234,6 +234,10 @@ input[type='text']:focus,input[type='password']:focus{
     justify-content: flex-end;
 }
 
+.justify-left {
+    justify-content: flex-start;
+}
+
 .box-sizing {
     box-sizing: border-box;
 }
@@ -535,10 +539,14 @@ input[type='text']:focus,input[type='password']:focus{
 .product-list-back{
     width: auto;
     background-color: white;
-    border-radius: 49px;
-    padding: 40px;
-    box-shadow: 4px 4px 5px rgba(0,0,0,0.15);
+    padding: 10px;
+    margin: 30px;
     overflow-x: auto;
+}
+
+.product-header{
+    font-weight: bold;
+    font-size: 24px;
 }
 
 .select-container{
@@ -548,11 +556,15 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 .select-btn{
+    border: 1px solid lightgray;
     padding: 5px 20px;
     text-align: left;
+    position: relative;
+    background-color: white;
+    cursor: pointer;
+    width: 80px;
     border-radius: 6px;
     margin-right: 10px;
-    box-shadow: var(--shadow);
     font-size: 14px;
 }
 
@@ -571,17 +583,19 @@ input[type='text']:focus,input[type='password']:focus{
     z-index: 2;
 }
 
-.select-btn:hover {
-    border-radius: 6px;
-    background: #C0D5FF;
-}
-
-.select-btn:focus{
-    background-color: #C0D5FF;
+.select-btn::after {
+    content: '▾';
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
 }
 
 .select-option-item {
-    border: none;
+    padding: 3px 3px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 .select-option-item:hover{
@@ -628,7 +642,53 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 .product-list {
+    table-layout: fixed;
     width: 100%;
+}
+
+.product-list th,
+.product-list td {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-align: center;
+    padding: 8px;
+    height: 45px;
+}
+
+.product-list tbody {
+    min-height: 450px;
+}
+
+.product-list thead,
+.product-list tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.product-pagination {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 20px;
+    flex-direction: row;
+}
+
+.product-pagination li {
+    list-style: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 2px;
+}
+
+.product-pagination li.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
 }
 
 .login-select {
