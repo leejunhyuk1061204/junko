@@ -135,8 +135,8 @@ input[type='text']:focus,input[type='password']:focus{
     word-break: keep-all;
 }
 
-.width-80{
-    width: 80px;
+.max-width-80{
+    max-width: 80px;
 }
 
 .width-100px{
@@ -165,7 +165,7 @@ input[type='text']:focus,input[type='password']:focus{
     text-align: center;
     cursor: pointer;
     background-color: #fff ;
-    box-shadow: var(--shadow);
+    /*box-shadow: var(--shadow);*/
 }
 
 .btn:hover{
@@ -242,6 +242,10 @@ input[type='text']:focus,input[type='password']:focus{
     width: fit-content;
 }
 
+.width-auto {
+    width: auto;
+}
+
 .main-back {
     background-color: var(--background-color);
 }
@@ -252,6 +256,14 @@ input[type='text']:focus,input[type='password']:focus{
 
 .margin-20 {
     margin: 20px;
+}
+
+.margin-40-200 {
+    margin: 40px 200px;
+}
+
+.margin-0-200 {
+    margin: 0 200px;
 }
 
 .margin-auto {
@@ -311,7 +323,7 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 .back-radius {
-    border-radius: 34px;
+    border-radius: 15px;
 }
 
 .outline-gray {
@@ -343,6 +355,13 @@ input[type='text']:focus,input[type='password']:focus{
     color: #fff;
 }
 
+.back-ground-white {
+    background-color: #fff;
+}
+
+.border-radius {
+    border-radius: var(--border-radius);
+}
 /*---------------------------------------------------------*/
 
 .page-background {
@@ -488,7 +507,7 @@ input[type='text']:focus,input[type='password']:focus{
     left: 0;
     top: 100%;
     min-width: 200px;
-    background-color: #F4F6FA;
+    background-color: #fff;
     border-radius: 0 0 8px 8px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     overflow: hidden;
@@ -506,7 +525,7 @@ input[type='text']:focus,input[type='password']:focus{
 .submenu-item {
     color: #000;
     padding: 12px 24px;
-    background-color: #F4F6FA;
+    background-color: #fff;
     font-size: 15px;
     border-radius: 8px;
     transition: background 0.2s, color 0.2s;
@@ -666,4 +685,22 @@ input[type='text']:focus,input[type='password']:focus{
     font-size: 12px;
     background-color: #C9C9C9;
     border-radius: var(--border-radius);
+}
+
+.order-head-text {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.order-table thead th:first-child {
+    width: 100px;
+}
+
+.order_table_input {
+    border: none !important;
+}
+
+.order_table_input:focus {
+    border : 1px solid var(--border-color);
+    border-radius : var(--border-radius);
 }
