@@ -442,7 +442,7 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 .header-text {
-    font-size: 30px;
+    font-size: 24px;
     font-weight: bold;
 }
 
@@ -451,6 +451,7 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 .header-date-text {
+    font-size: 14px;
     color : #6c757d;
 }
 

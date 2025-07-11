@@ -4,6 +4,7 @@ import Header from "@/app/header";
 import Link from "next/link";
 import '../../globals.css';
 import FindModal from "@/app/component/modal/FindModal";
+import axios from "axios";
 
 const sampleDepart = [
     {dept_idx:1 , dept_name:'인사부'},
@@ -21,12 +22,23 @@ const LoginPage = () => {
     const [login, setLogin] = useState({
             id: '',
             pw: '',
-            dept: '',
         });
     const [findForm, setFindForm] = useState({
         id:'',
         email:'',
     })
+
+
+    // 로그인
+    const toggleLogin = async () =>{
+        const {data} = await axios.post('http://localhost:8080/login',{user_id:login.id,pw:login.pw});
+        console.log(data);
+        if(data.success){
+            sessionStorage.setItem('loginId',login.id);
+            sessionStorage.setItem('token',data.token);
+            location.href='/';
+        }
+    }
 
     // 로그인 form 입력
     const loginChange = (e) => {
@@ -35,6 +47,7 @@ const LoginPage = () => {
             ...login,
             [name]: value
         });
+        console.log(login);
     }
 
     // 찾기 form 입력
@@ -57,9 +70,9 @@ const LoginPage = () => {
     }
 
     return (
-        <div className='page-background'>
+        <div>
             <Header/>
-            <div className='wrap main-back padding-120 flex justify-content-center'>
+            <div className='wrap main-back padding-120 flex justify-content-center page-background'>
                 <div className='max-width-400'>
                     <div>
                         <img src="/logo.png" alt="logo" />
@@ -86,7 +99,7 @@ const LoginPage = () => {
                             </div>
                         </div>
                         <div className='flex justify-content-center'>
-                            <button className='login-btn white-space-nowrap'>로그인</button>
+                            <button className='login-btn white-space-nowrap' onClick={toggleLogin}>로그인</button>
                         </div>
                     </div>
                     ):(
