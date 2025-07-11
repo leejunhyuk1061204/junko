@@ -161,7 +161,7 @@ const Header = () => {
                 {token ? (
                     <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_15 margin-right-4">
                         <div className="header-date-text">{date_time}</div>
-                        <div className='cursor-pointer'><img src='/run.png' alt='run' width={22}/></div>
+                        <div className='cursor-pointer'><img src='/run.png' alt='run' width={24}/></div>
                         <div className='cursor-pointer'><IoMailOutline/></div>
                         <div className='cursor-pointer'><BsPersonCircle/></div>
                         <div className='cursor-pointer'><IoSettingsOutline/></div>
