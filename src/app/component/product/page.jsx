@@ -5,6 +5,7 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headless
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Pagination from "react-js-pagination";
+import { useRouter } from 'next/navigation';
 
 const sortOptions = [
     { id: 'latest', name: '최신순' },
@@ -21,6 +22,7 @@ export default function OrderList() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const pageSize = 10;
+    const router = useRouter();
 
     useEffect(() => {
         fetchCategoryOptions();
@@ -104,6 +106,9 @@ export default function OrderList() {
         }
     };
 
+    const goToNewProduct = () => {
+        router.push('./product/insert');
+    };
 
     return (
         <div className='productPage wrap page-background'>
@@ -210,7 +215,9 @@ export default function OrderList() {
                 </div>
 
                 <div className="flex justify-left gap_10">
-                    <button className="product-btn">주문수집</button>
+                    <button className="product-btn" onClick={goToNewProduct}>
+                        상품 등록
+                    </button>
                     <button className="product-btn-del">삭제</button>
                 </div>
             </div>
