@@ -1,4 +1,5 @@
 import AlertModal from "@/app/component/alertmodal/page";
+import DatePickerModal from "@/app/component/datePicker/page";
 
 export default function Layout({ children }) {
     return(
@@ -10,6 +11,7 @@ export default function Layout({ children }) {
         <body>
         {children}
         <AlertModal />
+        <DatePickerModal/>
         </body>
         </html>
     );

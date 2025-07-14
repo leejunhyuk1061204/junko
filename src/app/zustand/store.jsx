@@ -85,3 +85,24 @@ export const useChartStore = create((set) => ({
     }
 
 }));
+
+// datePicker
+export const useDatePickerStore = create((set) => ({
+    isOpen : false,
+    targetIndex: null,
+    selectedDate:null,
+    onConfirm: null,
+
+    openDatePicker:({index = null,initialDate = null, onConfirm})=>
+        set({
+            isOpen: true,
+            targetIndex: index,
+            selectedDate:initialDate,
+            onConfirm,
+        }),
+
+    closeDatePicker: () => set({isOpen: false, onConfirm:null}),
+
+    setSelectedDate: (date) => set({selectedDate:date}),
+
+}));

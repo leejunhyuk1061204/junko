@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
 
-const SearchProductModal = ({open,onClose,key,selectProduct}) => {
+const SearchProductModal = ({open,onClose,orderProduct}) => {
 
     const [products,setProducts] = useState([]);
     const [search, setSearch] = useState('');
@@ -19,26 +19,36 @@ const SearchProductModal = ({open,onClose,key,selectProduct}) => {
 
     // 상품 선택
 
-    const selectProdInfo = (p) =>{
-        selectProduct(p)
-        setProducts([]);
+    const selectProdInfo = async (p) =>{
+        orderProduct(p);
         setSearch('');
         setPage(1);
         setTotal(1);
+        await getProducts();
 
         onClose();
     }
 
     // 상품 리스트 검색
     const getProducts = async ()=> {
-        const {data} = await axios.post('http://localhost:8080/product/list',{search:search,page:page});
+        const {data} = await axios.post('http://localhost:8080/productNoption/list',{search:search,page:page});
         console.log(data);
         setProducts(data.list);
-        setTotal(Math.ceil(data.total*1.0/10));
+        setTotal(data.total);
+    }
+
+    const searchEnter = async (e) => {
+        if (e.keyCode === 13) {
+            await getProducts();
+        }
     }
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
+        setProducts([]);
+        setSearch('');
+        setPage(1);
+        setTotal(1);
         onClose();
     };
 
@@ -92,7 +102,7 @@ const SearchProductModal = ({open,onClose,key,selectProduct}) => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <>
                             <div className='flex justify-content-between align-items-center gap_20 '>
-                                <input style={{margin:'0'}} type='text' value={search} onChange={(e)=>setSearch(e.target.value)}/>
+                                <input style={{margin:'0'}} type='text' value={search} onChange={(e)=>setSearch(e.target.value)} onKeyUp={searchEnter}/>
                                 <button className='width-fit btn white-space-nowrap' onClick={getProducts}>검색</button>
                             </div>
                             <table>
@@ -100,13 +110,15 @@ const SearchProductModal = ({open,onClose,key,selectProduct}) => {
                                     <tr>
                                         <th>상품코드</th>
                                         <th>상품 이름</th>
+                                        <th>옵션 이름</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {products && products.map(p=>(
-                                    <tr key={p.product_idx} className='cursor-pointer' onClick={()=>selectProdInfo(p)}>
+                                {products && products.map((p,idx)=>(
+                                    <tr key={idx} className='cursor-pointer' onClick={()=>selectProdInfo(p)}>
                                         <td>{p.product_idx}</td>
                                         <td>{p.product_name}</td>
+                                        <td>{p.combined_name||'없음'}</td>
                                     </tr>
                                 ))}
                                 </tbody>
