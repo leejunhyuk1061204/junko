@@ -133,26 +133,38 @@ const OrderPage = () => {
     };
 
     const planProductChange = (i,p,option) =>{
+        console.log(p);
         setPlanProduct((prev) => {
             const updated = [...prev];
             updated[i] = {
                 ...updated[i],
-                product_idx:p.product_idx,
-                product_name:p.product_name,
-                ...(option ? {
-                    product_option_idx: p.product_option_idx,
-                    combined_name: p.combined_name
-                } : {
-                    product_option_idx: null,
-                    combined_name: '옵션 없음'
-                })
+                product_idx: p.product_idx,
+                product_name: p.product_name,
+                product_option_idx: option
+                    ? (p.product_option_idx ?? null)
+                    : (p.product_option_idx ?? null),
+                combined_name: option
+                    ? (p.combined_name ?? '옵션 없음')
+                    : (p.combined_name ?? '옵션 없음')
             };
             return updated;
         })
 
         if(!option){
-            const filteredOrderProducts = orderProducts.filter(item => item.product_idx === p.product_idx);
-            setPlanOptionList(filteredOrderProducts);
+            const filteredOrderProducts = orderProducts
+                .filter(item => item.product_idx === p.product_idx)
+                .map(item => ({
+                    ...item,
+                    product_option_idx: item.product_option_idx ?? null,
+                    combined_name: item.combined_name ?? '옵션 없음'
+                }));
+            setPlanOptionList(prev => {
+                const updated = [...prev];
+                updated[i] = filteredOrderProducts;
+                return updated;
+            });
+
+            console.log('filteredOrderProducts',filteredOrderProducts);
 
             if (filteredOrderProducts.length > 0) {
                 setPlanProduct(prev => {
@@ -546,11 +558,10 @@ const OrderPage = () => {
                                         </div></td>
                                         <td><input className='order_table_input' type='text' value={planProduct[i]?.product_name||''} readOnly={true}/></td>
                                         <td><div className="listBox-container flex justify-content-center">
-                                            <Listbox value={planProduct} onChange={(p)=>planProductChange(i,p,true)}>
+                                            <Listbox value={planProduct[i]} onChange={(p)=>planProductChange(i,p,true)}>
                                                 <ListboxButton className="listBox-btn">{planProduct[i]?.combined_name || '옵션 선택'}</ListboxButton>
                                                 <ListboxOptions className="listBox-option">
-                                                    {planOptionList?.length === 0 && <ListboxOption value='' className="listBox-option-item">옵션 없음</ListboxOption>}
-                                                    {planOptionList?.length > 0 && planOptionList.map((option,idx) => (
+                                                    {planOptionList[i]?.length > 0 && planOptionList[i].map((option,idx) => (
                                                         <ListboxOption key={idx} value={option} className="listBox-option-item">
                                                             {option.combined_name}
                                                         </ListboxOption>
