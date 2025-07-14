@@ -635,6 +635,10 @@ input[type='text']:focus,input[type='password']:focus{
     font-size: 14px;
 }
 
+.product-btn:hover{
+    background-color: #1A82E3;
+}
+
 .product-btn-del{
     cursor: pointer;
     width: fit-content;
@@ -687,6 +691,15 @@ input[type='text']:focus,input[type='password']:focus{
     table-layout: fixed;
 }
 
+.product-clickable {
+    color: #006CCE;
+    cursor: pointer;
+}
+
+.product-clickable:hover {
+    text-decoration: underline;
+}
+
 .product-pagination {
     display: flex;
     gap: 6px;
@@ -710,7 +723,6 @@ input[type='text']:focus,input[type='password']:focus{
     color: white;
     border-color: #007bff;
 }
-
 
 .product-entry-table {
     width: 100%;
@@ -793,6 +805,65 @@ input[type='text']:focus,input[type='password']:focus{
     font-size: 14px;
     cursor: pointer;
     z-index: 1;
+}
+
+.product-detail-img-preview-box {
+    display: flex;
+    align-items: flex-start;
+    background: transparent;
+    padding: 10px;
+    border-left: 2px solid var(--border-color);
+    width: 500px;
+    gap: 12px;
+    min-height: 310px; /* 썸네일 흔들림 방지 */
+}
+
+.product-detail-img-preview {
+    width: 310px;
+    height: 310px;
+    object-fit: cover;
+    flex-shrink: 0;         /* 고정 */
+    background-color: #f5f5f5;
+}
+
+.product-thumbnail-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 310px;
+    overflow-y: auto;
+    padding-left: 4px;
+    flex-shrink: 0;         /* 고정 */
+    width: 140px;           /* 썸네일 너비 고정 */
+}
+
+.product-thumbnail-img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: border 0.2s ease;
+    background-color: #fff;
+    flex-shrink: 0;         /* 흔들림 방지 */
+}
+
+.product-thumbnail-img:hover {
+    border: 2px solid #3d9aff;
+}
+
+.product-detail-img-preview-empty {
+    width: 310px;
+    height: 310px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f1f3f5;
+    color: #999;
+    font-size: 14px;
+    border: 1px dashed #ccc;
+    border-radius: 6px;
+    flex-shrink: 0;
 }
 
 

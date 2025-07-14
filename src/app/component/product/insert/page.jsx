@@ -12,14 +12,14 @@ export default function InsertProduct() {
         try {
             const res = await axios.post('http://localhost:8080/product/insert', formData, {
                 headers: {
-                    Authorization: localStorage.getItem("token"),
+                    Authorization: sessionStorage.getItem("token"),
                     'Content-Type': 'multipart/form-data',
                 },
             })
 
             if (res.data?.success) {
                 alert('상품 등록 완료!')
-                router.push('/product')
+                router.push('./')
             } else {
                 alert('등록 실패: 로그인 여부나 필드 확인 필요')
             }

@@ -18,16 +18,16 @@ export default function UpdateProduct() {
 
     const handleSubmit = async (formData) => {
         try {
-            const res = await axios.post(`http://localhost:8080/product/update/${product_idx}`, formData, {
+            const res = await axios.put(`http://localhost:8080/product/${product_idx}/imgUpdate`, formData, {
                 headers: {
-                    Authorization: localStorage.getItem("token"),
+                    Authorization: sessionStorage.getItem("token"),
                     'Content-Type': 'multipart/form-data',
                 },
             })
 
             if (res.data?.success) {
                 alert('수정 완료!')
-                router.push('/product')
+                router.push(`/component/product/detail/${product_idx}`)
             } else {
                 alert('수정 실패')
             }

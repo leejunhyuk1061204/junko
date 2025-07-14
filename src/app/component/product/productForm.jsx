@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import axios from 'axios'
+import { useRouter } from 'next/navigation';
 
 export default function ProductForm({ onSubmit, initialData = {} }) {
     const isEdit = !!initialData?.product_idx;
@@ -20,6 +21,8 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
 
     const dragItem = useRef(null)
     const dragOverItem = useRef(null)
+
+    const router = useRouter();
 
     useEffect(() => {
         axios.get('http://localhost:8080/cate/list').then(res => {
@@ -42,7 +45,7 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
             if (initialData.imageUrls) {
                 const existingImages = initialData.imageUrls.map(fileName => ({
                     file: null,
-                    url: `http://localhost:8080/images/product/${fileName}`,
+                    url: `http://localhost:8080/images/${fileName}`,
                     isExisting: true,
                 }))
                 setImages(existingImages)
@@ -114,10 +117,21 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
 
         Object.entries(unformattedForm).forEach(([key, val]) => fd.append(key, val))
 
+        // 신규 이미지만 업로드
         images.forEach(img => {
-            if (!img.isExisting) fd.append("images", img.file)
-            else fd.append("existingImages", img.url) // 서버에서 필터링용
+            if (!img.isExisting) {
+                fd.append("images", img.file)
+            }
         })
+
+        // 기존 이미지 중 남겨진 파일명 리스트만 서버에 전달
+        const remaining = images
+            .filter(img => img.isExisting)
+            .map(img => {
+                const segments = img.url.split('/')
+                return segments[segments.length - 1]
+            })
+        remaining.forEach(name => fd.append("remainImageUrls", name))
 
         onSubmit(fd)
     }
@@ -245,8 +259,18 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
                 </tbody>
             </table>
 
-            <div className="flex justify-right">
-                <button type="submit" className="product-btn">{initialData.product_idx ? '수정하기' : '등록하기'}</button>
+            <div className="flex justify-between gap_10">
+                <button
+                    type="button"
+                    className="btn"
+                    onClick={() => router.push('../')}
+                >
+                    목록
+                </button>
+
+                <button type="submit" className="product-btn">
+                    {initialData.product_idx ? '수정' : '등록'}
+                </button>
             </div>
         </form>
     )

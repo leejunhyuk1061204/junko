@@ -93,7 +93,7 @@ export default function OrderList() {
                 size: pageSize
             }, {
                 headers: {
-                    Authorization: localStorage.getItem('token')
+                    Authorization: sessionStorage.getItem('token')
                 }
             });
 
@@ -109,6 +109,47 @@ export default function OrderList() {
     const goToNewProduct = () => {
         router.push('./product/insert');
     };
+
+    const goToDetail = (productIdx) => {
+        router.push(`./product/detail/${productIdx}`);
+    };
+
+    const handleDelSelected = async () => {
+        if (checkedItems.length === 0) {
+            alert('삭제할 상품을 선택해주세요.');
+            return;
+        }
+
+        if (!window.confirm('선택한 상품을 삭제하시겠습니까?')) return;
+
+        try {
+            const token = sessionStorage.getItem('token');
+            console.log('삭제 요청 전 토큰:', token);
+
+            // 병렬 삭제 요청
+            const deleteResults = await Promise.all(
+                checkedItems.map(product_idx =>
+                    axios.put(`http://localhost:8080/product/${product_idx}/del`, null, {
+                        headers: { Authorization: token }
+                    }).then(res => {
+                        console.log(`상품 ${product_idx} 응답:`, res.data);
+                        return res;
+                    })
+                )
+            );
+
+            // 성공 필터링
+            const successCount = deleteResults.filter(res => res.data?.success).length;
+            alert(`${successCount}개 상품 삭제 완료`);
+
+            // 삭제 후 리스트 갱신
+            fetchOrders(currentPage, selectedSort.id, selectedCategory.id);
+        } catch (err) {
+            console.error('상품 삭제 실패:', err);
+            alert('삭제 중 오류가 발생했습니다.');
+        }
+    };
+
 
     return (
         <div className='productPage wrap page-background'>
@@ -182,7 +223,9 @@ export default function OrderList() {
                             </td>
                             <td>{index + 1}</td>
                             <td>{order.product_idx}</td>
-                            <td>{order.product_name}</td>
+                            <td className="product-clickable" onClick={() => goToDetail(order.product_idx)}>
+                                {order.product_name}
+                            </td>
                             <td>{order.product_standard}</td>
                             <td>{order.purchase_price.toLocaleString()}원</td>
                             <td>{order.selling_price.toLocaleString()}원</td>
@@ -218,7 +261,9 @@ export default function OrderList() {
                     <button className="product-btn" onClick={goToNewProduct}>
                         상품 등록
                     </button>
-                    <button className="product-btn-del">삭제</button>
+                    <button className="product-btn-del" onClick={handleDelSelected}>
+                        삭제
+                    </button>
                 </div>
             </div>
         </div>
