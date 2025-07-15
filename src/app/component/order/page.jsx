@@ -160,7 +160,7 @@ const OrderListPage = () => {
                             <td className='position-relative cursor-pointer' onClick={(e)=>{e.stopPropagation();changeStatusClicked(i)}} ref={el => (statusRef.current[i] = el)}>
                                 {order.status}
                                 {statusClicked[i]
-                                // && order.status ==='요청'
+                                && order.status ==='요청'
                                     ? (
                                 <ul className="listBox-option">
                                     {orderStatusList?.map((os) => (
