@@ -263,7 +263,7 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
                 <button
                     type="button"
                     className="btn"
-                    onClick={() => router.push('../')}
+                    onClick={() => router.push('../product')}
                 >
                     목록
                 </button>
