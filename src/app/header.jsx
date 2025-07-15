@@ -67,8 +67,6 @@ const mainMenus = [
             { label: '세금 계산서 / 증빙 관리', href: '/' },
             { label: '입금 / 지급 관리', href: '/' },
             { label: '회계 전표 관리', href: '/component/accounting/entry' },
-            { label: '결산 / 리포트', href: '/' },
-            { label: '예산 실적 관리', href: '/' },
         ],
         href: '/',
     },
