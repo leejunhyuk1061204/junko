@@ -32,6 +32,59 @@ export const useAlertModalStore = create((set) => ({
         }),
 }));
 
+// 메인 대시보드
+export const useMainChartStore = create((set) => ({
+    categoryIdx: null,
+    startDate: null,
+    endDate: null,
+    chartData: {
+        getDaySales: [],
+        getRecentOrderStats: [],
+        getPopularProduct: [],
+        getHighReturnProduct: [],
+        getInventoryTurnoverStats: [],
+        returnProduct: [],
+        getDelayedProduct: [],
+        getOrderStatus: [],
+        getProductMarginStats: [],
+        getNetProfitStats: [],
+        getInOutProduct: [],
+        getMonthlySalesYoY: [],
+        getLowStockProduct: [],
+        getSalesThisMonth: [],
+        newOrder: [],
+        getPendingShipment: [],
+        getShippedToday: [],
+        getReceiveThisMonth: [],
+    },
+    loading: false,
+
+    setCategoryIdx: (categoryIdx) => set({categoryIdx}),
+    setStartDate: (startDate) => set({startDate}),
+    setEndDate: (endDate) => set({endDate}),
+
+    fetchMainChart: async () => {
+        set({loading: true});
+        try {
+            const {categoryIdx, startDate, endDate} = useMainChartStore.getState();
+            const {data} = await axios.post('http://localhost:8080/list/chart', {categoryIdx, startDate, endDate});
+
+            if (data.success) {
+                set({
+                    chartData: data.chartData || {},
+                    loading: false,
+                });
+            }else {
+                console.warn('차트 응답 성공 여부 false:', data);
+                set({ loading: false });
+            }
+        } catch (err) {
+            console.error("차트 데이터 요청 실패: ", err);
+            set({loading: false});
+        }
+    },
+}));
+
 // 차트
 export const useChartStore = create((set) => ({
     chartData: {
@@ -40,7 +93,6 @@ export const useChartStore = create((set) => ({
         getPopularProduct: [],
         getHighReturnProduct: [],
         getInventoryTurnoverStats: [],
-        returnProduct: [],
         getDelayedProduct: [],
         getOrderStatus: [],
         getProductMarginStats: [],
@@ -58,7 +110,7 @@ export const useChartStore = create((set) => ({
                 set({ loading: false });
                 return;
             }
-            const header = {
+            const headers = {
                 Authorization: sessionStorage.getItem("authorization"),
             };
             const payload = {
@@ -67,7 +119,7 @@ export const useChartStore = create((set) => ({
                 ...(startDate && endDate && { startDate, endDate })
             };
 
-            const {data} = await axios.post('http://localhost/list/chart', payload, {header});
+            const {data} = await axios.post('http://localhost/list/chart', payload, {headers});
 
             if (data.success && data.loginYN) {
                 set({
