@@ -1,15 +1,16 @@
 'use client'
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
+import PdfViewer from "@/app/component/pdfviewer/page";
 
 const DetailOrderModal = ({open,onClose,idx}) => {
 
     const [order, setOrder] = useState([]);
     const [orderProducts, setOrderProducts] = useState([]);
     const [orderPlans, setOrderPlans] = useState([]);
-    const [planProducts, setPlanProducts] = useState([]);
     const [fileInfo, setFileInfo] = useState({});
     const [file, setFile] = useState(null);
+    const [pdfViewer, setPdfViewer] = useState(false);
 
     useEffect(() => {
         if(idx===null) return;
@@ -21,10 +22,36 @@ const DetailOrderModal = ({open,onClose,idx}) => {
         getFile();
     }, [fileInfo]);
 
-    const onLoadSuccess = ({ numPages }) => {
-        setNumPages(numPages);
-    };
 
+    // pdf 다운로드
+    const downloadPDF = async() => {
+        const {data, headers} = await axios.get(`http://localhost:8080/download/pdf?idx=${idx}&type=발주서`,{
+            responseType: 'blob',
+        });
+        console.log(data);
+
+        const disposition = headers['content-disposition'];
+        const filenameMatch = disposition && disposition.match(/filename\*?=UTF-8''(.+)/);
+        const filename = filenameMatch ? decodeURIComponent(filenameMatch[1]) : 'download.pdf';
+
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+
+        window.URL.revokeObjectURL(url);
+    }
+
+    // 워드 다운로드
+    const downloadWord = async() => {
+        const {data} = await axios.get(`http://localhost:8080/download/docx?idx=${idx}&type=발주서`);
+        console.log(data);
+    }
 
     // 발주서
     const getFileInfo = async ()=>{
@@ -37,15 +64,22 @@ const DetailOrderModal = ({open,onClose,idx}) => {
         }
     }
 
-    const getFile = async ()=>{
-        const {data} = await axios.get(`http://localhost:8080/pdf/preview/${fileInfo?.fileInfo?.new_filename}.pdf`,{
-            responseType:'blob',
-        });
+    const getFile = async () => {
+        if (!fileInfo?.fileInfo?.new_filename) return;
 
-        console.log(data);
-        const fileURL = URL.createObjectURL(data);
-        setFile(fileURL);
-    }
+        try {
+            const { data } = await axios.get(
+                `http://localhost:8080/pdf/preview/${fileInfo.fileInfo.new_filename}`,
+                { responseType: 'blob' }
+            );
+
+            const blob = new Blob([data], { type: 'application/pdf' });
+            const blobUrl = URL.createObjectURL(blob);
+            setFile(blobUrl);
+        } catch (err) {
+            console.error('PDF 파일 요청 실패:', err);
+        }
+    };
 
     // order 가져오기
     const getOrder = async () =>{
@@ -56,9 +90,14 @@ const DetailOrderModal = ({open,onClose,idx}) => {
         setOrderPlans(data.full.orderPlan);
     }
 
-
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
+        setOrder([]);
+        setOrderProducts([]);
+        setOrderPlans([]);
+        setFileInfo({});
+        setFile(null);
+        setPdfViewer(false);
         onClose();
     };
 
@@ -110,7 +149,7 @@ const DetailOrderModal = ({open,onClose,idx}) => {
                 <>
 
                     {/* 탭 내용 */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxHeight:'600px',overflowY:'auto'}}>
                         <>
                             <div className='back-ground-white margin-30  padding-30 width-auto flex back-radius flex-direction-col margin min-width-400'>
                                 <div className='flex gap_20 justify-content-between'>
@@ -191,12 +230,19 @@ const DetailOrderModal = ({open,onClose,idx}) => {
                                         ))}
                                         </tbody>
                                     </table>
-                                </div>
-                                {fileInfo.success ? (
-                                    <div>
-
+                                </div >
+                                {fileInfo.success ? (<>
+                                    {pdfViewer && (
+                                        <div style={{maxHeight:'400px', overflowY:'hidden'}}>
+                                            <PdfViewer file={file}/>
+                                        </div>
+                                        )}
+                                    <div className='flex gap_20 justify-content-center'>
+                                        <button className='btn' onClick={()=>setPdfViewer(!pdfViewer)}>PDF 미리보기</button>
+                                        <button className='btn' onClick={downloadPDF}>PDF 다운로드</button>
+                                        {/*<button className='btn' onClick={downloadWord}>워드 다운로드</button>*/}
                                     </div>
-                                ):(<div><p>발주서가 없습니다.</p></div>)}
+                                </>):(<div className='margin-bottom-20'><p>발주서가 없습니다.</p></div>)}
                             </div>
                         </>
                     </div>
