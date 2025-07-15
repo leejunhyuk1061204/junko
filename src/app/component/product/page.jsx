@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Pagination from "react-js-pagination";
 import { useRouter } from 'next/navigation';
+import { TbSearch } from "react-icons/tb";
+import DocsModal from "@/app/component/product/productModal/DocsModal";
 
 const sortOptions = [
     { id: 'latest', name: '최신순' },
@@ -24,6 +26,19 @@ export default function OrderList() {
     const pageSize = 10;
     const router = useRouter();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [searchText, setSearchText] = useState('');
+    const [showDocsModal, setShowDocsModal] = useState(false);
+    const [docProductIdx, setDocProductIdx] = useState(null);
+
+    const openDocsModal = (productIdx) => {
+        setDocProductIdx(productIdx);
+        setShowDocsModal(true);
+    };
+
+    const closeDocsModal = () => {
+        setShowDocsModal(false);
+        setDocProductIdx(null);
+    };
 
     useEffect(() => {
         fetchCategoryOptions();
@@ -37,9 +52,9 @@ export default function OrderList() {
 
     useEffect(() => {
         if (selectedCategory?.id !== undefined) {
-            fetchOrders(currentPage, selectedSort.id, selectedCategory.id);
+            fetchOrders(currentPage, selectedSort.id, selectedCategory.id, searchText); // ← 검색어 추가
         }
-    }, [selectedSort.id, selectedCategory?.id, currentPage]);
+    }, [selectedSort.id, selectedCategory?.id, currentPage, searchText]);
 
     useEffect(() => {
         setCheckedItems([]);
@@ -93,30 +108,34 @@ export default function OrderList() {
         }
     };
 
-    const fetchOrders = async (page, sortId, categoryId) => {
-        try {
-            const response = await axios.post('http://localhost:8080/cate/product/list', {
-                category_idx: categoryId || 0,
-                page: page,
-                size: pageSize,
-                sort: sortId
-            }, {
-                headers: {
-                    Authorization: sessionStorage.getItem('token')
-                }
-            });
+    const fetchOrders = async (page, sortId, categoryId, search = '') => {
+        const token = sessionStorage.getItem('token')
+        const url = 'http://localhost:8080/product/list'
 
-            const result = response.data;
-
-            const list = result?.data?.list || result?.list || [];
-            const total = result?.data?.total || result?.total || list.length;
-
-            setOrders(list);
-            setTotalCount(total);
-        } catch (err) {
-            console.error('상품 목록 조회 실패:', err);
+        const payload = {
+            category_idx: categoryId || 0,
+            page,
+            size: 10,
+            sort: sortId,
+            search: search.trim()
         }
-    };
+
+        try {
+            const res = await axios.post(url, payload, {
+                headers: { Authorization: token }
+            })
+
+            const list = res.data?.data?.list || res.data?.list || []
+            const total = res.data?.data?.total || res.data?.total || list.length
+
+            setOrders(list)
+            setTotalCount(total)
+        } catch (err) {
+            console.error('상품 목록 조회 실패:', err)
+        }
+    }
+
+
 
     const goToNewProduct = () => {
         router.push('./product/insert');
@@ -162,6 +181,16 @@ export default function OrderList() {
         }
     };
 
+    const handleSearch = () => {
+        setCurrentPage(1);
+        fetchOrders(1, selectedSort.id, selectedCategory?.id, searchText);
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     return (
         <div className='productPage wrap page-background'>
@@ -172,6 +201,17 @@ export default function OrderList() {
                 </h3>
 
                 <div className="flex gap_10 align-center justify-right margin-bottom-10">
+                    {/* 검색 입력창 */}
+                    <input
+                        type="text"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        placeholder="상품명 또는 품목코드"
+                        className="product-input-search"
+                    />
+                    <button className="product-search-btn" onClick={handleSearch}><TbSearch className="product-search-icon"/></button>
+
                     {/* 정렬 */}
                     <div className="select-container">
                         <Listbox value={selectedSort} onChange={handleSortChange}>
@@ -206,23 +246,24 @@ export default function OrderList() {
                 {/* 상품 테이블 */}
                 <table className="product-list margin-bottom-10">
                     <thead>
-                        <tr>
-                            <th>
-                                NO.<input
-                                    type="checkbox"
-                                    checked={isAllChecked}
-                                    onChange={handleAllCheck}
-                                />
-                            </th>
-                            <th>품목코드</th>
-                            <th>품목명</th>
-                            <th>규격</th>
-                            <th>입고 단가</th>
-                            <th>판매 단가</th>
-                            <th>할인율</th>
-                            <th>카테고리</th>
-                            <th>이미지</th>
-                        </tr>
+                    <tr>
+                        <th>
+                            NO.<input
+                            type="checkbox"
+                            checked={isAllChecked}
+                            onChange={handleAllCheck}
+                        />
+                        </th>
+                        <th>품목코드</th>
+                        <th>품목명</th>
+                        <th>규격</th>
+                        <th>입고 단가</th>
+                        <th>판매 단가</th>
+                        <th>할인율</th>
+                        <th>카테고리</th>
+                        <th>이미지</th>
+                        <th>문서</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {orders.map((order, index) => (
@@ -245,6 +286,11 @@ export default function OrderList() {
                             <td>{order.discount_rate}%</td>
                             <td>{order.category_name || '기타'}</td>
                             <td>-</td>
+                            <td>
+                                <button className="product-clickable" onClick={() => openDocsModal(order.product_idx)}>
+                                    문서
+                                </button>
+                            </td>
                         </tr>
                     ))}
 
@@ -260,7 +306,7 @@ export default function OrderList() {
                 </table>
 
                 {/* 페이지네이션 */}
-                <div className="product-pagination flex justify-content-center gap_5">
+                <div className="product-pagination flex justify-content-center gap_5 margin-bottom-20">
                     <Pagination
                         activePage={currentPage}
                         itemsCountPerPage={pageSize}
@@ -287,6 +333,9 @@ export default function OrderList() {
                     </button>
                 </div>
             </div>
+            {showDocsModal && (
+                <DocsModal productIdx={docProductIdx} onClose={closeDocsModal} />
+            )}
         </div>
-    );
+);
 }

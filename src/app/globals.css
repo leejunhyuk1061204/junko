@@ -627,6 +627,8 @@ input[type='text']:focus,input[type='password']:focus{
     /*box-shadow: var(--shadow);*/
 }
 
+/* ---------------------------- 상품 관련 ----------------------------*/
+/* product 랑 select 는 상품 관련입니당 */
 .product-wrap{
     margin : 30px 60px;
     width: auto;
@@ -651,6 +653,7 @@ input[type='text']:focus,input[type='password']:focus{
     position: relative;
     width: fit-content;
     cursor: pointer;
+    height: 32px;
 }
 
 .select-btn{
@@ -661,6 +664,7 @@ input[type='text']:focus,input[type='password']:focus{
     background-color: white;
     cursor: pointer;
     min-width: 100px;
+    height: 20px;
     border-radius: 6px;
     margin-right: 10px;
     font-size: 14px;
@@ -727,6 +731,35 @@ input[type='text']:focus,input[type='password']:focus{
     border-radius: 6px;
     padding: 5px 15px;
     font-size: 14px;
+}
+
+.product-input-search {
+    height: 32px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.product-search-btn {
+    height: 32px;
+    padding: 0 12px;
+    background-color: #1c64f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.product-search-btn:hover {
+    background-color: #1752cc;
+}
+
+.product-search-icon{
+    width: auto;
+    height: 20px;
+    color: white;
 }
 
 .product-modal-select{
@@ -980,6 +1013,79 @@ input[type='text']:focus,input[type='password']:focus{
     flex-shrink: 0;
 }
 
+.option-combined-scroll-box {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+}
+.option-tag {
+    background: #f0f0f0;
+    border-radius: 12px;
+    padding: 4px 10px;
+    margin: 4px;
+    display: inline-block;
+    font-size: 0.9rem;
+}
+
+.option-input-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.option-input-box .input {
+    height: 26px;
+    width: 80%;
+    padding: 0 10px;
+    font-size: 14px;
+}
+
+.option-btn{
+    cursor: pointer;
+    width: 180px;
+    height: 16px;
+    box-shadow: var(--shadow);
+    background-color: #006CCE;
+    color: white;
+    margin-right: 10px;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+.option-del{
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+
+.option-header{
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.option-select-input{
+    margin: 10px 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    height: 26px;
+    padding: 0 10px;
+    font-size: 14px;
+    background-color: white;
+    color: #333;
+    appearance: none; /* 브라우저 기본 스타일 제거 */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'%3E%3Cpath fill='%23666' d='M5.516 7.548l4.484 4.484 4.484-4.484a.999.999 0 1 1 1.414 1.414l-5.192 5.192a.997.997 0 0 1-1.41 0L4.102 8.962a.999.999 0 1 1 1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 12px;
+}
+
+/* ------------------------------- 로그인 관련 -------------------------------*/
 
 .login-select {
     border: 1px solid var(--border-color);
