@@ -328,6 +328,10 @@ const OrderInsertPage = () => {
                                 msg1: '등록 완료',
                                 msg2: '발주가 등록되었습니다.',
                                 showCancel: false,
+                                onConfirm:()=>{
+                                    closeModal();
+                                    location.href="/component/order"
+                                }
                             });
                         } else {
                             openModal({
@@ -599,7 +603,7 @@ const OrderInsertPage = () => {
                                 <tr key={i}>
                                     <td><input className='order_table_input' type='text' name='product_idx' value={orderProducts[i]?.product_idx||''} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}} readOnly={true}/></td>
                                     <td><input className='order_table_input' type='text' name='product_name' value={orderProducts[i]?.product_name||''} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}} readOnly={true}/></td>
-                                    <td><input className='order_table_input' type='text' name='product_option' value={orderProducts[i]?.combined_name||''} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}} readOnly={true}/></td>
+                                    <td><input className='order_table_input' type='text' name='product_option' value={orderProducts[i]?.combined_name ?? (orderProducts[i] ? '없음' : '')} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}} readOnly={true}/></td>
                                     <td><input className='order_table_input' type='text' name='purchase_price' value={orderProducts[i]?.purchase_price||''} onClick={()=>{setOpenSearchProductModal(true);setKey(i)}} readOnly={true}/></td>
                                     <td><input className='order_table_input' type='text' name='order_cnt' value={orderProducts[i]?.order_cnt||''} onChange={(e)=>inputOrderProduct(i,e)}/></td>
                                     <td><input className='order_table_input' type='text' value={orderProducts[i]?.order_cnt * orderProducts[i]?.purchase_price || ''} readOnly={true}/></td>

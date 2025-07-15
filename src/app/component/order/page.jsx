@@ -110,11 +110,11 @@ const OrderListPage = () => {
         <h3 className="text-align-left margin-bottom-10 margin-30">
             <span className="product-header">발주 목록 / 상세 조회</span>
         </h3>
-        <div className="product-list-back">
+        <div className="order-list-back">
             <div className="flex gap_10 align-center justify-right margin-bottom-10">
                 {/* 검색 */}
                 <div className='width-fit flex gap_15 align-center'>
-                    <input style={{padding:'1.5px'}} type='text' placeholder='검색할 단어를 입력해주세요' value={search} onChange={e=>setSearch(e.target.value)} onKeyUp={e=>searchEnter(e)}/>
+                    <input style={{padding:'1.5px'}} type='text' placeholder='검색어 입력 후 엔터' value={search} onChange={e=>setSearch(e.target.value)} onKeyUp={e=>searchEnter(e)}/>
                     <button className='btn white-space-nowrap height-50' onClick={()=>{getOrderList();setSearch('')}}><FaSearch /></button>
                 </div>
                 {/* 정렬 */}
@@ -180,7 +180,9 @@ const OrderListPage = () => {
                 </tbody>
             </table>
             {/* 페이지네이션 */}
-            <div className="product-pagination flex justify-content-center gap_5">
+            <div className="product-pagination flex justify-content-between gap_5 margin-bottom-10">
+                <div className='width-fit'></div>
+                <div>
                 <Pagination
                     activePage={page}
                     itemsCountPerPage={10}
@@ -188,6 +190,8 @@ const OrderListPage = () => {
                     pageRangeDisplayed={5}
                     onChange={(page) => setPage(page)}  // set만!
                 />
+                </div>
+                <div className='flex justify-right width-fit'><button className='btn white-space-nowrap' onClick={()=>{location.href="/component/order/insert"}}>등록</button></div>
             </div>
         </div>
         <DetailOrderModal open={detailOrderOpen.boolean} idx={detailOrderOpen.idx} onClose={()=>setDetailOrderOpen({boolean:false,idx:0})}/>

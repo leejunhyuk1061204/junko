@@ -233,7 +233,7 @@ const DetailOrderModal = ({open,onClose,idx}) => {
                                 </div >
                                 {fileInfo.success ? (<>
                                     {pdfViewer && (
-                                        <div style={{maxHeight:'400px', overflowY:'hidden'}}>
+                                        <div style={{maxHeight:'500px', overflowY:'auto'}}>
                                             <PdfViewer file={file}/>
                                         </div>
                                         )}

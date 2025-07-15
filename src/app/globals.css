@@ -659,6 +659,14 @@ input[type='text']:focus,input[type='password']:focus{
     min-height: 800px;
 }
 
+.order-list-back{
+    width: auto;
+    background-color: white;
+    padding: 10px;
+    margin: 30px;
+    overflow-x: auto;
+}
+
 .product-header{
     font-weight: bold;
     font-size: 24px;
