@@ -60,59 +60,63 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
     }, [form.customer_name])
 
     const handleSubmit = async () => {
+        const token = sessionStorage.getItem("token");
+        const user_idx = sessionStorage.getItem("user_idx");
+
         if (!form.entry_type || !form.amount || !form.entry_date) {
-            alert("필수 항목을 입력하세요")
-            return
+            alert("필수 항목을 입력하세요");
+            return;
         }
 
-        const data = new FormData()
-        data.append("entry_type", form.entry_type)
-        data.append("amount", form.amount)
-        data.append("entry_date", form.entry_date)
+        const data = new FormData();
+        data.append("entry_type", form.entry_type);
+        data.append("amount", form.amount);
+        data.append("entry_date", form.entry_date);
 
         try {
             if (form.custom_name) {
                 const res = await axios.get("http://localhost:8080/custom/findByName", {
                     params: { name: form.custom_name.trim() }
-                })
+                });
                 if (res.data.custom_idx !== undefined) {
-                    data.append("custom_idx", res.data.custom_idx)
+                    data.append("custom_idx", res.data.custom_idx);
                 } else {
-                    alert("유효하지 않은 거래처명입니다!")
-                    return
+                    alert("유효하지 않은 거래처명입니다!");
+                    return;
                 }
             }
 
             if (form.customer_name) {
                 const res = await axios.get("http://localhost:8080/sales/findByName", {
                     params: { name: form.customer_name.trim() }
-                })
+                });
                 if (res.data.sales_idx !== undefined) {
-                    data.append("sales_idx", res.data.sales_idx)
+                    data.append("sales_idx", res.data.sales_idx);
                 } else {
-                    alert("유효하지 않은 고객명입니다!")
-                    return
+                    alert("유효하지 않은 고객명입니다!");
+                    return;
                 }
             }
 
-            if (file) data.append("file", file)
+            if (file) data.append("file", file);
 
             const res = await axios.post("http://localhost:8080/accountRegist", data, {
                 headers: {
-                    authorization: localStorage.getItem("token")
+                    Authorization: `Bearer ${token}`,
+                    user_idx: user_idx
                 }
-            })
+            });
 
             if (res.data.success) {
-                alert("전표 등록 완료!")
-                onSuccess()
-                onClose()
+                alert("전표 등록 완료!");
+                onSuccess();
+                onClose();
             } else {
-                alert("등록 실패 또는 로그인 필요")
+                alert("등록 실패 또는 로그인 필요");
             }
         } catch (e) {
-            alert("등록 중 오류 발생")
-            console.error(e)
+            alert("등록 중 오류 발생");
+            console.error(e);
         }
     }
 

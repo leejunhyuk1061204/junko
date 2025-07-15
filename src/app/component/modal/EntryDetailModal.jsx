@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import axios from "axios"
 import EntryEditModal from "@/app/component/modal/EntryEditModal";
+import DeptTable from '@/app/component/accounting/dept/DeptTable'
 
 const EntryDetailModal = ({ open, onClose, entry }) => {
     const [files, setFiles] = useState([])
@@ -14,6 +15,39 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
         const userId = sessionStorage.getItem('user_id') // 또는 쿠키에서 가져오기
         setLoginUserId(userId)
     }, [])
+
+    const userType = sessionStorage.getItem("user_type"); // "admin" or "user"
+    const userIdx = sessionStorage.getItem("user_idx");
+
+    const handleApprove = async () => {
+        const token = sessionStorage.getItem("token");
+
+        try {
+            const res = await axios.patch(
+                `http://localhost:8080/accountApprove/${entry.entry_idx}`,
+                {}, // body는 비워도 OK
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        user_idx: userIdx
+                    }
+                }
+            );
+
+            if (res.data.success) {
+                alert("전표가 승인되었습니다!");
+                onClose();
+                window.location.reload();
+            } else {
+                alert(res.data.message || "승인 실패");
+            }
+        } catch (err) {
+            console.error("승인 오류", err);
+            alert("승인 중 오류 발생");
+        }
+    };
+
+
 
     const updateStatus = async (newStatus) => {
         try {
@@ -147,6 +181,12 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                     )}
                 </div>
 
+                {userType === "admin" && entry.status === "제출" && (
+                    <button className="entryList-fabBtn blue" onClick={handleApprove}>
+                        승인
+                    </button>
+                )}
+
                 <EntryEditModal
                     open={editOpen}
                     onClose={() => setEditOpen(false)}
@@ -156,6 +196,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         window.location.reload(); // 리스트 갱신
                     }}
                 />
+                <DeptTable entry_idx={entry.entry_idx} />
             </div>
         </div>
     )
