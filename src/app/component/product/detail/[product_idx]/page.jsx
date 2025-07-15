@@ -4,6 +4,7 @@ import {useEffect, useRef, useState} from 'react';
 import { useParams } from 'next/navigation';
 import axios from 'axios';
 import Header from '@/app/header';
+import OptionManager from './option';
 
 export default function ProductDetail() {
     const { product_idx } = useParams();
@@ -49,7 +50,7 @@ export default function ProductDetail() {
                 <h3 className="order-head-text margin-bottom-20">상품 상세 정보</h3>
 
                 {/* 테이블 + 이미지 박스 */}
-                <div className="back-ground-white padding-30 border-radius margin-bottom-10">
+                <div className="back-ground-white padding-30 border-radius margin-bottom-20">
                     <div className="flex gap_20 align-center">
                         <div style={{ flex: 1 }}>
                             <table className="product-entry-table">
@@ -66,52 +67,59 @@ export default function ProductDetail() {
                             </table>
                         </div>
 
-                            {/* 이미지 박스 */}
-                            {(product.imageUrls.length > 1) ? (
-                                // 썸네일 2개 이상일 때 → 메인 + 썸네일 나란히
-                                <div className="product-detail-img-preview-box">
-                                    {mainImg ? (
+                        {/* 이미지 박스 */}
+                        {(product.imageUrls.length > 1) ? (
+                            // 썸네일 2개 이상일 때 → 메인 + 썸네일 나란히
+                            <div className="product-detail-img-preview-box">
+                                {mainImg ? (
+                                    <img
+                                        src={mainImg}
+                                        alt="상품 이미지"
+                                        className="product-detail-img-preview"
+                                    />
+                                ) : (
+                                    <div className="product-detail-img-preview-empty">이미지 없음</div>
+                                )}
+                                <div className="product-thumbnail-vertical">
+                                    {product.imageUrls.map((img, i) => (
                                         <img
-                                            src={mainImg}
-                                            alt="상품 이미지"
-                                            className="product-detail-img-preview"
+                                            key={i}
+                                            src={`http://localhost:8080/images/${img}`}
+                                            onClick={() => setMainImg(`http://localhost:8080/images/${img}`)}
+                                            className={`product-thumbnail-img ${mainImg?.includes(img) ? 'active' : ''}`}
+                                            alt={`썸네일 ${i}`}
                                         />
-                                    ) : (
-                                        <div className="product-detail-img-preview-empty">이미지 없음</div>
-                                    )}
-                                    <div className="product-thumbnail-vertical">
-                                        {product.imageUrls.map((img, i) => (
-                                            <img
-                                                key={i}
-                                                src={`http://localhost:8080/images/${img}`}
-                                                onClick={() => setMainImg(`http://localhost:8080/images/${img}`)}
-                                                className={`product-thumbnail-img ${mainImg?.includes(img) ? 'active' : ''}`}
-                                                alt={`썸네일 ${i}`}
-                                            />
-                                        ))}
-                                    </div>
+                                    ))}
                                 </div>
-                            ) : (
-                                // 썸네일이 1개 이하일 때 → 대표 이미지만 중앙정렬
-                                <div
-                                    className="product-detail-img-preview-box"
-                                    style={{ justifyContent: 'center' }}
-                                >
-                                    {mainImg ? (
-                                        <img
-                                            src={mainImg}
-                                            alt="상품 이미지"
-                                            className="product-detail-img-preview"
-                                        />
-                                    ) : (
-                                        <div className="product-detail-img-preview-empty">이미지 없음</div>
-                                    )}
-                                </div>
-                            )}
-                        </div>
+                            </div>
+                        ) : (
+                            // 썸네일이 1개 이하일 때 → 대표 이미지만 중앙정렬
+                            <div
+                                className="product-detail-img-preview-box"
+                                style={{ justifyContent: 'center' }}
+                            >
+                                {mainImg ? (
+                                    <img
+                                        src={mainImg}
+                                        alt="상품 이미지"
+                                        className="product-detail-img-preview"
+                                    />
+                                ) : (
+                                    <div className="product-detail-img-preview-empty">이미지 없음</div>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
+
+                {/* 옵션 관리자 */}
+                <div className="back-ground-white padding-30 border-radius margin-bottom-20">
+                    <h4 className="margin-bottom-10 option-header">옵션 관리</h4>
+                    <OptionManager productIdx={product_idx} />
+                </div>
+
                 {/* 버튼 영역 */}
-                <div className="flex justify-right gap_10">
+                <div className="flex justify-left gap_10">
                     <button
                         className="btn"
                         onClick={() => window.location.href = '../'}

@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Pagination from "react-js-pagination";
 import { useRouter } from 'next/navigation';
+import { TbSearch } from "react-icons/tb";
+import DocsModal from "@/app/component/product/productModal/DocsModal";
 
 const sortOptions = [
     { id: 'latest', name: '최신순' },
@@ -18,19 +20,41 @@ export default function OrderList() {
     const [orders, setOrders] = useState([]);
     const [categoryOptions, setCategoryOptions] = useState([{ id: 0, name: '전체' }]);
     const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
-    const [selectedCategory, setSelectedCategory] = useState({ id: 0, name: '전체' });
+    const [selectedCategory, setSelectedCategory] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const pageSize = 10;
     const router = useRouter();
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+    const [searchText, setSearchText] = useState('');
+    const [showDocsModal, setShowDocsModal] = useState(false);
+    const [docProductIdx, setDocProductIdx] = useState(null);
+
+    const openDocsModal = (productIdx) => {
+        setDocProductIdx(productIdx);
+        setShowDocsModal(true);
+    };
+
+    const closeDocsModal = () => {
+        setShowDocsModal(false);
+        setDocProductIdx(null);
+    };
 
     useEffect(() => {
         fetchCategoryOptions();
     }, []);
 
     useEffect(() => {
-        fetchOrders(currentPage, selectedSort.id, selectedCategory.id);
-    }, [selectedSort.id, selectedCategory.id, currentPage]);
+        if (categoryOptions.length > 0 && !selectedCategory) {
+            setSelectedCategory(categoryOptions[0]);
+        }
+    }, [categoryOptions]);
+
+    useEffect(() => {
+        if (selectedCategory?.id !== undefined) {
+            fetchOrders(currentPage, selectedSort.id, selectedCategory.id, searchText); // ← 검색어 추가
+        }
+    }, [selectedSort.id, selectedCategory?.id, currentPage, searchText]);
 
     useEffect(() => {
         setCheckedItems([]);
@@ -76,35 +100,42 @@ export default function OrderList() {
                     id: c.category_idx,
                     name: c.category_name
                 }));
-                setCategoryOptions([{ id: 0, name: '전체' }, ...options]);
+                setCategoryOptions(options);
+                setSelectedCategory(options[0]);
             }
         } catch (err) {
             console.error('카테고리 목록 불러오기 실패:', err);
         }
     };
 
-    const fetchOrders = async (page, sortId, categoryId) => {
-        try {
-            const response = await axios.post('http://localhost:8080/product/list', {
-                search: '',
-                category: selectedCategory.id,
-                sort: selectedSort.id === 'latest' ? '' : 'price_asc',
-                page: page,
-                size: pageSize
-            }, {
-                headers: {
-                    Authorization: sessionStorage.getItem('token')
-                }
-            });
+    const fetchOrders = async (page, sortId, categoryId, search = '') => {
+        const token = sessionStorage.getItem('token')
+        const url = 'http://localhost:8080/product/list'
 
-            if (response.data) {
-                setOrders(response.data.list || []);
-                setTotalCount(response.data.total || 0);
-            }
-        } catch (err) {
-            console.error('상품 목록 조회 실패:', err);
+        const payload = {
+            category_idx: categoryId || 0,
+            page,
+            size: 10,
+            sort: sortId,
+            search: search.trim()
         }
-    };
+
+        try {
+            const res = await axios.post(url, payload, {
+                headers: { Authorization: token }
+            })
+
+            const list = res.data?.data?.list || res.data?.list || []
+            const total = res.data?.data?.total || res.data?.total || list.length
+
+            setOrders(list)
+            setTotalCount(total)
+        } catch (err) {
+            console.error('상품 목록 조회 실패:', err)
+        }
+    }
+
+
 
     const goToNewProduct = () => {
         router.push('./product/insert');
@@ -150,6 +181,16 @@ export default function OrderList() {
         }
     };
 
+    const handleSearch = () => {
+        setCurrentPage(1);
+        fetchOrders(1, selectedSort.id, selectedCategory?.id, searchText);
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
 
     return (
         <div className='productPage wrap page-background'>
@@ -160,6 +201,17 @@ export default function OrderList() {
                 </h3>
 
                 <div className="flex gap_10 align-center justify-right margin-bottom-10">
+                    {/* 검색 입력창 */}
+                    <input
+                        type="text"
+                        value={searchText}
+                        onChange={(e) => setSearchText(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        placeholder="상품명 또는 품목코드"
+                        className="product-input-search"
+                    />
+                    <button className="product-search-btn" onClick={handleSearch}><TbSearch className="product-search-icon"/></button>
+
                     {/* 정렬 */}
                     <div className="select-container">
                         <Listbox value={selectedSort} onChange={handleSortChange}>
@@ -177,7 +229,9 @@ export default function OrderList() {
                     {/* 카테고리 */}
                     <div className="select-container">
                         <Listbox value={selectedCategory} onChange={handleCategoryChange}>
-                            <ListboxButton className="select-btn">{selectedCategory.name}</ListboxButton>
+                            <ListboxButton className="select-btn">
+                                {selectedCategory ? selectedCategory.name : '카테고리 선택'}
+                            </ListboxButton>
                             <ListboxOptions className="select-option">
                                 {categoryOptions.map(option => (
                                     <ListboxOption key={option.id} value={option} className="select-option-item">
@@ -192,36 +246,36 @@ export default function OrderList() {
                 {/* 상품 테이블 */}
                 <table className="product-list margin-bottom-10">
                     <thead>
-                        <tr>
-                            <th>
-                                <input
-                                    type="checkbox"
-                                    checked={isAllChecked}
-                                    onChange={handleAllCheck}
-                                />
-                            </th>
-                            <th>NO.</th>
-                            <th>품목코드</th>
-                            <th>품목명</th>
-                            <th>규격</th>
-                            <th>입고 단가</th>
-                            <th>판매 단가</th>
-                            <th>할인율</th>
-                            <th>카테고리</th>
-                            <th>이미지</th>
-                        </tr>
+                    <tr>
+                        <th>
+                            NO.<input
+                            type="checkbox"
+                            checked={isAllChecked}
+                            onChange={handleAllCheck}
+                        />
+                        </th>
+                        <th>품목코드</th>
+                        <th>품목명</th>
+                        <th>규격</th>
+                        <th>입고 단가</th>
+                        <th>판매 단가</th>
+                        <th>할인율</th>
+                        <th>카테고리</th>
+                        <th>이미지</th>
+                        <th>문서</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {orders.map((order, index) => (
                         <tr key={order.product_idx}>
                             <td>
+                                {index + 1}.
                                 <input
                                     type="checkbox"
                                     checked={checkedItems.includes(order.product_idx)}
                                     onChange={(e) => handleCheckItem(e, order.product_idx)}
                                 />
                             </td>
-                            <td>{index + 1}</td>
                             <td>{order.product_idx}</td>
                             <td className="product-clickable" onClick={() => goToDetail(order.product_idx)}>
                                 {order.product_name}
@@ -232,6 +286,11 @@ export default function OrderList() {
                             <td>{order.discount_rate}%</td>
                             <td>{order.category_name || '기타'}</td>
                             <td>-</td>
+                            <td>
+                                <button className="product-clickable" onClick={() => openDocsModal(order.product_idx)}>
+                                    문서
+                                </button>
+                            </td>
                         </tr>
                     ))}
 
@@ -247,7 +306,7 @@ export default function OrderList() {
                 </table>
 
                 {/* 페이지네이션 */}
-                <div className="product-pagination flex justify-content-center gap_5">
+                <div className="product-pagination flex justify-content-center gap_5 margin-bottom-20">
                     <Pagination
                         activePage={currentPage}
                         itemsCountPerPage={pageSize}
@@ -257,15 +316,26 @@ export default function OrderList() {
                     />
                 </div>
 
-                <div className="flex justify-left gap_10">
-                    <button className="product-btn" onClick={goToNewProduct}>
-                        상품 등록
-                    </button>
+                <div className="flex justify-left gap_10 position-relative">
+                    <div className="product-dropdown-wrap">
+                        <button className="product-btn" onClick={() => setIsDropdownOpen(prev => !prev)}>
+                            상품 등록 ▾
+                        </button>
+                        {isDropdownOpen && (
+                            <p className="product-dropdown-content">
+                                <button onClick={() => router.push('./product/insert')}>1개 상품 등록</button>
+                                <button onClick={() => router.push('./product/insertCsv')}>CSV 대량 등록</button>
+                            </p>
+                        )}
+                    </div>
                     <button className="product-btn-del" onClick={handleDelSelected}>
-                        삭제
+                        선택 삭제
                     </button>
                 </div>
             </div>
+            {showDocsModal && (
+                <DocsModal productIdx={docProductIdx} onClose={closeDocsModal} />
+            )}
         </div>
-    );
+);
 }
