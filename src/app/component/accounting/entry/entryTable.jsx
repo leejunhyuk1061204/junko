@@ -17,6 +17,7 @@ export default function EntryTable({ entries, selectedList, setSelectedList, onC
                 <th>고객명</th>
                 <th>금액</th>
                 <th>일자</th>
+                <th>작성자</th>
                 <th>상태</th>
                 <th>첨부</th>
                 <th>승인</th>
@@ -38,6 +39,7 @@ export default function EntryTable({ entries, selectedList, setSelectedList, onC
                     <td>{entry.customer_name || '-'}</td>
                     <td>{entry.amount?.toLocaleString()}원</td>
                     <td>{entry.entry_date}</td>
+                    <td>{entry.user_name || '-'}</td>
                     <td className={`status ${entry.status}`}>{entry.status}</td>
                     <td>{entry.has_file === true || entry.has_file === 1 ? '○' : 'X'}</td>
                     <td>{entry.approved ? '○' : 'X'}</td>

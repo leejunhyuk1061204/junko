@@ -15,6 +15,30 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
         setLoginUserId(userId)
     }, [])
 
+    const updateStatus = async (newStatus) => {
+        try {
+            const res = await axios.patch(`http://localhost:8080/accountStatusUpdate/${entry.entry_idx}/status`, {
+                status: newStatus,
+                logMsg: `${newStatus} 처리됨`
+            }, {
+                headers: {
+                    authorization: localStorage.getItem("token")
+                }
+            })
+
+            if (res.data.success) {
+                alert(`${newStatus} 처리 완료!`)
+                onClose()
+                window.location.reload()
+            } else {
+                alert(res.data.message || '처리 실패')
+            }
+        } catch (err) {
+            console.error("상태 처리 중 오류", err)
+            alert("처리 중 오류 발생")
+        }
+    }
+
     const handlePreview = (file) => {
         setSelectedFile(file)
     }
@@ -106,6 +130,22 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         </button>
                     </div>
                 )}
+                <div style={{ marginTop: '10px', textAlign: 'center' }}>
+                    {entry.status === "작성중" && loginUserId === entry.user_id && (
+                        <button className="entryList-fabBtn blue" onClick={() => updateStatus("제출")}>제출</button>
+                    )}
+
+                    {entry.status === "제출" && userType === "admin" && (
+                        <>
+                            <button className="entryList-fabBtn blue" onClick={() => updateStatus("확정")}>확정</button>
+                            <button className="entryList-fabBtn red-del" onClick={() => updateStatus("반려")}>반려</button>
+                        </>
+                    )}
+
+                    {entry.status === "반려" && loginUserId === entry.user_id && (
+                        <button className="entryList-fabBtn blue" onClick={() => updateStatus("제출")}>재제출</button>
+                    )}
+                </div>
 
                 <EntryEditModal
                     open={editOpen}
