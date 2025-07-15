@@ -39,7 +39,7 @@ export default function EntryTable({ entries, selectedList, setSelectedList, onC
                     <td>{entry.amount?.toLocaleString()}원</td>
                     <td>{entry.entry_date}</td>
                     <td className={`status ${entry.status}`}>{entry.status}</td>
-                    <td>{entry.has_file ? '○' : 'X'}</td>
+                    <td>{entry.has_file === true || entry.has_file === 1 ? '○' : 'X'}</td>
                     <td>{entry.approved ? '○' : 'X'}</td>
                 </tr>
             ))}

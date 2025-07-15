@@ -2,10 +2,18 @@
 
 import { useEffect, useState } from "react"
 import axios from "axios"
+import EntryEditModal from "@/app/component/modal/EntryEditModal";
 
 const EntryDetailModal = ({ open, onClose, entry }) => {
     const [files, setFiles] = useState([])
     const [selectedFile, setSelectedFile] = useState(null)
+    const [loginUserId, setLoginUserId] = useState(null)
+    const [editOpen, setEditOpen] = useState(false)
+
+    useEffect(() => {
+        const userId = sessionStorage.getItem('user_id') // 또는 쿠키에서 가져오기
+        setLoginUserId(userId)
+    }, [])
 
     const handlePreview = (file) => {
         setSelectedFile(file)
@@ -43,8 +51,20 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         {files.length > 0 ? files.map(file => (
                             <li key={file.file_idx}>
                                 📎 {file.ori_filename}
-                                <button onClick={() => handlePreview(file)}>미리보기</button>
-                                <button onClick={() => window.open(`http://localhost:8080/entryFileDown/${file.file_idx}`, '_blank')}>
+                                <button
+                                    className="entryList-fabBtn blue"
+                                    onClick={() => handlePreview(file)}
+                                    style={{ marginLeft: '10px' }}
+                                >
+                                    미리보기
+                                </button>
+                                <button
+                                    className="entryList-fabBtn gray"
+                                    onClick={() =>
+                                        window.open(`http://localhost:8080/entryFileDown/${file.file_idx}`, '_blank')
+                                    }
+                                    style={{ marginLeft: '5px' }}
+                                >
                                     다운로드
                                 </button>
                             </li>
@@ -54,7 +74,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                 {selectedFile && (
                     <div style={{ marginTop: '20px' }}>
                         <strong>미리보기:</strong>
-                        {selectedFile.ori_filename.endsWith('.pdf') ? (
+                        {selectedFile.type === 'pdf' ? (
                             <iframe
                                 src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`}
                                 width="100%"
@@ -65,12 +85,37 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                             <img
                                 src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`}
                                 alt="첨부 이미지"
-                                style={{ maxWidth: '100%', maxHeight: '500px', border: '1px solid #ccc', borderRadius: '8px' }}
+                                style={{
+                                    maxWidth: '100%',
+                                    maxHeight: '500px',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '8px'
+                                }}
+                                onError={() => alert('이미지 로딩 실패!')}
                             />
                         )}
                     </div>
                 )}
+                {loginUserId === entry.user_id && (
+                    <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                        <button
+                            onClick={() => setEditOpen(true)}
+                            className="entryList-fabBtn blue"
+                        >
+                            ✏️ 수정하기
+                        </button>
+                    </div>
+                )}
 
+                <EntryEditModal
+                    open={editOpen}
+                    onClose={() => setEditOpen(false)}
+                    entry={entry}
+                    onSuccess={() => {
+                        onClose(); // 상세 닫고
+                        window.location.reload(); // 리스트 갱신
+                    }}
+                />
             </div>
         </div>
     )

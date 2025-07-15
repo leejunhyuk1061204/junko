@@ -7,6 +7,7 @@ import EntryTable from "./entryTable"
 import SearchBar from "./searchBar"
 import Pagination from "react-js-pagination"
 import EntryDetailModal from "@/app/component/modal/EntryDetailModal";
+import EntryRegistModal from "@/app/component/modal/EntryRegistModal";
 
 export default function Page() {
     const [entries, setEntries] = useState([])
@@ -16,6 +17,7 @@ export default function Page() {
     const [selectedList, setSelectedList] = useState([])
     const [selectedEntry, setSelectedEntry] = useState(null)
     const [isSearching, setIsSearching] = useState(false)
+    const [showRegistModal, setShowRegistModal] = useState(false)
 
     const defaultFilter = {
         status: '',
@@ -137,8 +139,10 @@ export default function Page() {
                                 onChange={(page) => setPage(page)}
                             />
                         </div>
-
                         <div className="flex justify-start gap-2 mt-4">
+                            <button className="entryList-fabBtn blue" onClick={() => setShowRegistModal(true)}>
+                                전표 등록
+                            </button>
                             <button className="entryList-fabBtn red-del" onClick={handleDelete}>삭제</button>
                         </div>
                     </section>
@@ -148,6 +152,14 @@ export default function Page() {
                             open={!!selectedEntry}
                             entry={selectedEntry}
                             onClose={() => setSelectedEntry(null)}
+                        />
+                    )}
+
+                    {showRegistModal && (
+                        <EntryRegistModal
+                            open={showRegistModal}
+                            onClose={() => setShowRegistModal(false)}
+                            onSuccess={() => fetchEntries(page)}
                         />
                     )}
                 </div>
