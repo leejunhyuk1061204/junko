@@ -1724,6 +1724,81 @@ input[type='text']:focus,input[type='password']:focus{
     gap: 4px;
     margin-bottom: 15px;
 }
+/*-------------------------수금 / 지급 css--------------------------------*/
+.cap-wrapper {
+    padding: 32px;
+}
+.cap-header {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+.cap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+.cap-table th, .cap-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+.cap-table th {
+    background: #f5f5f5;
+}
+.cap-table td button {
+    cursor: pointer;
+}
+
+/* === 수금 지급 검색 영역 === */
+.cap-search-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.cap-search-bar input,
+.cap-search-bar select,
+.cap-search-bar button {
+    padding: 8px;
+    font-size: 14px;
+}
+
+/* === 수금 지급 등록 영역 === */
+
+.modal-cap {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    padding: 24px;
+    width: 500px;
+    z-index: 1000;
+}
+
+.modal-cap form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.modal-cap label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 500;
+}
+.modal-cap input, .modal-cap select {
+    padding: 8px;
+}
+.modal-cap button {
+    margin-top: 12px;
+    padding: 10px;
+    font-weight: bold;
+}
 
 
 /* === 메인 페이지 === */
