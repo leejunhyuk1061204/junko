@@ -69,6 +69,14 @@ const LoginPage = () => {
         setResult(false);
     }
 
+    // 엔터
+    const loginEnter = (e) => {
+        console.log(e.keyCode);
+        if(e.keyCode===13){
+            toggleLogin();
+        }
+    }
+
     return (
         <div>
             <Header/>
@@ -83,7 +91,7 @@ const LoginPage = () => {
                         <div><p className='text-align-left '>아이디</p></div>
                         <div className='margin-bottom-10'><input type='text' placeholder='아이디를 입력하세요' value={login.id} name='id' onChange={e=>loginChange(e)}/></div>
                         <div><p className='text-align-left '>비밀번호</p></div>
-                        <div className='margin-bottom-10'><input type='password' placeholder='비밀번호를 입력하세요' value={login.pw} name='pw' onChange={e=>loginChange(e)}/></div>
+                        <div className='margin-bottom-10'><input type='password' placeholder='비밀번호를 입력하세요' value={login.pw} name='pw' onChange={e=>loginChange(e)} onKeyUp={e=>loginEnter(e)}/></div>
                         {/*<div><p className='text-align-left '>부서</p></div>*/}
                         {/*<div className='margin-y-10'>*/}
                         {/*    <select className='width-100 login-select' id='dept' onChange={e=>loginChange(e)}>*/}

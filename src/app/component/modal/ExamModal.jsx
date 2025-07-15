@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ExamModal = ({onClose}) => {
+const ExamModal = ({open,onClose}) => {
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
