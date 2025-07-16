@@ -2,21 +2,22 @@ const CustomToolbar =(props) => {
     const {label, onNavigate, localizer} = props;
 
     return (
-        <div className="rbc-toolbar no-wrap" style={{position: 'relative'}}>
-            <span className="rbc-btn-group">
-                <button type="button" onClick={() => onNavigate('PREV')}>{localizer.messages.previous}</button>
-                <button type="button" onClick={() => onNavigate('TODAY')}>{localizer.messages.today}</button>
-                <button type="button" onClick={() => onNavigate('NEXT')}>{localizer.messages.next}</button>
-            </span>
-            <span className="rbc-toolbar-label flex-1">{label}</span>
+        <div>
+            <div className="schedule-toolbar-wrapper">
+                <div className="schedule-custom-toolbar">
+                    <button type="button" onClick={() => onNavigate('PREV')}>&lt;</button>
+                    <span className="rbc-toolbar-label">{label}</span>
+                    <button type="button" onClick={() => onNavigate('NEXT')}>&gt;</button>
+                </div>
+                <div className="schedule-today-btn">
+                    <button type="button" onClick={() => onNavigate('TODAY')}>{localizer.messages.today}</button>
+                </div>
+            </div>
+
             <div className="schedule-label-opt">
-                <p style={{backgroundColor: '#90A4AE'}}>일정</p>
-                <p style={{backgroundColor: '#A8B88A'}}>연차</p>
-                <p style={{backgroundColor: '#D6BFA7'}}>반차</p>
-                <p style={{backgroundColor: '#9FA8DA'}}>회의</p>
-                <p style={{backgroundColor: '#E0B084'}}>외근</p>
-                <p style={{backgroundColor: '#A1887F'}}>출장</p>
-                <p style={{backgroundColor: '#AED9B4'}}>행사</p>
+                <p style={{backgroundColor: '#90A4AE'}}>개인 일정</p>
+                <p style={{backgroundColor: '#D6BFA7'}}>근무 상태</p>
+                <p style={{backgroundColor: '#AED9B4'}}>회사 일정</p>
                 <p style={{backgroundColor: '#D78888'}}>중요</p>
             </div>
         </div>
