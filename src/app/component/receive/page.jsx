@@ -39,8 +39,8 @@ const ReceivingPage = () => {
     const [selectedStatus, setSelectedStatus] = useState({idx:1, name:'전체'});
     const statusRef = useRef({});
     const [selectedDate, setSelectedDate] = useState({});
-    const [inputModalOpen, setInputModalOpen] = useState({bool:false,idx:0});
-    const [updateInfo, setUpdateInfo] = useState({});
+    const [inputModalOpen, setInputModalOpen] = useState({bool:false,idx:0,status:null});
+    const [updateInfo, setUpdateInfo] = useState([]);
 
 
     useEffect(() => {
@@ -66,8 +66,8 @@ const ReceivingPage = () => {
     }
 
     // 입고 상태 수정하기
-    const updateReceiveStatus = async (idx,status) => {
-        setInputModalOpen({bool:true,idx:idx});
+    const updateReceiveStatus = (idx,status) => {
+        setInputModalOpen({bool:true,idx:idx,status:status});
         // const {date} = await axios.post('http://localhost:8080/receive/update',{receive_idx : idx , status : status})
         // console.log(data);
         // if(!data.success){
@@ -251,7 +251,7 @@ const ReceivingPage = () => {
                     </div>
                 </div>
             </div>
-            <ReceiveInputModal open={inputModalOpen.bool} onClose={()=>setInputModalOpen({bool:false,idx:0})} setUpdateInfo={setUpdateInfo} idx={inputModalOpen.idx}/>
+            <ReceiveInputModal open={inputModalOpen.bool} onClose={()=>setInputModalOpen({bool:false,idx:0,status:null})} setUpdateInfo={setUpdateInfo} idx={inputModalOpen.idx} status={inputModalOpen.status} getReceiveList={getReceiveList}/>
         </div>
     );
 };

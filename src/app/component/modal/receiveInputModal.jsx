@@ -1,71 +1,119 @@
 'use client'
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
+import {useAlertModalStore} from "@/app/zustand/store";
 
-const receiveInputModal = ({open,onClose,setUpdateInfo,idx}) => {
+const receiveInputModal = ({open,onClose,setUpdateInfo,idx,status,getReceiveList}) => {
 
+    const {openModal,closeModal} = useAlertModalStore();
     const [receiveProducts, setReceiveProducts] = useState([]);
     const [info, setInfo] = useState([]);
     const [row, setRow] = useState(3);
 
     const [productList, setProductList] = useState([]);
-    const [productSearch1, setProductSearch1] = useState('');
-    const [productSearch2, setProductSearch2] = useState('');
     const [productFocused, setProductFocused] = useState({});
+    const [optionFocused, setOptionFocused] = useState({});
+    const [optionList, setOptionList] = useState({});
 
-    const [optionList, setOptionList] = useState([]);
-    const [searchOption, setSearchOption] = useState([]);
-    const [optionSearch1, setOptionSearch1] = useState('');
-    const [optionSearch2, setOptionSearch2] = useState('');
-    const [optionFocused, setOptionFocused] = useState([]);
+    const [zoneList, setZoneList] = useState([]);
+    const [zoneFocused, setZoneFocused] = useState({});
 
-    useEffect(() => {
-        if (idx === null) return;
+    const [user, setUser] = useState([]);
+    const [selectedUser, setSelectedUser] = useState({});
+    const [userSearch, setUserSearch] = useState('');
+    const [userName, setUserName] = useState('');
+    const [userFocused, setUserFocused] = useState(false);
+
+    useEffect(()=>{
+        if(idx === 0) return;
         getReceiveProduct();
+        getUser();
     },[idx])
 
-    useEffect(() => {
-        console.log('옵션리스트',optionList);
-    }, [optionList]);
+    // user 리스트
+    const getUser = async (searchText='') => {
+        const {data} = await axios.post('http://localhost:8080/users/list',{page:1,user_name:searchText});
+        setUser(data.list);
+        // console.log('user',data);
+    }
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setProductSearch2(productSearch1);
+            setUserName(userSearch);
             // // console.log('유저 검색');
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [productSearch1]);
+    }, [userSearch]);
 
     useEffect(() => {
-        getReceiveProduct(productSearch2);
-    }, [productSearch2]);
+        getUser(userName);
+    }, [userName]);
 
-    const filterOptionList = (searchText='') => {
-        let filteredOptionList = optionList.filter(f=>f.option_name.contain(searchText));
-        setSearchOption(filteredOptionList);
+    const updateInfo = async () => {
+        try {
+            console.log(info);
+            const {data} = await axios.post('http://localhost:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser})
+            console.log(data);
+            if (!data.success) {
+                openModal({
+                    svg: '❗',
+                    msg1: '변경 실패',
+                    msg2: '진행 상태 변경에 실패했습니다',
+                    showCancel: false,
+                    onConfirm: () => {
+                        closeModal();
+                        handleClose();
+                    }
+                })
+            } else {
+                openModal({
+                    svg: '❗',
+                    msg1: '변경 성공',
+                    msg2: '진행 상태 변경에 성공했습니다',
+                    showCancel: false,
+                    onConfirm: () => {
+                        closeModal();
+                        getReceiveList();
+                        handleClose();
+                    }
+                })
+            }
+        } catch (error) {
+            console.log(error);
+            openModal({
+                svg: '❗',
+                msg1: '오류 발생',
+                msg2: '서버 요청 중 문제가 발생했습니다',
+                showCancel: false,
+                onConfirm: () => {
+                    closeModal();
+                    handleClose();
+                }
+            })
+        }
     }
-
-    useEffect(() => {
-        const timer = setTimeout(()=>{
-            setOptionSearch2(optionSearch1);
-        },300);
-
-        return () => clearTimeout(timer);
-    },[optionSearch1])
-
-    useEffect(()=>{
-        filterOptionList();
-    },[optionSearch2])
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
         setReceiveProducts([]);
-        setInfo({});
-        setProductSearch1('');
-        setProductSearch2('');
+        setInfo([]);
+        setRow(3);
+
+        setProductList([]);
         setProductFocused({});
-        setOptionList([]);
+        setOptionFocused({});
+        setOptionList({});
+
+        setZoneList([]);
+        setZoneFocused({});
+
+        setUser([]);
+        setSelectedUser({});
+        setUserSearch('');
+        setUserName('');
+        setUserFocused(false);
+        
         onClose();
     };
 
@@ -77,17 +125,25 @@ const receiveInputModal = ({open,onClose,setUpdateInfo,idx}) => {
             const item = updated[i] || {};
             updated[i] = {
                 ...item,
-                filed:value
+                [filed]:value
             }
             return updated;
         });
     }
 
     // idx로 receive_product 가져오기
-    const getReceiveProduct = async (searchText='') => {
-        const {data} = await axios.post('http://localhost:8080/receiveProduct/list',{page:1,receive_idx:idx,search:searchText,limit:false});
+    const getReceiveProduct = async () => {
+        const {data} = await axios.post('http://localhost:8080/receiveProduct/list',{receive_idx:idx});
+        console.log(idx);
         console.log('입고상품',data);
         setReceiveProducts(data.list);
+        let filteredReceiveProduct = data.list.filter((item,index,self)=>self.findIndex(v=>v.product_idx === item.product_idx) === index);
+        setProductList(filteredReceiveProduct);
+        if(data.list.length > 0){
+            const zone = await axios.post('http://localhost:8080/zone/list',{warehouse_idx:data.list[0].warehouse_idx});
+            console.log(zone.data);
+            setZoneList(zone.data.list);
+        }
     }
 
     if (!open) return null;
@@ -116,7 +172,7 @@ const receiveInputModal = ({open,onClose,setUpdateInfo,idx}) => {
                     padding: '40px 30px',
                     minWidth: '320px',
                     position: 'relative',
-                    width: '700px'
+                    width: '1000px'
                 }}
             >
                 <button
@@ -140,6 +196,46 @@ const receiveInputModal = ({open,onClose,setUpdateInfo,idx}) => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         <>
                             <div>
+                                <div className='flex align-center gap_15'>
+                                    <div className='max-width-80 white-space-nowrap width'>담당자</div>
+                                    <div>
+                                        <div className="listBox-container">
+                                            <input
+                                                type="text"
+                                                className="width-100 border rounded"
+                                                placeholder="담당자 검색"
+                                                value={userSearch}
+                                                onChange={(e) => setUserSearch(e.target.value)}
+                                                onFocus={() => {
+                                                    setUserFocused(true);
+                                                    getUser(userSearch);
+                                                }}
+                                                onBlur={() => setTimeout(() => setUserFocused(false), 120)}
+                                            />
+                                            {userFocused ? (<>
+                                                {user?.length > 0 && (
+                                                    <ul className="listBox-option">
+                                                        {user?.map((u) => (
+                                                            <li
+                                                                key={u.user_idx}
+                                                                onClick={() => {
+                                                                    setSelectedUser(u.user_idx)
+                                                                    setUserSearch(u.user_name);
+                                                                }}
+                                                                className="listBox-option-item margin-0"
+                                                            >
+                                                                {u.user_name}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                                {user?.length === 0 && userSearch && (
+                                                    <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">검색 결과 없음</div>
+                                                )}
+                                            </>):('')}
+                                        </div>
+                                    </div>
+                                </div>
                                 <table>
                                     <thead>
                                         <tr>
@@ -155,95 +251,147 @@ const receiveInputModal = ({open,onClose,setUpdateInfo,idx}) => {
                                     <tbody>
                                     {Array.from({ length: row }, (_, i) => (
                                         <tr key={i}>
+                                            <td>{info[i]?.product_idx || ''}</td>
                                             <td>
                                                 <div className="listBox-container">
                                                     <input
                                                         type="text"
                                                         className="width-100 border rounded"
-                                                        placeholder="상품 검색"
-                                                        value={optionSearch1}
-                                                        onChange={(e) => setOptionSearch1(e.target.value)}
+                                                        placeholder="입고 상품"
+                                                        value={info[i]?.product_name || ''}
                                                         onFocus={() => {
-                                                            setProductFocused(prev=>({...prev,i:true}));
-                                                            getReceiveProduct(productSearch1);
+                                                            setProductFocused(prev=>({...prev,[i]:true}));
                                                         }}
-                                                        onBlur={() => setTimeout(() => setProductFocused(prev=>({...prev,i:false})), 120)}
+                                                        onBlur={() => setTimeout(() => setProductFocused(prev=>({...prev,[i]:false})), 120)}
+                                                        readOnly={true}
                                                     />
-                                                    {productFocused[i]===true ? (<>
-                                                        {receiveProducts?.length > 0 && (
+                                                    {productFocused[i] ? (<>
+                                                        {productList?.length > 0 && (
                                                             <ul className="listBox-option">
-                                                                {receiveProducts?.map((rp) => (
+                                                                {productList?.map((pl) => (
                                                                     <li
-                                                                        key={rp.receive_product_idx}
+                                                                        key={pl.receive_product_idx}
                                                                         onClick={() => {
-                                                                            changeInfo(i,'product_idx',rp.product_idx);
-                                                                            changeInfo(i,'product_name',rp.product_name);
-                                                                            setProductSearch1(rp.product_name);
-                                                                            setOptionList(receiveProducts.filter(item=>item.product_idx === rp.product_idx));
+                                                                            changeInfo(i,'product_name', pl.product_name);
+                                                                            changeInfo(i,'product_idx', Number(pl.product_idx));
+                                                                            if(typeof pl.product_option_idx === 'undefined'){
+                                                                                changeInfo(i,'product_option_idx',null);
+                                                                            } else {
+                                                                                setOptionList(prev=>({...prev,[i]:receiveProducts.filter(f=>f.product_idx===pl.product_idx)}));
+                                                                                if(receiveProducts.filter(f=>f.product_idx === pl.product_idx).length ===1){
+                                                                                    changeInfo(i,'product_option_idx',Number(receiveProducts.filter(f=>f.product_idx === pl.product_idx)[0].product_option_idx));
+                                                                                    changeInfo(i,'combined_name',receiveProducts.filter(f=>f.product_idx === pl.product_idx)[0].combined_name);
+                                                                                }
+                                                                            }
                                                                         }}
                                                                         className="listBox-option-item margin-0"
                                                                     >
-                                                                        {rp.product_name}
+                                                                        {pl.product_name}
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                         )}
-                                                        {receiveProducts?.length === 0 && productSearch1 && (
+                                                        {receiveProducts?.length === 0 && (
                                                             <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">검색 결과 없음</div>
                                                         )}
                                                     </>):('')}
                                                 </div>
                                             </td>
                                             <td>
-                                                <input type='text' value={info[i]?.product_name || ''} />
+                                                <div className="listBox-container">
+                                                    <input
+                                                        type="text"
+                                                        className="width-100 border rounded"
+                                                        placeholder="상품 옵션"
+                                                        value={info[i]?.product_option_idx ? // 옵션 있어 ?
+                                                            info[i]?.combined_name :
+                                                            !info[i]?.product_idx ? // 상품은 선택 됐어 ?
+                                                                '' :
+                                                                info[i]?.product_option_idx === null ? // 선택된 상품에 옵션이 있어 ?
+                                                                    '없음' :
+                                                                    optionList[i]?.length === 1 ? // 선택된 상품의 옵션리스트가 하나야 ?
+                                                                        optionList[i][0].combined_name : '옵션 선택'}
+                                                        onFocus={() => {
+                                                            setOptionFocused(prev=>({...prev,[i]:true}));
+                                                            console.log(optionList);
+                                                        }}
+                                                        onBlur={() => setTimeout(() => setOptionFocused(prev=>({...prev,[i]:false})), 120)}
+                                                        readOnly={true}
+                                                    />
+                                                    {optionFocused[i] && optionList[i]?.length > 1 ? (<>
+                                                        {optionList[i]?.length > 0 && (
+                                                            <ul className="listBox-option">
+                                                                {optionList[i]?.map((option) => (
+                                                                    <li
+                                                                        key={option.product_option_idx}
+                                                                        onClick={() => {
+                                                                            changeInfo(i,'product_option_idx', Number(option.product_option_idx));
+                                                                            changeInfo(i,'combined_name',option.combined_name);
+                                                                        }}
+                                                                        className="listBox-option-item margin-0"
+                                                                    >
+                                                                        {option.combined_name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                        {optionList[i]?.length === 0 && (
+                                                            <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">옵션 없음</div>
+                                                        )}
+                                                    </>):('')}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <input type='text' placeholder='수량 입력' value={info[i]?.stock_cnt || ''} onChange={e=>changeInfo(i,'stock_cnt',Number(e.target.value))} />
                                             </td>
                                             <td>
                                                 <div className="listBox-container">
                                                     <input
                                                         type="text"
                                                         className="width-100 border rounded"
-                                                        placeholder="상품 검색"
-                                                        value={optionSearch1}
-                                                        onChange={(e) => setOptionSearch1(e.target.value)}
+                                                        placeholder="보관 장소"
+                                                        value={info[i]?.zone_name ? receiveProducts[0]?.warehouse_name +' '+info[i]?.zone_name : ''}
                                                         onFocus={() => {
-                                                            setOptionFocused(prev=>({...prev,i:true}));
-                                                            filterOptionList(optionSearch1);
+                                                            setZoneFocused(prev=>({...prev,[i]:true}));
                                                         }}
-                                                        onBlur={() => setTimeout(() => setProductFocused(prev=>({...prev,i:false})), 120)}
+                                                        onBlur={() => setTimeout(() => setZoneFocused(prev=>({...prev,[i]:false})), 120)}
+                                                        readOnly={true}
                                                     />
-                                                    {productFocused[i]===true ? (<>
-                                                        {receiveProducts?.length > 0 && (
+                                                    {zoneFocused[i] ? (<>
+                                                        {zoneList?.length > 0 && (
                                                             <ul className="listBox-option">
-                                                                {receiveProducts?.map((rp) => (
+                                                                {zoneList?.map((z) => (
                                                                     <li
-                                                                        key={rp.receive_product_idx}
+                                                                        key={z.zone_idx}
                                                                         onClick={() => {
-                                                                            changeInfo(i,'product_idx',rp.product_idx);
-                                                                            changeInfo(i,'product_name',rp.product_name);
-                                                                            setProductSearch1(rp.product_name);
-                                                                            setOptionList(receiveProducts.filter(item=>item.product_idx === rp.product_idx));
+                                                                            changeInfo(i,'zone_name', z.zone_name);
+                                                                            changeInfo(i,'zone_idx', Number(z.zone_idx));
                                                                         }}
                                                                         className="listBox-option-item margin-0"
                                                                     >
-                                                                        {rp.product_name}
+                                                                        {z.zone_name}
                                                                     </li>
                                                                 ))}
                                                             </ul>
                                                         )}
-                                                        {receiveProducts?.length === 0 && productSearch1 && (
+                                                        {zoneList?.length === 0 && (
                                                             <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">검색 결과 없음</div>
                                                         )}
                                                     </>):('')}
                                                 </div>
                                             </td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                            <td>
+                                                <input type='date' placeholder='제조일자' value={info[i]?.manufacture || ''} onChange={e=>changeInfo(i,'manufacture',e.target.value)} />
+                                            </td>
+                                            <td>
+                                                <input type='date' placeholder='유통기한' value={info[i]?.expiration || ''} onChange={e=>changeInfo(i,'expiration',e.target.value)} />
+                                            </td>
                                         </tr>
                                     ))}
                                     </tbody>
                                 </table>
+                                <div className='flex justify-right margin-y-20'><button className='btn' onClick={()=>setRow(row+1)}>상품 추가</button></div>
+                                <div><button className='btn' onClick={updateInfo}>완료</button></div>
                             </div>
                         </>
                     </div>
