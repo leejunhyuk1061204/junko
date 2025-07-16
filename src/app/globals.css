@@ -315,6 +315,10 @@ input[type='text']:focus,input[type='password']:focus{
     margin-right: 4%;
 }
 
+.margin-right-10 {
+    margin-right: 10px;
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
@@ -381,6 +385,10 @@ input[type='text']:focus,input[type='password']:focus{
 
 .font-color-red {
     color: var(--red-color);
+}
+
+.font-bold {
+    font-weight: 600;
 }
 
 .btn-back-blue {
@@ -1108,7 +1116,99 @@ input[type='text']:focus,input[type='password']:focus{
     background-size: 12px;
 }
 
-/* ------------------------------- 로그인 관련 -------------------------------*/
+/* ------------------------------- 카테고리 관련 ------------------------------- */
+.category-container {
+    display: flex;
+    width: 90%;
+    gap: 24px;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.category-left {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+}
+
+.category-right {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    min-height: 500px;
+    margin-right: 20px;
+}
+
+.category-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    text-align: left;
+    margin-left: 50px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fafafa;
+    transition: background 0.2s;
+    font-size: 14px;
+    margin-bottom: 3px;
+    width: 534px;
+}
+
+.category-item:hover {
+    background-color: #f0f0f0;
+}
+
+.category-item.dragging {
+    opacity: 0.4;
+}
+
+.depth-indent {
+    display: inline-block;
+    width: 16px;
+    position: relative;
+    margin-right: 8px;
+    font-size: 20px;
+}
+
+.cate-btn{
+    cursor: pointer;
+    width: 40px;
+    height: 16px;
+    box-shadow: var(--shadow);
+    background-color: #006CCE;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+.cate-btn:hover {
+    background-color: #1A82E3;
+}
+
+.cate-del-btn{
+    cursor: pointer;
+    width: 40px;
+    height: 16px;
+    box-shadow: var(--shadow);
+    background-color: #E86060;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+/* ------------------------------- 로그인 관련 ------------------------------- */
 
 .login-select {
     border: 1px solid var(--border-color);
@@ -1341,11 +1441,32 @@ input[type='text']:focus,input[type='password']:focus{
     color: #fff;
 }
 
+.react-datepicker__day--in-range {
+    background-color: var(--blue-btn-hover);
+    color: white;
+}
+
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+    background-color: var(--blue-btn-hover);
+    color: white;
+}
+
+.react-datepicker__day--range-start {
+    background-color: var(--blue-btn-hover);
+    border-color: var(--blue-btn-hover);
+    color: #fff;
+}
+
 .react-datepicker__day:hover {
     background-color: #f5f5f5;
     border-color: #f5f5f5;
     color: black;
     font-weight: 600;
+}
+
+.react-datepicker__aria-live {
+    display: none !important;
 }
 
 .calendar-footer {
@@ -1513,7 +1634,7 @@ input[type='text']:focus,input[type='password']:focus{
     color: var(--red-color);
 }
 
-.order-list-table thead th:first-child{
+.checkbox-table thead th:first-child{
     width:60px;
 }
 /*-------------------------회계 전표 css--------------------------------*/
