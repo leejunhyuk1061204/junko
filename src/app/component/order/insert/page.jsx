@@ -194,6 +194,8 @@ const OrderInsertPage = () => {
         // console.log(i);
         openDatePicker({
             index:i,
+            mode:'single',
+            modeSelect:false,
             initialDate: new Date(),
             onConfirm:(index,date)=>{
                 setOrderPlan((prev) => {
