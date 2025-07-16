@@ -198,7 +198,7 @@ const receiveInputModal = ({open,onClose,setUpdateInfo,idx,status,getReceiveList
                             <div>
                                 <div className='flex align-center gap_15'>
                                     <div className='max-width-80 white-space-nowrap width'>담당자</div>
-                                    <div>
+                                    <div className='flex-25'>
                                         <div className="listBox-container">
                                             <input
                                                 type="text"
