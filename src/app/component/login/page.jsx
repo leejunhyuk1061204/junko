@@ -37,6 +37,7 @@ const LoginPage = () => {
             sessionStorage.setItem('loginId',login.id);
             sessionStorage.setItem('token',data.token);
             sessionStorage.setItem('user_idx', data.user_idx);
+            sessionStorage.setItem('user_name',data.user_name);
             location.href='/';
         }
     }

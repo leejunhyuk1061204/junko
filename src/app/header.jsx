@@ -62,7 +62,7 @@ const mainMenus = [
     {
         title: '정산 / 회계관리',
         submenu: [
-            { label: '정산 현황', href: '/' },
+            { label: '정산 현황', href: '/component/purchaseSettlement' },
             { label: '거래처 / 공급사별 정산', href: '/' },
             { label: '세금 계산서 / 증빙 관리', href: '/' },
             { label: '입금 / 지급 관리', href: '/component/collectionAndPayment' },
@@ -163,7 +163,7 @@ const Header = () => {
                         <div className='cursor-pointer'><IoMailOutline/></div>
                         <div className='cursor-pointer'><BsPersonCircle/></div>
                         <div className='cursor-pointer'><IoSettingsOutline/></div>
-                        <div className='header-login-text'>환영합니다 {sessionStorage.getItem('loginId')} 님</div>
+                        <div className='header-login-text'>환영합니다 {sessionStorage.getItem('user_name')}님</div>
                         <button className='cursor-pointer header-login-text' onClick={handleLogout}>로그아웃</button>
                     </div>
                 ):(
