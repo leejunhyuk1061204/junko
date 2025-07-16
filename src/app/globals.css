@@ -1864,6 +1864,144 @@ input[type='text']:focus,input[type='password']:focus{
     font-weight: bold;
 }
 
+/*-------------------------정산 현황 css--------------------------------*/
+.settlement-wrapper {
+    padding: 2rem;
+}
+
+.settlement-filter {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.settlement-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.settlement-table th,
+.settlement-table td {
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+.status-label {
+    padding: 0.3rem 0.7rem;
+    border-radius: 1rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.status-red {
+    background-color: #fdd;
+    color: #d00;
+}
+
+.status-green {
+    background-color: #defade;
+    color: #1a7f2c;
+}
+
+.status-yellow {
+    background-color: #fff9cc;
+    color: #cfa300;
+}
+
+.settlement-bottom {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+.btn-blue {
+    background: #1976d2;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+}
+
+.btn-red {
+    background: #d32f2f;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 5px;
+}
+
+/* === 정산현황 등록 모달 페이지 === */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 10px;
+    min-width: 400px;
+}
+
+.modal-actions {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+}
+
+/* === settlementRow 페이지 === */
+
+.status-label {
+    display: inline-block;
+    padding: 0.3rem 0.6rem;
+    border-radius: 1rem;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.status-red {
+    background-color: #fdecea;
+    color: #d32f2f;
+}
+
+.status-green {
+    background-color: #e6f4ea;
+    color: #2e7d32;
+}
+
+.status-yellow {
+    background-color: #fff8e1;
+    color: #f9a825;
+}
+
+/* === 정산 상세보기 페이지 === */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 999;
+}
+.modal-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    min-width: 400px;
+}
+
 
 /* === 메인 페이지 === */
 .main-container {
