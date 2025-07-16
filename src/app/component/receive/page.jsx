@@ -8,6 +8,7 @@ import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui
 import {useAlertModalStore, useDatePickerStore} from "@/app/zustand/store";
 import {FaRegCalendarCheck} from "react-icons/fa6";
 import { format } from 'date-fns';
+import ReceiveInputModal from "@/app/component/modal/receiveInputModal";
 
 const sortOptions = [
     { id: 1, name: '최신순' , orderColumn : 'receive_date', orderDirection: 'desc' },
@@ -16,7 +17,7 @@ const sortOptions = [
 ];
 
 const receiveStatusList = [
-    {idx:1, name:'입고예정'},
+    // {idx:1, name:'입고예정'},
     {idx:2, name:'입고완료'},
 ]
 const statusList = [
@@ -38,7 +39,8 @@ const ReceivingPage = () => {
     const [selectedStatus, setSelectedStatus] = useState({idx:1, name:'전체'});
     const statusRef = useRef({});
     const [selectedDate, setSelectedDate] = useState({});
-    const [inputModalOpen, setInputModalOpen] = useState(false);
+    const [inputModalOpen, setInputModalOpen] = useState({bool:false,idx:0});
+    const [updateInfo, setUpdateInfo] = useState({});
 
 
     useEffect(() => {
@@ -65,6 +67,7 @@ const ReceivingPage = () => {
 
     // 입고 상태 수정하기
     const updateReceiveStatus = async (idx,status) => {
+        setInputModalOpen({bool:true,idx:idx});
         // const {date} = await axios.post('http://localhost:8080/receive/update',{receive_idx : idx , status : status})
         // console.log(data);
         // if(!data.success){
@@ -248,6 +251,7 @@ const ReceivingPage = () => {
                     </div>
                 </div>
             </div>
+            <ReceiveInputModal open={inputModalOpen.bool} onClose={()=>setInputModalOpen({bool:false,idx:0})} setUpdateInfo={setUpdateInfo} idx={inputModalOpen.idx}/>
         </div>
     );
 };
