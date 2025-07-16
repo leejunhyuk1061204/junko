@@ -1,10 +1,15 @@
 import React from "react";
 import CategoryTree from "./categoryTree";
 
-export default function CategoryList({ data, onChange }) {
+export default function CategoryList({ data, onChange, onEdit, onDelete }) {
     return (
-        <div className="catagory-tree-wrapper">
-            <CategoryTree data={data} onReorder={onChange} />
+        <div className="category-tree-wrapper">
+            <CategoryTree
+                data={data}
+                onReorder={onChange}
+                onEdit={onEdit}
+                onDelete={onDelete}
+            />
         </div>
     );
 }

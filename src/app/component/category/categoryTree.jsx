@@ -1,4 +1,3 @@
-// CategoryTree.jsx
 'use client';
 
 import axios from 'axios';
@@ -17,7 +16,7 @@ import {
 } from '@dnd-kit/sortable';
 import SortableItem from './SortableItem';
 
-export default function CategoryTree({ data, onReorder }) {
+export default function CategoryTree({ data, onReorder, onEdit, onDelete }) {
     const [items, setItems] = useState([]);
     const [activeId, setActiveId] = useState(null);
     const sensors = useSensors(useSensor(PointerSensor));
@@ -30,13 +29,9 @@ export default function CategoryTree({ data, onReorder }) {
 
     const flatten = (nodes, parent = null, depth = 0) => {
         return nodes.reduce((acc, node) => {
-            acc.push({
-                ...node,
-                category_parent: parent, // 부모 설정
-                depth, // 깊이 설정
-            });
-            if (Array.isArray(node.children) && node.children.length > 0) {
-                acc = acc.concat(flatten(node.children, node.category_idx, depth + 1)); // 자식에 대해서 재귀 호출
+            acc.push({ ...node, category_parent: parent, depth });
+            if (Array.isArray(node.children)) {
+                acc = acc.concat(flatten(node.children, node.category_idx, depth + 1));
             }
             return acc;
         }, []);
@@ -45,16 +40,16 @@ export default function CategoryTree({ data, onReorder }) {
     const buildTree = (flatList) => {
         const map = {};
         flatList.forEach((item) => {
-            map[item.category_idx] = { ...item, children: [] }; // 각 항목을 키로 하여 map에 저장
+            map[item.category_idx] = { ...item, children: [] };
         });
 
         const root = [];
         flatList.forEach((item) => {
             if (item.category_parent === null) {
-                root.push(map[item.category_idx]); // 최상위 아이템은 root에 추가
+                root.push(map[item.category_idx]);
             } else {
-                const parent = map[item.category_parent]; // 부모를 찾아서
-                if (parent) parent.children.push(map[item.category_idx]); // 부모의 children 배열에 자식 추가
+                const parent = map[item.category_parent];
+                if (parent) parent.children.push(map[item.category_idx]);
             }
         });
 
@@ -75,27 +70,19 @@ export default function CategoryTree({ data, onReorder }) {
         const flat = flatten(items);
         const activeItem = flat.find((i) => i.category_idx === active.id);
         const overItem = flat.find((i) => i.category_idx === over.id);
-
         if (!activeItem || !overItem) return;
 
-        // 1번 밑으로 이동시키려면, overItem의 category_idx를 activeItem의 category_parent로 설정
         const updatedList = flat.map((item) => {
             if (item.category_idx === activeItem.category_idx) {
-                return {
-                    ...item,
-                    category_parent: overItem.category_idx, // 부모를 overItem의 category_idx로 설정
-                };
+                return { ...item, category_parent: overItem.category_idx };
             }
             return item;
         });
 
-        // category_order는 인덱스를 기준으로 갱신
         const finalList = updatedList.map((item, idx) => ({
             ...item,
-            category_order: idx, // 순서 업데이트
+            category_order: idx,
         }));
-
-        console.log('최종 리스트:', finalList);  // 서버로 보내는 데이터 확인
 
         setItems(buildTree(finalList));
 
@@ -116,9 +103,13 @@ export default function CategoryTree({ data, onReorder }) {
             key={item.category_idx}
             item={item}
             depth={depth}
-            renderChild={renderItem}
+            renderChild={renderChild}
+            onEdit={onEdit}
+            onDelete={onDelete}  // 여기 꼭 넘기기!
         />
     );
+
+    const renderChild = (child, depth) => renderItem(child, depth);
 
     const flatItems = flatten(items);
 
@@ -133,8 +124,9 @@ export default function CategoryTree({ data, onReorder }) {
                 items={flatItems.map(i => i.category_idx)}
                 strategy={verticalListSortingStrategy}
             >
-                {items.map((item) => renderItem(item))}
+                {items.map(item => renderItem(item))}
             </SortableContext>
+
             <DragOverlay>
                 {activeId && (
                     <div style={{ padding: 8, background: '#eee' }}>
