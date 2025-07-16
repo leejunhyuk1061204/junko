@@ -1108,7 +1108,71 @@ input[type='text']:focus,input[type='password']:focus{
     background-size: 12px;
 }
 
-/* ------------------------------- 로그인 관련 -------------------------------*/
+/* ------------------------------- 카테고리 관련 ------------------------------- */
+.category-container {
+    display: flex;
+    width: 90%;
+    gap: 24px;
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.category-left {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+}
+
+.category-right {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+    min-height: 500px;
+    margin-right: 20px;
+}
+
+.category-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    text-align: left;
+    margin-left: 50px;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background-color: #fafafa;
+    transition: background 0.2s;
+    font-size: 14px;
+    margin-bottom: 3px;
+    width: 98%;
+}
+
+.category-item:hover {
+    background-color: #f0f0f0;
+}
+
+.category-item.dragging {
+    opacity: 0.4;
+}
+
+.depth-indent {
+    display: inline-block;
+    width: 16px;
+    position: relative;
+    margin-right: 8px;
+    font-size: 20px;
+}
+
+/* ------------------------------- 로그인 관련 ------------------------------- */
 
 .login-select {
     border: 1px solid var(--border-color);
