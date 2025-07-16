@@ -145,7 +145,7 @@ const DetailOrderModal = ({open,onClose,idx}) => {
                 >
                     ×
                 </button>
-
+                <h3 style={{fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>상세 정보</h3>
                 <>
 
                     {/* 탭 내용 */}
