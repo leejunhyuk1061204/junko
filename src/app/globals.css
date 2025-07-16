@@ -2060,6 +2060,33 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 
+/* ---------------세금 계산서------------ */
+/* 입력 박스 */
+.input-box {
+    @apply border px-2 py-1 rounded w-40;
+}
+
+/* 파란 버튼 */
+.btn-blue {
+    @apply bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600;
+}
+
+/* 상태 뱃지 */
+.badge {
+    @apply px-2 py-0.5 text-xs font-bold rounded;
+}
+.badge-draft {
+    @apply bg-yellow-200 text-yellow-900;
+}
+.badge-done {
+    @apply bg-green-200 text-green-800;
+}
+.badge-cancel {
+    @apply bg-red-200 text-red-700;
+}
+
+
+
 /* =============== 메인 페이지 =============== */
 .main-container {
     padding: 20px;

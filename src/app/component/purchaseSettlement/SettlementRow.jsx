@@ -10,17 +10,11 @@ export default function SettlementRow({ item, index, onClick }) {
         '부분정산': 'status-yellow'
     };
 
-    console.log("👀 렌더링할 항목:", item);
-
     return (
-        <tr className="settlement-row" onClick={() => onClick(settlement_idx)}>
+        <tr className="settlement-row" onClick={() => onClick(item)}>
             <td>{index}</td>
             <td>{`정산 #${settlement_idx}`}</td>
-            <td>
-                <span className={`status-label ${statusClass[status] || ''}`}>
-                    {status}
-                </span>
-            </td>
+            <td><span className={`status-label ${statusClass[status] || ''}`}>{status}</span></td>
             <td>-</td>
             <td>{settlement_day}</td>
             <td>{custom_name}</td>
@@ -28,4 +22,3 @@ export default function SettlementRow({ item, index, onClick }) {
         </tr>
     );
 }
-
