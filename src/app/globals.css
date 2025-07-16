@@ -315,6 +315,10 @@ input[type='text']:focus,input[type='password']:focus{
     margin-right: 4%;
 }
 
+.margin-right-10 {
+    margin-right: 10px;
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
@@ -381,6 +385,10 @@ input[type='text']:focus,input[type='password']:focus{
 
 .font-color-red {
     color: var(--red-color);
+}
+
+.font-bold {
+    font-weight: 600;
 }
 
 .btn-back-blue {
@@ -1153,7 +1161,7 @@ input[type='text']:focus,input[type='password']:focus{
     transition: background 0.2s;
     font-size: 14px;
     margin-bottom: 3px;
-    width: 98%;
+    width: 534px;
 }
 
 .category-item:hover {
@@ -1170,6 +1178,34 @@ input[type='text']:focus,input[type='password']:focus{
     position: relative;
     margin-right: 8px;
     font-size: 20px;
+}
+
+.cate-btn{
+    cursor: pointer;
+    width: 40px;
+    height: 16px;
+    box-shadow: var(--shadow);
+    background-color: #006CCE;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+.cate-btn:hover {
+    background-color: #1A82E3;
+}
+
+.cate-del-btn{
+    cursor: pointer;
+    width: 40px;
+    height: 16px;
+    box-shadow: var(--shadow);
+    background-color: #E86060;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
 }
 
 /* ------------------------------- 로그인 관련 ------------------------------- */
@@ -1405,11 +1441,32 @@ input[type='text']:focus,input[type='password']:focus{
     color: #fff;
 }
 
+.react-datepicker__day--in-range {
+    background-color: var(--blue-btn-hover);
+    color: white;
+}
+
+.react-datepicker__day--range-start,
+.react-datepicker__day--range-end {
+    background-color: var(--blue-btn-hover);
+    color: white;
+}
+
+.react-datepicker__day--range-start {
+    background-color: var(--blue-btn-hover);
+    border-color: var(--blue-btn-hover);
+    color: #fff;
+}
+
 .react-datepicker__day:hover {
     background-color: #f5f5f5;
     border-color: #f5f5f5;
     color: black;
     font-weight: 600;
+}
+
+.react-datepicker__aria-live {
+    display: none !important;
 }
 
 .calendar-footer {
@@ -1577,7 +1634,7 @@ input[type='text']:focus,input[type='password']:focus{
     color: var(--red-color);
 }
 
-.order-list-table thead th:first-child{
+.checkbox-table thead th:first-child{
     width:60px;
 }
 /*-------------------------회계 전표 css--------------------------------*/
@@ -2003,7 +2060,7 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 
-/* === 메인 페이지 === */
+/* =============== 메인 페이지 =============== */
 .main-container {
     padding: 20px;
     background-color: #f4f6f8;
@@ -2027,7 +2084,7 @@ input[type='text']:focus,input[type='password']:focus{
 
 .main-chart-row {
     display: flex;
-    gap: 24px;
+    gap: 15px;
     margin-top: 24px;
     align-items: flex-start;
 }
@@ -2063,7 +2120,6 @@ input[type='text']:focus,input[type='password']:focus{
 
 /* 차트 */
 .main-chart-box {
-    flex: 2;
     background-color: #fff;
     padding: 16px;
     border-radius: 8px;
@@ -2071,7 +2127,7 @@ input[type='text']:focus,input[type='password']:focus{
     height: 432px;
     position: relative;
     margin-top: 32px;
-    width: 70%;
+    width: 66.3%;
 }
 
 .chart-box canvas {
@@ -2166,7 +2222,7 @@ input[type='text']:focus,input[type='password']:focus{
 
 /* 캘린더 */
 .main-calendar-box {
-    flex: 1;
+    width: 33%;
     margin-top: 32px;
     background-color: #fff;
     padding: 16px;
@@ -2255,4 +2311,28 @@ input[type='text']:focus,input[type='password']:focus{
 
 .rbc-event-label {
     display: none;
+}
+
+
+/* =============== 스케줄 =============== */
+.schedule-label-opt {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap:3px;
+}
+
+.schedule-label-opt p {
+    color: white !important;
+    padding: 3px 5px;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+.no_wrap {
+    flex-wrap: nowrap !important;
+}
+
+.flex_1{
+    flex:1;
 }
