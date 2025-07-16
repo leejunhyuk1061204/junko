@@ -5,6 +5,7 @@ import Link from "next/link";
 import '../../globals.css';
 import FindModal from "@/app/component/modal/FindModal";
 import axios from "axios";
+import {useAlertModalStore} from "@/app/zustand/store";
 
 const sampleDepart = [
     {dept_idx:1 , dept_name:'인사부'},
@@ -27,20 +28,32 @@ const LoginPage = () => {
         id:'',
         email:'',
     })
+    const {openModal} = useAlertModalStore();
 
 
     // 로그인
     const toggleLogin = async () =>{
-        const {data} = await axios.post('http://localhost:8080/login',{user_id:login.id,pw:login.pw});
-        console.log(data);
-        if(data.success){
-            sessionStorage.setItem('loginId',login.id);
-            sessionStorage.setItem('token',data.token);
-            sessionStorage.setItem('user_idx', data.user_idx);
-            sessionStorage.setItem('user_name',data.user_name);
-            location.href='/';
+        try {
+            const {data} = await axios.post('http://localhost:8080/login',{user_id:login.id,pw:login.pw});
+            console.log(data);
+            if(data.success) {
+                sessionStorage.setItem('loginId', login.id);
+                sessionStorage.setItem('token', data.token);
+                sessionStorage.setItem('user_idx', data.user_idx);
+                sessionStorage.setItem('user_name', data.user_name);
+                location.href = '/';
+            }else {
+                openModal({
+                    svg: '❗',
+                    msg1: '로그인 실패',
+                    msg2: '아이디 또는 비밀번호를 확인해주세요.',
+                    showCancel: false,
+                });
+            }
+        }catch(err){
+            console.error("로그인 실패: ", err);
         }
-    }
+    };
 
     // 로그인 form 입력
     const loginChange = (e) => {

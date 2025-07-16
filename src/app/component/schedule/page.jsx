@@ -2,6 +2,7 @@
 
 import Header from "@/app/header";
 import '../../globals.css';
+import "react-big-calendar/lib/css/react-big-calendar.css";
 import {useCallback, useEffect, useState} from "react";
 import {Calendar, dateFnsLocalizer, momentLocalizer} from "react-big-calendar";
 import {useRouter} from "next/navigation";
@@ -79,6 +80,7 @@ export default function SchedulePage() {
         }
     }, [openModal, router]);
 
+
     // 일정 등록
     const insertEvent = async (formData) => {
 
@@ -96,9 +98,8 @@ export default function SchedulePage() {
     return (
         <div>
             <Header />
-            <h2>Schedule</h2>
-            <div style={{padding: '20px'}}>
-                <div style={{height: 600}}>
+            <div style={{padding: '1px', display: 'flex', justifyContent: 'center'}}>
+                <div className="schedule-box" style={{height: 700, width: '70%'}}>
                     <Calendar
                         localizer={localizer}
                         events={event}
@@ -108,6 +109,18 @@ export default function SchedulePage() {
                         endAccessor="end"
                         style={{ height: '100%' }}
                         components={{ toolbar: CustomToolbar }}
+                        eventPropGetter={(event) => {
+                            const color = LABEL_COLORS[event.resource.label] || '#90A4AE';
+                            return {
+                                style: {
+                                    backgroundColor: color,
+                                    color: '#fff',
+                                    borderRadius: '6px',
+                                    border: 'none',
+                                    padding: '4px 8px',
+                                },
+                            };
+                        }}
                     />
                 </div>
             </div>
