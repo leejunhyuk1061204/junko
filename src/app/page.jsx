@@ -28,7 +28,8 @@ const MainPage = () => {
     const {fetchSchedules} = useScheduleStore();
 
     useEffect(() => {
-        const token = sessionStorage.getItem("authorization");
+        const token = sessionStorage.getItem("token");
+        console.log("토큰있음?",token);
         if (token) {
             fetchSchedules(token);
         }
@@ -36,7 +37,7 @@ const MainPage = () => {
 
     // 달력 클릭 시
     const handleDateClick = () => {
-        const token = sessionStorage.getItem("authorization");
+        const token = sessionStorage.getItem("token");
         if (!token) {
             openModal({
                 svg: '❗',
@@ -136,8 +137,10 @@ const MainPage = () => {
         // 전일 대비 매출
         const daySalesChart = (data) => {
             const ctx = document.getElementById("daySalesChart");
-            const labels = data.map(d => d.date);
+            const labels = ['전일', '금일'];
             const sales = data.map(d => d.total_sales);
+            const maxValue = Math.max(...sales);
+            const adjustedMax = Math.max(maxValue, 500000); // y축 최소 최대값 50만원
 
             if (ctx && !daySalesChartRef.current) {
                 daySalesChartRef.current = new Chart(ctx, {
@@ -161,17 +164,13 @@ const MainPage = () => {
                         scales: {
                             x: {
                                 beginAtZero: true,
-                                grid: {display: false},
-                                ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 20,
-                                    autoSkip: false,
-                                    callback: function(value) {return value.length > 8 ? value.slice(0, 8) + '…' : value;}}
-                            },
+                                grid: {display: false},},
                             y: {
                                 beginAtZero: true,
+                                max: adjustedMax,
                                 ticks: {
-                                    stepSize: 5,
+                                    stepSize: 100000,
+                                    callback: value => value.toLocaleString() + '원'
 
                                 }
                             }
@@ -277,7 +276,7 @@ const MainPage = () => {
 
     }, [chartData]);
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return <div style={{marginTop: '30px'}}>Loading...</div>;
     if (!summaryData) return null;
 
     const SummaryCard = ({ title, value }) => (

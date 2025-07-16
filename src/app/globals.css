@@ -1801,7 +1801,7 @@ input[type='text']:focus,input[type='password']:focus{
 }
 
 
-/* === 메인 페이지 === */
+/* =============== 메인 페이지 =============== */
 .main-container {
     padding: 20px;
     background-color: #f4f6f8;
@@ -1825,7 +1825,7 @@ input[type='text']:focus,input[type='password']:focus{
 
 .main-chart-row {
     display: flex;
-    gap: 24px;
+    gap: 15px;
     margin-top: 24px;
     align-items: flex-start;
 }
@@ -1861,7 +1861,6 @@ input[type='text']:focus,input[type='password']:focus{
 
 /* 차트 */
 .main-chart-box {
-    flex: 2;
     background-color: #fff;
     padding: 16px;
     border-radius: 8px;
@@ -1869,7 +1868,7 @@ input[type='text']:focus,input[type='password']:focus{
     height: 432px;
     position: relative;
     margin-top: 32px;
-    width: 70%;
+    width: 66.3%;
 }
 
 .chart-box canvas {
@@ -1964,7 +1963,7 @@ input[type='text']:focus,input[type='password']:focus{
 
 /* 캘린더 */
 .main-calendar-box {
-    flex: 1;
+    width: 33%;
     margin-top: 32px;
     background-color: #fff;
     padding: 16px;
@@ -2053,4 +2052,28 @@ input[type='text']:focus,input[type='password']:focus{
 
 .rbc-event-label {
     display: none;
+}
+
+
+/* =============== 스케줄 =============== */
+.schedule-label-opt {
+    width: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap:3px;
+}
+
+.schedule-label-opt p {
+    color: white !important;
+    padding: 3px 5px;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+
+.no_wrap {
+    flex-wrap: nowrap !important;
+}
+
+.flex_1{
+    flex:1;
 }
