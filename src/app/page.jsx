@@ -5,7 +5,7 @@ import Header from "@/app/header";
 import "./globals.css";
 import {Bar, Line} from "react-chartjs-2";
 import {Chart} from "chart.js/auto";
-import {useAlertModalStore, useMainChartStore} from "@/app/zustand/store";
+import {useAlertModalStore, useMainChartStore, useScheduleStore} from "@/app/zustand/store";
 import {ko} from "date-fns/locale/ko";
 import {Calendar, dateFnsLocalizer} from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -19,16 +19,33 @@ const locales = {
     'ko': ko,
 };
 
-const localizer = dateFnsLocalizer({
-    format, parse, startOfWeek, getDay, locales,});
+const localizer = dateFnsLocalizer({format, parse, startOfWeek, getDay, locales,});
 
 const MainPage = () => {
 
     const {openModal} = useAlertModalStore();
     const {chartData, loading, fetchMainChart} = useMainChartStore();
+    const {fetchSchedules} = useScheduleStore();
+
+    useEffect(() => {
+        const token = sessionStorage.getItem("authorization");
+        if (token) {
+            fetchSchedules(token);
+        }
+    }, []);
 
     // 달력 클릭 시
     const handleDateClick = () => {
+        const token = sessionStorage.getItem("authorization");
+        if (!token) {
+            openModal({
+                svg: '❗',
+                msg1: '해당 페이지 접근 불가',
+                msg2: '로그인 후 이용해주세요.',
+                showCancel: false,
+            });
+            return;
+        }
         router.push('/schedule'); // SPA
     };
 
@@ -65,9 +82,13 @@ const MainPage = () => {
         // 전년 대비 월별 매출
         const monthlySalesChart = (rawData) => {
             const ctx = document.getElementById("monthlySalesChart");
-            const labels = rawData.map(item => item.month);
-            const thisYear = rawData.map(item => item.this_year_sales);
-            const lastYear = rawData.map(item => item.last_year_sales);
+            const labels = Array.from({length: 12}, (_, i) => {
+                const month = (i+1).toString().padStart(2, "0");
+                return `${month}`;
+            });
+            const dataMap = new Map(rawData.map(item => [item.month, item]));
+            const thisYear = labels.map(month => dataMap.get(month)?.sales_this_year?? 0);
+            const lastYear = labels.map(month => dataMap.get(month)?.sales_last_year?? 0);
 
             if (ctx && !monthlySalesChartRef.current) {
                 monthlySalesChartRef.current = new Chart(ctx, {
@@ -96,9 +117,16 @@ const MainPage = () => {
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
-                            y: {
+                            x: {
                                 beginAtZero: true,
-                            }
+                                grid: {display: false},
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 20,
+                                    autoSkip: false,
+                                    callback: function(value) {return value.length > 8 ? value.slice(0, 8) + '…' : value;}}
+                            },
+                            y: {beginAtZero: true,}
                         }
                     }
                 });
@@ -129,9 +157,23 @@ const MainPage = () => {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {padding: {bottom: 20},},
                         scales: {
+                            x: {
+                                beginAtZero: true,
+                                grid: {display: false},
+                                ticks: {
+                                    maxRotation: 45,
+                                    minRotation: 20,
+                                    autoSkip: false,
+                                    callback: function(value) {return value.length > 8 ? value.slice(0, 8) + '…' : value;}}
+                            },
                             y: {
                                 beginAtZero: true,
+                                ticks: {
+                                    stepSize: 5,
+
+                                }
                             }
                         }
                     }
@@ -167,10 +209,11 @@ const MainPage = () => {
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {padding: {bottom: 20},},
                         scales: {
-                            y: {
-                                beginAtZero: true,
-                            }
+                            x: {grid: {display: false}},
+                            y: {beginAtZero: true,
+                                grid: {display: false},}
                         }
                     }
                 });
@@ -190,20 +233,28 @@ const MainPage = () => {
                         labels,
                         datasets: [
                             {
-                                label: '판매량',
+                                label: '판매 수',
                                 data: sales,
                                 backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                                barThickness: 30,
                             }
                         ]
                     },
                     options: {
-                        indexAxis: 'y', // 수평 막대
+                        indexAxis: 'y',
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {padding: {bottom: 20},},
                         scales: {
-                            x: {
-                                beginAtZero: true,
-                            }
+                            x: {beginAtZero: true,
+                                grid: {display: false},
+                                ticks: {stepSize: 5},
+                                title: {display: false,
+                                        text: '(개)',
+                                        align: 'end',
+                                        color: '#666',
+                                        font: {size: 12, weight: 'normal'},},},
+                            y: {grid: {display: false},},
                         }
                     }
                 })
@@ -213,11 +264,15 @@ const MainPage = () => {
         // 차트 그리기
         monthlySalesChart(chartData.getMonthlySalesYoY);
         daySalesChart(chartData.getDaySales);
+        inOutChart(chartData.getInOutProduct);
+        popularProductChart(chartData.getPopularProduct);
 
         return () => {
             // 재렌더 시 기존 차트 제거
             if (monthlySalesChartRef.current) monthlySalesChartRef.current.destroy();
             if (daySalesChartRef.current) daySalesChartRef.current.destroy();
+            if (inOutChartRef.current) inOutChartRef.current.destroy();
+            if (popularProductChartRef.current) popularProductChartRef.current.destroy();
         };
 
     }, [chartData]);
@@ -231,6 +286,16 @@ const MainPage = () => {
             <div className="summary-value">{typeof value === 'number'? value.toLocaleString():value}</div>
         </div>
     );
+
+    const CustomToolbar = ({label, onNavigate}) => {
+        return (
+            <div className="custom-toolbar">
+                <button onClick={() => onNavigate("PREV")} aria-label="이전">&lt;</button>
+                <span className="custom-label">{label}</span>
+                <button onClick={() => onNavigate("NEXT")} aria-label="다음">&gt;</button>
+            </div>
+        );
+    };
 
     return (
         <div>
@@ -261,6 +326,7 @@ const MainPage = () => {
                                 onSelectSlot={handleDateClick}
                                 selectable
                                 style={{height: 400}}
+                                components={{toolbar: CustomToolbar,}}
                             />
                         </div>
                     </div>
@@ -339,142 +405,6 @@ const MainPage = () => {
 
                 </div>
             </div>
-
-
-            {/*
-            <div className="dashboard-container">
-                요약 카드
-                <div className="summary-grid">
-                    {[
-                        ['매출', '1,233'],
-                        ['매입', '890'],
-                        ['재고부족', '38'],
-                        ['미정산', '7'],
-                        ['오류', ''],
-                        ['신규주문', '6'],
-                        ['출고대기', '22'],
-                    ].map(([label, value], idx) => (
-                        <div key={idx} className="summary-card">
-                            <div className="summary-label">{label}</div>
-                            <div className="summary-value">{value}</div>
-                        </div>
-                    ))}
-                </div>
-
-                공지
-                <div className="notice-box">
-                    <strong>📢 공지 사항</strong>
-                    <p>● 미결제 정산 72건 처리 요청</p>
-                </div>
-
-                차트 및 리스트
-                <div className="chart-grid">
-                    <div className="chart-card">
-                        <h3>매출 추이</h3>
-                        <Line data={{
-                            labels: [6, 7, 8, 9, 10, 11, 12],
-                            datasets: [
-                                {
-                                label: '매출',
-                                data: [200, 400, 300, 450, 380, 500, 420],
-                                borderColor: '#3B82F6',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                },
-                            ],
-                        }}
-                        options={{responsive: true, maintainAspectRatio: false}}
-                        />
-                    </div>
-
-                    <div className="chart-card">
-                        <h3>매출 VS 매입</h3>
-                        <Bar data={{
-                            labels: ['6월', '7월', '8월'],
-                            datasets: [
-                                {
-                                    label: '매출',
-                                    data: [1200, 1233, 1100],
-                                    backgroundColor: '#60A5FA',
-                                },
-                                {
-                                    label: '매입',
-                                    data: [800, 890, 950],
-                                    backgroundColor: '#9CA3AF',
-                                },
-                            ],
-                        }}
-                        options={{responsive: true, maintainAspectRatio: false}}
-                        />
-                    </div>
-
-                    <div className="chart-card">
-                        <h3>최근 매출</h3>
-                        <ul>
-                            <li>2025-06-26: ￦100,000</li>
-                            <li>2025-06-25: ￦120,000</li>
-                            <li>2025-06-24: ￦98,000</li>
-                        </ul>
-                    </div>
-
-                    <div className="chart-card">
-                        <h3>최근 매입</h3>
-                        <ul>
-                            <li>2025-06-26: ￦70,000</li>
-                            <li>2025-06-25: ￦85,000</li>
-                            <li>2025-06-24: ￦90,000</li>
-                        </ul>
-                    </div>
-                </div>
-                <div className="footer-top">
-                    <div className="circle-box">
-                        <div className="circle">
-                            <div className="circle-label">KPI 달성</div>
-                            <div className="circle-value">100%</div>
-                        </div>
-                    </div>
-                    <div className="circle-box">
-                        <div className="circle">
-                            <div className="circle-label">주간 성장률</div>
-                            <div className="circle-value">40%</div>
-                        </div>
-                    </div>
-                    <div className="report-box">
-                        <h4>◆ 오늘의 한 줄 보고 / 요약</h4>
-                        <ul>
-                            <li>1. 전일 매출 +5%</li>
-                            <li>2. 오늘 날씨 맑음</li>
-                            <li>3. 오늘 팀원과 간단 안건 공유, 논의 챙겨</li>
-                            <li>4. 거래처 미팅 장소 변경 됨 (본사 → 외식)</li>
-                            <li>5. 포켓몬 vs 디지몬 (밸런스 게임)</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <Link href="/component/schedule" className="calendar-box">
-                    <div className="calendar-header">6월 일정</div>
-                    <table className="calendar">
-                        <thead>
-                        <tr>
-                            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {[0, 1, 2, 3, 4].map((weekIdx) => (
-                            <tr key={weekIdx}>
-                                {Array.from({ length: 7 }).map((_, dayIdx) => {
-                                    const day = weekIdx * 7 + dayIdx - 1;
-                                    return (
-                                        <td key={dayIdx} className={day % 7 === 0 ? 'sunday' : ''}>
-                                            {day > 0 && day <= 30 ? day : ''}
-                                        </td>
-                                    );
-                                })}
-                            </tr>
-                        ))}
-                        </tbody>
-                    </table>
-                </Link>
-            </div>*/}
         </div>
     );
 };
