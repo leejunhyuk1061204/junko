@@ -408,6 +408,10 @@ input[type='text']:focus,input[type='password']:focus{
     flex: 1;
 }
 
+.flex-25 {
+    flex: 0 0 25%;
+}
+
 .text-overflow-ellipsis {
     text-overflow: ellipsis;
 }
@@ -2089,7 +2093,6 @@ input[type='text']:focus,input[type='password']:focus{
 
 /* =============== 메인 페이지 =============== */
 .main-container {
-    padding: 20px;
     background-color: #f4f6f8;
     min-height: 100vh;
     font-family: Arial, sans-serif;
@@ -2225,10 +2228,14 @@ input[type='text']:focus,input[type='password']:focus{
 
 .table-wrapper {
     background-color: #fff;
-    padding: 16px;
+    padding: 11px;
     border-radius: 8px;
     overflow-x: auto;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.table-wrapper h3 {
+    margin-bottom: 10px;
 }
 
 .data-table {
@@ -2342,24 +2349,153 @@ input[type='text']:focus,input[type='password']:focus{
 
 
 /* =============== 스케줄 =============== */
-.schedule-label-opt {
-    width: fit-content;
+.schedule-box .rbc-event {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #fff;
+    border: none;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 오늘 날짜 원 스타일 */
+.schedule-box .rbc-day-bg.rbc-today {
+    background-color: #f0f8ff;
+}
+
+.schedule-box .rbc-date-cell.rbc-now {
+    position: relative;
+}
+.schedule-box .rbc-date-cell.rbc-now > a {
+    background: #3f51b5;
+    color: #fff !important;
+    padding: 3px 7px;
+    border-radius: 100%;
+    font-size: 12px;
+    position: relative;
+    z-index: 2;
+}
+
+.schedule-box .rbc-header {
+    padding: 9px 0;
+    font-weight: 600;
+    font-size: 14px;
+    color: #444;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 2px solid #ddd;
+}
+
+.schedule-box .rbc-header:first-child {
+    color: #e57373;
+}
+
+.schedule-box .rbc-header:last-child {
+    color: #64b5f6;
+}
+
+/* 배경 일자 셀 간격 */
+.schedule-box .rbc-month-row {
+    border-top: none !important;
+    border-bottom: none !important;
+}
+
+/* 월간 기본 캘린더 셀 높이 */
+.schedule-box .rbc-month-view {
+    border: none;
+}
+
+.schedule-toolbar-wrapper {
     display: flex;
-    flex-direction: column;
-    gap:3px;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+    max-width: 1100px;
+    margin: 0 auto; /*가운데 정렬*/
+    box-sizing: border-box;
+}
+
+.schedule-custom-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.schedule-custom-toolbar button {
+    color: #444;
+    background-color: transparent;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 10px 16px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.schedule-custom-toolbar button:hover {
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+.schedule-today-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-left: auto;
+    margin-top: -32px;
+    padding-right: 8px;
+}
+
+.schedule-today-btn button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    border-radius: 6px;
+}
+
+.schedule-today-btn button:hover {
+    background-color: #f0f0f0;
+    color: #444;
+    text-decoration: underline;
+}
+
+.rbc-toolbar-label {
+    font-size: 28px;
+    font-weight: 770;
+    color: #444;
+}
+
+.schedule-label-opt {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 50px;
+    margin-bottom: 5px;
 }
 
 .schedule-label-opt p {
     color: white !important;
-    padding: 3px 5px;
-    box-sizing: border-box;
-    border-radius: 5px;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    background-color: #eee;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .no_wrap {
     flex-wrap: nowrap !important;
-}
-
-.flex_1{
-    flex:1;
 }

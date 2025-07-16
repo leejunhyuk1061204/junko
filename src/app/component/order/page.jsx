@@ -28,8 +28,8 @@ const statusList = [
     {idx:1, name:'전체'},
     {idx:2, name:'확정'},
     {idx:3, name:'취소'},
-    {idx:4, name:'입고완료'},
-    {idx:5, name:'요청'},
+    {idx:4, name:'요청'},
+    // {idx:5, name:'입고완료'},
 ]
 
 const DetailOrderModal = dynamic(() => import('../modal/DetailOrderModal'), {

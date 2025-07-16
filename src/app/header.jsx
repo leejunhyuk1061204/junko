@@ -163,7 +163,7 @@ const Header = () => {
                         <div className='cursor-pointer'><IoMailOutline/></div>
                         <div className='cursor-pointer'><BsPersonCircle/></div>
                         <div className='cursor-pointer'><IoSettingsOutline/></div>
-                        <div className='header-login-text'>환영합니다 {sessionStorage.getItem('user_name')}님</div>
+                        <div className='header-login-text'>환영합니다  {sessionStorage.getItem('user_name')} 님</div>
                         <button className='cursor-pointer header-login-text' onClick={handleLogout}>로그아웃</button>
                     </div>
                 ):(

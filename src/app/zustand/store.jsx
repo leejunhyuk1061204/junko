@@ -44,6 +44,7 @@ export const useMainChartStore = create((set) => ({
         getHighReturnProduct: [],
         getInventoryTurnoverStats: [],
         returnProduct: [],
+        returnProductThisMonth: [],
         getDelayedProduct: [],
         getOrderStatus: [],
         getProductMarginStats: [],

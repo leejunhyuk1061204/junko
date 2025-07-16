@@ -70,7 +70,7 @@ const MainPage = () => {
             totalReceive: chartData.getReceiveThisMonth[0]?.receive_cnt?
                 chartData.getReceiveThisMonth[0].receive_cnt.toLocaleString() : '0',
             lowStock: chartData.getLowStockProduct.length.toLocaleString(),
-            returnProd: chartData.returnProduct.reduce((acc, cur) =>
+            returnProd: chartData.returnProductThisMonth.reduce((acc, cur) =>
                 acc+(cur.return_cnt || 0), 0).toLocaleString(),
             newOrderCnt: chartData.newOrder[0]?.new_order_cnt?
                 chartData.newOrder[0].new_order_cnt.toLocaleString() : '0',
@@ -303,9 +303,9 @@ const MainPage = () => {
                 <div className="main-box">
                     <div className="summary-grid">
                         <SummaryCard title="이달 매출" value={summaryData.totalSales} />
-                        <SummaryCard title="이달 매입" value={summaryData.totalReceive} />
+                        <SummaryCard title="이달 매입 건수" value={summaryData.totalReceive} />
                         <SummaryCard title="재고 부족 상품 수" value={summaryData.lowStock} />
-                        <SummaryCard title="반품 건수" value={summaryData.returnProd} />
+                        <SummaryCard title="이달 반품 건수" value={summaryData.returnProd} />
                         <SummaryCard title="신규 주문" value={summaryData.newOrderCnt} />
                         <SummaryCard title="출고 대기" value={summaryData.pendingShipping} />
                         <SummaryCard title="오늘 출고" value={summaryData.shipped} />
