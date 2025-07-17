@@ -91,18 +91,46 @@ const OrderListPage = () => {
 
     // 오더 수정
     const updateOrder = async(idx,status) => {
-        const {data} = await axios.post('http://localhost:8080/order/update',{order_idx:idx,status:status});
-        console.log(data);
-        getOrderList();
-        if(!data.success){
-            openModal({
-                svg: '❗',
-                msg1: '변경 실패',
-                msg2: '진행 상태 변경에 실패했습니다',
-                showCancel: false,
-                onConfirm: closeModal
-            })
-        }
+        openModal({
+            svg: '❓',
+            msg1: '변경 확인',
+            msg2: '진행 상태를 변경하시겠습니까?',
+            showCancel: true,
+            onConfirm: async() => {
+                const {data} = await axios.post('http://localhost:8080/order/update',{order_idx:idx,status:status});
+                console.log(data);
+                closeModal();
+                setTimeout(()=>{
+                    try {
+                        if (data.success) {
+                            openModal({
+                                svg: '✔',
+                                msg1: '변경 완료',
+                                msg2: '진행 상태가 변경되었습니다.',
+                                showCancel: false,
+                                onConfirm: ()=>{
+                                    getOrderList();
+                                }
+                            });
+                        } else {
+                            openModal({
+                                svg: '❗',
+                                msg1: '변경 실패',
+                                msg2: '진행 상태 변경에 실패했습니다.',
+                                showCancel: false,
+                            });
+                        }
+                    } catch (err) {
+                        openModal({
+                            svg: '❗',
+                            msg1: '오류',
+                            msg2: err.response?.data?.message || err.message,
+                            showCancel: false,
+                        });
+                    }
+                },100);
+            }
+        })
     }
 
     // 정렬 변경

@@ -2,17 +2,32 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
 
-const ReceiveProductModal = ({open,onClose,idx}) => {
+const ProductModal = ({open,onClose,receive_idx,sales_idx}) => {
 
     const [productList,setProductList] = useState([]);
 
     useEffect(()=>{
-        if(idx === 0) return;
-        getProductList();
-    },[idx])
+        if(receive_idx === 0 || typeof receive_idx === 'undefined') return;
+        getReceiveProductList();
+    },[receive_idx])
 
-    const getProductList = async() => {
-        const {data} = await axios.post('http://localhost:8080/receiveProduct/list',{receive_idx:idx})
+    useEffect(() => {
+        if(sales_idx === 0 || typeof sales_idx === 'undefined') return;
+        getSalesProductList();
+    }, [sales_idx]);
+
+    // 입고상품 리스트
+    const getReceiveProductList = async() => {
+        if(receive_idx === 0 || typeof receive_idx === 'undefined') return;
+        const {data} = await axios.post('http://localhost:8080/receiveProduct/list',{receive_idx:receive_idx})
+        console.log(data);
+        setProductList(data.list);
+    }
+
+    // 주문상품 리스트
+    const getSalesProductList = async() => {
+        if(sales_idx === 0 || typeof sales_idx === 'undefined') return;
+        const {data} = await axios.post('http://localhost:8080/salesProduct/list',{sales_idx:sales_idx})
         console.log(data);
         setProductList(data.list);
     }
@@ -66,7 +81,10 @@ const ReceiveProductModal = ({open,onClose,idx}) => {
                 >
                     ×
                 </button>
-                <h3 style={{fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>입고 상품</h3>
+                <h3 style={{fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>
+                    {receive_idx !== 0 && typeof receive_idx !== 'undefined'? '입고 상품':''}
+                    {sales_idx !== 0 && typeof sales_idx !== 'undefined' ? '주문 상품' : ''}
+                </h3>
                 <>
 
                     {/* 탭 내용 */}
@@ -82,12 +100,20 @@ const ReceiveProductModal = ({open,onClose,idx}) => {
                                     </tr>
                                </thead>
                                <tbody>
-                               {productList?.map((product) => (
+                               {receive_idx !== 0 && typeof receive_idx !== 'undefined' && productList?.map((product) => (
                                    <tr key={product.receive_product_idx}>
                                        <th>{product.product_idx || ''}</th>
                                        <th>{product.product_name || ''}</th>
                                        <th>{product.combined_name ? product.combined_name : '없음'}</th>
                                        <th>{product.receive_cnt}</th>
+                                   </tr>
+                               ))}
+                               {sales_idx !== 0 && typeof sales_idx !== 'undefined' && productList?.map((product) => (
+                                   <tr key={product.sales_product_idx}>
+                                       <th>{product.product_idx || ''}</th>
+                                       <th>{product.product_name || ''}</th>
+                                       <th>{product.combined_name ? product.combined_name : '없음'}</th>
+                                       <th>{product.product_cnt}</th>
                                    </tr>
                                ))}
                                </tbody>
@@ -100,4 +126,4 @@ const ReceiveProductModal = ({open,onClose,idx}) => {
     );
 };
 
-export default ReceiveProductModal;
+export default ProductModal;
