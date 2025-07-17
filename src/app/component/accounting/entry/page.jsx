@@ -114,6 +114,7 @@ export default function Page() {
             <Header />
 
             <main className="entryList-container">
+                <div className="entryList-title">회계전표 관리</div>
                 <div className="entryList-layout">
                     <section className="entryList-left">
                         <SearchBar

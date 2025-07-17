@@ -128,54 +128,47 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
                     <button className="entryRegist-modal-close" onClick={onClose}>×</button>
                     <h3 className="entryRegist-modal-title">회계 전표 등록</h3>
 
-                    <div className="entryRegist-form-item">
-                        <label>전표 유형</label>
-                        <select name="entry_type" value={form.entry_type} onChange={handleChange}>
-                            <option value="">선택</option>
-                            <option value="매입">매입</option>
-                            <option value="매출">매출</option>
-                            <option value="환불">환불</option>
-                            <option value="수금">수금</option>
-                            <option value="지급">지급</option>
-                        </select>
-                    </div>
+                    <table className="entryRegist-table">
+                        <tbody>
+                        <tr>
+                            <th>전표 유형</th>
+                            <td>
+                                <select name="entry_type" value={form.entry_type} onChange={handleChange}>
+                                    <option value="">선택</option>
+                                    <option value="매입">매입</option>
+                                    <option value="매출">매출</option>
+                                    <option value="환불">환불</option>
+                                    <option value="수금">수금</option>
+                                    <option value="지급">지급</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>금액</th>
+                            <td><input type="number" name="amount" value={form.amount} onChange={handleChange} /></td>
+                        </tr>
+                        <tr>
+                            <th>전표 일자</th>
+                            <td><input type="date" name="entry_date" value={form.entry_date} onChange={handleChange} /></td>
+                        </tr>
+                        <tr>
+                            <th>거래처명</th>
+                            <td><input type="text" name="custom_name" value={form.custom_name} onChange={handleChange} /></td>
+                        </tr>
+                        <tr>
+                            <th>고객명</th>
+                            <td><input type="text" name="customer_name" value={form.customer_name} onChange={handleChange} /></td>
+                        </tr>
+                        <tr>
+                            <th>첨부파일</th>
+                            <td><input type="file" onChange={(e) => setFile(e.target.files[0])} /></td>
+                        </tr>
+                        </tbody>
+                    </table>
 
-                    <div className="entryRegist-form-item">
-                        <label>금액</label>
-                        <input type="number" name="amount" value={form.amount} onChange={handleChange}/>
+                    <div style={{ textAlign: "center", marginTop: "24px" }}>
+                        <button className="entryList-fabBtn blue" onClick={handleSubmit}>등록</button>
                     </div>
-
-                    <div className="entryRegist-form-item">
-                        <label>전표 일자</label>
-                        <input type="date" name="entry_date" value={form.entry_date} onChange={handleChange}/>
-                    </div>
-
-                    <div className="entryRegist-form-item">
-                        <label>거래처명 (매입용)</label>
-                        <input
-                            type="text"
-                            name="custom_name"
-                            value={form.custom_name}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="entryRegist-form-item">
-                        <label>고객명 (매출/환불용)</label>
-                        <input
-                            type="text"
-                            name="customer_name"
-                            value={form.customer_name}
-                            onChange={handleChange}
-                        />
-                    </div>
-
-                    <div className="entryRegist-form-item">
-                        <label>첨부파일</label>
-                        <input type="file" onChange={(e) => setFile(e.target.files[0])}/>
-                    </div>
-
-                    <button className="entryList-fabBtn blue" onClick={handleSubmit}>등록</button>
                 </div>
             </div>
         )

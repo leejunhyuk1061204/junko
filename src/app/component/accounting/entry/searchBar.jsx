@@ -1,6 +1,14 @@
+import { TbSearch } from 'react-icons/tb'
+
+
 export default function SearchBar({ filter, onFilterChange, onSearch, onReset }) {
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        onSearch()
+    }
+
     return (
-        <div className="entryList-searchBar">
+        <form className="entryList-searchBar" onSubmit={handleSubmit}>
             <select
                 value={filter.status}
                 onChange={(e) => onFilterChange({ ...filter, status: e.target.value })}
@@ -38,8 +46,13 @@ export default function SearchBar({ filter, onFilterChange, onSearch, onReset })
                 onChange={(e) => onFilterChange({ ...filter, endDate: e.target.value })}
             />
 
-            <button className="entryList-fabBtn blue" onClick={onSearch}>검색</button>
-            <button className="entryList-fabBtn gray" onClick={onReset}>초기화</button>
-        </div>
+            <button type="submit" className="entryList-fabBtn blue" title="검색">
+                <TbSearch size={16} />
+            </button>
+
+            <button type="button" className="entryList-fabBtn gray" onClick={onReset}>
+                초기화
+            </button>
+        </form>
     )
 }
