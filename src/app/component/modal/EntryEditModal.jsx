@@ -9,66 +9,83 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
         amount: '',
         entry_date: '',
         custom_name: '',
-        customer_name: '',
-    })
+        customer_name: ''
+    });
+
+
 
     useEffect(() => {
         if (entry) {
             setForm({
                 entry_type: entry.entry_type || '',
                 amount: entry.amount || '',
-                entry_date: entry.entry_date || '',
+                entry_date: entry.entry_date?.slice(0, 10) || '',
                 custom_name: entry.custom_name || '',
                 customer_name: entry.customer_name || ''
-            })
+            });
         }
-    }, [entry])
+    }, [entry]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target
-        setForm({ ...form, [name]: value })
+        const { name, value } = e.target;
+        setForm({ ...form, [name]: value });
     }
 
     const handleSubmit = async () => {
         if (!form.entry_type || !form.amount || !form.entry_date) {
-            alert("필수 항목을 입력하세요")
-            return
+            alert("필수 항목을 입력해주세요");
+            return;
         }
 
         try {
-            const { data: customRes } = await axios.get(`http://localhost:8080/customIdxByName`, {
-                params: { name: form.custom_name.trim() }
-            })
+            const token = localStorage.getItem("token");
 
-            const { data: salesRes } = await axios.get(`http://localhost:8080/salesIdxByName`, {
-                params: { name: form.customer_name.trim() }
-            })
+            // 거래처 / 고객 idx 조회
+            let custom_idx = null;
+            let sales_idx = null;
 
-            const custom_idx = customRes?.idx || null
-            const sales_idx = salesRes?.idx || null
+            if (form.custom_name.trim()) {
+                const { data: customRes } = await axios.get("http://localhost:8080/custom/findByName", {
+                    params: { name: form.custom_name.trim() }
+                });
+                custom_idx = customRes?.custom_idx || null;
+            }
 
+            if (form.customer_name.trim()) {
+                const { data: salesRes } = await axios.get("http://localhost:8080/sales/findByName", {
+                    params: { name: form.customer_name.trim() }
+                });
+                sales_idx = salesRes?.sales_idx || null;
+            }
+
+            // 수정 요청
             const res = await axios.put(`http://localhost:8080/accountUpdate/${entry.entry_idx}`, {
                 entry_type: form.entry_type,
                 amount: form.amount,
                 entry_date: form.entry_date,
                 custom_idx,
                 sales_idx
-            })
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
             if (res.data.success) {
-                alert('수정 완료!')
-                onSuccess()
-                onClose()
+                alert("수정 완료!");
+                onSuccess();
+                onClose();
             } else {
-                alert(res.data.message || '수정 실패')
+                alert("수정 실패 또는 권한 오류");
             }
-        } catch (err) {
-            console.error('수정 중 오류:', err)
-            alert('수정 중 오류 발생')
-        }
-    }
 
-    if (!open) return null
+        } catch (err) {
+            console.error("수정 중 오류:", err);
+            alert("서버 오류로 수정 실패");
+        }
+    };
+
+    if (!open) return null;
 
     return (
         <div className="entryRegist-modal" onClick={onClose}>

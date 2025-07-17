@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
 
-export default function DeptRegistModal({ entry_idx, onClose }) {
+export default function DeptRegistModal({ entry_idx, onClose, onSuccess }) {
     const [form, setForm] = useState({
         as_idx: '',
         amount: '',
@@ -62,6 +62,7 @@ export default function DeptRegistModal({ entry_idx, onClose }) {
                 }
 
                 alert("분개 등록 완료")
+                onSuccess();
                 onClose()
             } else {
                 alert("분개 등록 실패: " + (res.data.message || '서버 응답 실패'))

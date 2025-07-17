@@ -17,8 +17,15 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
     const [showDeptRegist, setShowDeptRegist] = useState(false)
 
     useEffect(() => {
-        setLoginUserId(sessionStorage.getItem('user_id'))
+        const id = sessionStorage.getItem('user_id')
+        console.log("✅ 로그인 유저 ID 확인 (useEffect):", id)
+        setLoginUserId(id)
     }, [])
+
+    useEffect(() => {
+        const id = sessionStorage.getItem('user_id')
+        setLoginUserId(id)
+    }, [entry, open])
 
     useEffect(() => {
         if (!open || !entry) return
@@ -35,7 +42,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                 logMsg: `${newStatus} 처리됨`
             }, {
                 headers: {
-                    authorization: localStorage.getItem("token")
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
                 }
             })
             if (res.data.success) {
@@ -47,6 +54,10 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
             alert("처리 중 오류 발생")
         }
     }
+    useEffect(() => {
+        console.log("✅ entry 상태 확인:", entry)
+        console.log("✅ 로그인 유저 ID 확인:", loginUserId)
+    }, [entry, loginUserId])
 
     const handleDeleteDept = async (dept_idx) => {
         if (!window.confirm("삭제할까요?")) return
@@ -118,9 +129,10 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                     <td>{dept.file_idx ? <a href={`http://localhost:8080/deptfileDown/${dept.file_idx}`} target="_blank">다운</a> : '-'}</td>
                                     <td>
                                         <button className="entryList-fabBtn gray" onClick={async () => {
+                                            console.log("✅ 분개 미리보기 요청:", dept.dept_idx)
                                             const res = await axios.post("http://localhost:8080/accountDeptPdf", {
                                                 dept_idx: dept.dept_idx,
-                                                template_idx: 20
+                                                template_idx: 14
                                             })
                                             if (res.data.success) {
                                                 setDeptPreviewUrl(`http://localhost:8080/entryFileDown/${res.data.file_idx}?preview=true`)
@@ -139,13 +151,11 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         </table>
                     </div>
 
+
                     {/* 버튼 */}
                     {loginUserId && String(entry.user_id) === loginUserId && (
-                        <div style={{ textAlign: 'center', marginTop: 10 }}>
-                            <button className="entryList-fabBtn blue" onClick={() => setEditOpen(true)}>✏️ 수정하기</button>
-                        </div>
+                        <button className="entryList-fabBtn blue" onClick={() => setEditOpen(true)}>✏️ 수정하기</button>
                     )}
-
                     {/* 상태 버튼 */}
                     <div style={{ marginTop: 20, textAlign: 'center' }}>
                         {entry.status === "작성중" && loginUserId === entry.user_id && (
@@ -163,9 +173,29 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                     </div>
 
                     {/* 모달 */}
-                    <EntryEditModal open={editOpen} onClose={() => setEditOpen(false)} entry={entry} onSuccess={() => { onClose(); window.location.reload(); }} />
-                    {showDeptRegist && <DeptRegistModal entry_idx={entry.entry_idx} onClose={() => { setShowDeptRegist(false); }} />}
-                    {editDeptOpen && selectedDept && <DeptEditModal entry_idx={entry.entry_idx} dept={selectedDept} onClose={() => setEditDeptOpen(false)} onSuccess={() => { axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`).then(res => setDeptList(res.data.data || [])) }} />}
+                    <EntryEditModal
+                        open={editOpen}
+                        onClose={() => setEditOpen(false)}
+                        entry={entry}
+                        onSuccess={() => { onClose(); window.location.reload(); }} />
+                    {showDeptRegist && (
+                        <DeptRegistModal
+                            entry_idx={entry.entry_idx}
+                            onClose={() => setShowDeptRegist(false)}
+                            onSuccess={() => {
+                                axios
+                                    .get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`)
+                                    .then(res => setDeptList(res.data.data || []))
+                            }}
+                        />
+                    )}
+                    {editDeptOpen && selectedDept &&
+                        <DeptEditModal
+                            entry_idx={entry.entry_idx}
+                            dept={selectedDept}
+                            onClose={() => setEditDeptOpen(false)}
+                            onSuccess={() => { axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`)
+                                .then(res => setDeptList(res.data.data || [])) }} />}
                 </div>
 
                 {/* 오른쪽: 전표 파일/분개 PDF 미리보기 */}
