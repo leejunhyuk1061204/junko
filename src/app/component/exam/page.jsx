@@ -4,7 +4,6 @@ import Header from "@/app/header";
 import '../../globals.css';
 import Image from "next/image";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
-import ProductModal from "@/app/component/modal/productModal";
 import {useAlertModalStore} from "@/app/zustand/store";
 import OptionModal from "@/app/component/modal/OptionModal";
 
@@ -340,7 +339,6 @@ const ProductPage = () => {
                 </div>
                 ):''}
             </div>
-            <ProductModal open={productModalOpen.bool} val={productModalOpen.val} onClose={()=>setProductModalOpen({bool:false,val:''})} productList={productList}/>
             <OptionModal open={optionModalOpen.bool} val={optionModalOpen.val} onClose={()=>setOptionModalOpen({bool:false,val:''})} optionList={optionList}/>
         </div>
     );

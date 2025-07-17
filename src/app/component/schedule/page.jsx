@@ -3,7 +3,7 @@
 import Header from "@/app/header";
 import '../../globals.css';
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import {Calendar, dateFnsLocalizer, momentLocalizer} from "react-big-calendar";
 import {useRouter} from "next/navigation";
 import {useAlertModalStore} from "@/app/zustand/store";
@@ -12,8 +12,10 @@ import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from "date-fns/startOfWeek";
 import getDay from "date-fns/getDay";
-import CustomToolbar from "@/app/component/schedule/CustomToolbar";
+import addDays from "date-fns/addDays";
+import CustomToolbar from "./CustomToolbar";
 import ko from "date-fns/locale/ko";
+import ScheduleModal from "@/app/component/modal/ScheduleModal";
 
 const locales = {'ko': ko,};
 const localizer = dateFnsLocalizer({format, parse, startOfWeek, getDay, locales,});
@@ -26,25 +28,31 @@ export default function SchedulePage() {
     const {openModal} = useAlertModalStore();
 
     const [event, setEvent] = useState([]);
-    const [iinputInfo, setInputInfo] = useState({open: false, start: null, end: null, x: 0, y: 0});
+    const [inputInfo, setInputInfo] = useState({open: false, start: null, end: null, x: 0, y: 0});
     const [form, setForm] = useState({
         title: '',
         description: '',
         start_time: '',
         end_time: '',
-        status: '',
+        label_idx: '일정',
     })
     const [detailInfo, setDetailInfo] = useState({open:false, event:null, x:0, y:0});
     const [editForm, setEditForm] = useState(null);
     const [view, setView] = useState('month');
 
+    // 에러 상태
+    const [errors, setErrors] = useState({});
+    const inputRef = useRef();
+    const inputModalRef = useRef(null);
+    const detailModalRef = useRef(null);
+
     const LABEL_COLORS = {
         '일정': '#90A4AE',
-        '연차': '#A8B88A',
+        '연차': '#D6BFA7',
         '반차': '#D6BFA7',
-        '회의': '#9FA8DA',
-        '외근': '#E0B084',
-        '출장': '#A1887F',
+        '회의': '#AED9B4',
+        '외근': '#D6BFA7',
+        '출장': '#D6BFA7',
         '행사': '#AED9B4',
         '중요': '#D78888',
     }
@@ -62,38 +70,202 @@ export default function SchedulePage() {
             return;
         }
         try {
-            const {data} = await axios.post('http://localhost:8080/schedule/list', {label_idx: 1}, {headers: {Authorization: token}});
 
-            if (date.loginYN && Array.isArray(data.list)) {
-                const mappedEvents = data.list.map(item => ({
-                    id: item.schedule_idx,
-                    title: item.title,
-                    start: new Date(item.start_date+'T'+item.start_time),
-                    end: new Date(item.end_date+'T'+item.end_time),
-                    allDay: false,
-                    resource: item
-                }));
-                setEvent(mappedEvents);
-            }
+            // 일정 불러오기
+            const [personalRes, deptRes] = await Promise.all([
+                axios.post('http://localhost:8080/schedule/list', {label_idx: 1}, {headers: {Authorization: token}}),
+                axios.post('http://localhost:8080/schedule/list', {label_idx: 0}, {headers: {Authorization: token}}),
+            ]);
+
+            const personalList = personalRes.data.list || [];
+            const deptList = deptRes.data.list || [];
+            const allEvents = [...personalList, ...deptList];
+
+            const mappedEvents = allEvents.map(item => ({
+                id: item.schedule_idx,
+                title: item.title,
+                start: new Date(`${item.start_date}T${item.start_time}`),
+                end: new Date(`${item.end_date}T${item.end_time}`),
+                allDay: false,
+                resource: item
+            }));
+            setEvent(mappedEvents);
         }catch (err) {
             console.error("일정 불러오기 실패: ", err);
         }
     }, [openModal, router]);
 
-
-    // 일정 등록
-    const insertEvent = async (formData) => {
-
-    };
-
-    // 일정 수정
-    const updateEvent = async (formData) => {
-
-    }
-
     useEffect(() => {
         fetchEvents();
     }, [fetchEvents]);
+
+
+    // 날짜 클릭
+    const handleSelectSlot = (slotInfo) => {
+        // slotInfo.start, slotInfo.end: Date 객체
+        // slotInfo.action: 'select', 'click', etc.
+        const isSingleDay = format(slotInfo.start, 'yyyy-MM-dd') === format(addDays(slotInfo.end,-1), 'yyyy-MM-dd');
+        setInputInfo({
+            open: true,
+            start: slotInfo.start,
+            end: addDays(slotInfo.end,-1),
+            x: 0,
+            y: 0
+        });
+        setForm({
+            title: '',
+            description: '',
+            start_time: '',
+            end_time: '',
+            label_name: '',
+        });
+        setErrors({});
+        setTimeout(() => {
+            inputRef.current && inputRef.current.focus();
+        }, 50);
+    };
+
+    // 일정 클릭 (상세정보)
+    const selectEvent = (event) => {
+        console.log(event);
+        setDetailInfo({
+            open: true,
+            event: event,
+            x: 0,
+            y: 0
+        });
+        setEditForm(null);
+    };
+
+    // 일정 등록
+    const insertEvent = async () => {
+        if (!form.title || form.title.trim() === '') {
+            setErrors({title: true});
+            openModal({
+                svg: '❗',
+                msg1: '입력 오류',
+                msg2: '제목을 입력해주세요.',
+                showCancel: false,
+            });
+            setTimeout(() => {
+                inputRef.current && inputRef.current.focus();
+            }, 50);
+            return;
+        }
+        setErrors({});
+
+        // 날짜, 시간 데이터 가공
+        const startDate = format(inputInfo.start, 'yyyy-MM-dd');
+        const endDate = format(inputInfo.end, 'yyyy-MM-dd');
+
+        try {
+            const {data} = await axios.post('http://localhost:8080/schedule/insert', {
+                title: form.title,
+                description: form.description,
+                start_date: startDate,
+                end_date: endDate,
+                start_time: form.start_time,
+                end_time: form.end_time,
+                label_idx: parseInt(form.label_idx),
+            },);
+            setInputInfo({...inputInfo, open: false});
+            fetchEvents();
+            openModal({
+                svg: '✔',
+                msg1: '확인',
+                msg2: '일정 등록을 완료하였습니다.',
+                showCancel: false,
+            });
+        }catch (err) {
+            openModal({
+                svg: '❗',
+                msg1: '등록 실패',
+                msg2: err.response?.data?.message || '등록 실패',
+                showCancel: false,
+            });
+        }
+    };
+
+    // 일정 수정
+    const updateEvent = async (event, editData) => {
+        if (!editData.title || editData.title.trim() === '') {
+            setEditForm(prev => ({...prev, title: prev.title || ''}));
+            openModal({
+                svg: '❗',
+                msg1: '입력 오류',
+                msg2: '제목을 입력해주세요.',
+                showCancel: false,
+            });
+            return;
+        }
+
+        try {
+            await axios.post('http://localhost:8080/schedule/update', {
+                schedule_idx: editData.schedule_idx,
+                title: editData.title,
+                description: editData.description,
+                start_date: editData.start_date,
+                end_date: editData.end_date,
+                start_time: editData.start_time,
+                end_time: editData.end_time,
+                label_idx: parseInt(editData.label_idx)
+            });
+
+            if (data.success) {
+                openModal({
+                    svg: '✔',
+                    msg1: '확인',
+                    msg2: '일정 수정을 완료하였습니다.',
+                    showCancel: false,
+                });
+                setDetailInfo({...detailInfo, open: false});
+                fetchEvents();
+            }else {
+                openModal({
+                    svg: '❗',
+                    msg1: '수정 실패',
+                    msg2: err.response?.data?.message || '수정 실패',
+                    showCancel: false,
+                });
+            }
+        }catch (err) {
+            console.log("일정 수정 실패: ", err);
+        }
+    };
+
+
+
+    const eventPropGetter = (event, start, end, isSelected) => {
+        const label_idx = event.resource?.label_idx;
+        const bgColor =LABEL_COLORS[event.resource.label] || '#90A4AE';
+
+        return {
+            style: {
+                bgColor,
+                color: '#fff',
+                borderRadius: '6px',
+                border: isSelected ? '2px solid #1976d2' : 'none',
+                cursor: 'pointer',
+                fontWeight: 600,
+                paddingLeft: 6,
+                paddingRight: 6,
+                minHeight: 24
+            },
+        };
+    }
+
+    // 캘린더에 보여지는 이벤트
+    const CustomEvent = ({event}) => {
+        const {title, start_time, end_time, description} = event.resource || {};
+
+        if (!title || !start_time || !end_time) {
+            return (
+                <div style={{whiteSpace: 'pre-line'}}>
+                    {event.title}
+                </div>
+            );
+        }
+    }
 
     return (
         <div>
@@ -103,24 +275,42 @@ export default function SchedulePage() {
                     <Calendar
                         localizer={localizer}
                         events={event}
-                        defaultView="month"
-                        views={['month', 'week', 'day']}
+                        defaultView={view}
+                        onView={setView}
+                        views={['month']}
                         startAccessor="start"
                         endAccessor="end"
+                        titleAccessor="title"
+                        selectable={true}
+                        popup={true}
+                        onSelectSlot={handleSelectSlot}
+                        onSelectEvent={selectEvent}
+                        eventPropGetter={eventPropGetter}
                         style={{ height: '100%' }}
-                        components={{ toolbar: CustomToolbar }}
-                        eventPropGetter={(event) => {
-                            const color = LABEL_COLORS[event.resource.label] || '#90A4AE';
-                            return {
-                                style: {
-                                    backgroundColor: color,
-                                    color: '#fff',
-                                    borderRadius: '6px',
-                                    border: 'none',
-                                    padding: '4px 8px',
-                                },
-                            };
+                        messages={{
+                            next: "다음달",
+                            previous: "이전달",
+                            today: "Today",
+                            month: "월",
+                            week: "주",
+                            day: "일",
+                            showMore: total => `+${total}개 더보기`
                         }}
+                        components={{toolbar: CustomToolbar, events: CustomEvent}}
+                    />
+                    <ScheduleModal
+                        open={inputInfo.open}
+                        mode="insert"
+                        form={form}
+                        setForm={setForm}
+                        errors={errors}
+                        setErrors={setErrors}
+                        onSubmit={insertEvent}
+                        onClose={() => setInputInfo({...inputInfo, open: false})}
+                        dateInfo={inputInfo}
+                    />
+                    <ScheduleModal
+
                     />
                 </div>
             </div>

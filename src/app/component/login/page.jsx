@@ -1,276 +1,215 @@
 'use client'
-import { useEffect, useState } from "react"
-import axios from "axios"
-import EntryEditModal from "@/app/component/modal/EntryEditModal"
-import DeptRegistModal from "@/app/component/modal/DeptRegistModal"
-import DeptEditModal from "@/app/component/modal/DeptEditModal"
+import React, {useState} from 'react';
+import Header from "@/app/header";
+import Link from "next/link";
+import '../../globals.css';
+import FindModal from "@/app/component/modal/FindModal";
+import axios from "axios";
+import {useAlertModalStore} from "@/app/zustand/store";
 
-const EntryDetailModal = ({ open, onClose, entry }) => {
-    const [files, setFiles] = useState([])
-    const [selectedFile, setSelectedFile] = useState(null)
-    const [loginUserId, setLoginUserId] = useState(null)
-    const [editOpen, setEditOpen] = useState(false)
-    const [deptList, setDeptList] = useState([])
-    const [selectedDept, setSelectedDept] = useState(null)
-    const [editDeptOpen, setEditDeptOpen] = useState(false)
-    const [deptPreviewUrl, setDeptPreviewUrl] = useState(null)
-    const [showDeptRegist, setShowDeptRegist] = useState(false)
+const sampleDepart = [
+    {dept_idx:1 , dept_name:'인사부'},
+    {dept_idx:2 , dept_name:'총무부'},
+    {dept_idx:3 , dept_name:'기획부'},
+    {dept_idx:4 , dept_name:'회계부'},
+    {dept_idx:5 , dept_name:'생상관리부'},
+];
 
-    // ✅ 로그인 유저 ID 가져오기 (loginId 또는 user_id)
-    useEffect(() => {
-        const userId = sessionStorage.getItem('user_id') || sessionStorage.getItem('loginId')
-        setLoginUserId(userId)
-    }, [open])
+const LoginPage = () => {
 
-    // 파일/분개 목록 불러오기
-    useEffect(() => {
-        if (!open || !entry) return
-        axios.get(`http://localhost:8080/entryFileList/${entry.entry_idx}/upload`)
-            .then(res => setFiles(res.data.files || []))
-        axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`)
-            .then(res => setDeptList(res.data.data || []))
-    }, [entry, open])
+    const [find,setFind]=useState(false);
+    const [tab, setTab]=useState('id');
+    const [result,setResult]=useState(false);
+    const [login, setLogin] = useState({
+            id: '',
+            pw: '',
+        });
+    const [findForm, setFindForm] = useState({
+        id:'',
+        email:'',
+    })
+    const {openModal} = useAlertModalStore();
 
-    // 상태 업데이트
-    const updateStatus = async (newStatus) => {
+
+    // 로그인
+    const toggleLogin = async () =>{
         try {
-            const res = await axios.patch(`http://localhost:8080/accountStatusUpdate/${entry.entry_idx}/status`, {
-                status: newStatus,
-                logMsg: `${newStatus} 처리됨`
-            }, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("token")}`
-                }
-            })
-            if (res.data.success) {
-                alert(`${newStatus} 처리 완료!`)
-                onClose()
-                window.location.reload()
+            const {data} = await axios.post('http://localhost:8080/login',{user_id:login.id,pw:login.pw});
+            console.log(data);
+            if(data.success) {
+                sessionStorage.setItem('loginId', login.id);
+                sessionStorage.setItem('token', data.token);
+                sessionStorage.setItem('user_idx', data.user_idx);
+                sessionStorage.setItem('user_name', data.user_name);
+                location.href = '/';
+            }else {
+                openModal({
+                    svg: '❗',
+                    msg1: '로그인 실패',
+                    msg2: '아이디 또는 비밀번호를 확인해주세요.',
+                    showCancel: false,
+                });
             }
-        } catch {
-            alert("처리 중 오류 발생")
+        }catch(err){
+            console.error("로그인 실패: ", err);
+        }
+    };
+
+    // 로그인 form 입력
+    const loginChange = (e) => {
+        const {name, value} = e.target;
+        setLogin({
+            ...login,
+            [name]: value
+        });
+        console.log(login);
+    }
+
+    // 찾기 form 입력
+    const findChange = (e) => {
+        const {name, value} = e.target;
+        setFindForm({
+            ...findForm,
+            [name]: value
+        });
+    }
+
+    // 찾기 모드 초기화
+    const findReset = () =>{
+        setFindForm({
+            id : '',
+            email : '',
+        })
+        setFind(false);
+        setResult(false);
+    }
+
+    // 엔터
+    const loginEnter = (e) => {
+        console.log(e.keyCode);
+        if(e.keyCode===13){
+            toggleLogin();
         }
     }
 
-    // 분개 삭제
-    const handleDeleteDept = async (dept_idx) => {
-        if (!window.confirm("삭제할까요?")) return
-        await axios.delete(`http://localhost:8080/accountDeptDelete/${entry.entry_idx}/details/${dept_idx}`)
-        setDeptList(prev => prev.filter(d => d.dept_idx !== dept_idx))
-    }
-
-    if (!open || !entry) return null
-
     return (
-        <div style={modalOverlayStyle}>
-            <div style={modalContentWrapperStyle}>
-                <button className="entryList-fabBtn gray" onClick={onClose} style={{ position: 'absolute', top: 20, right: 20 }}>
-                    닫기
-                </button>
-
-                <div style={modalLeftPanelStyle}>
-                    <h3 style={titleStyle}>전표 상세</h3>
-
-                    <table className="entryDetail-table">
-                        <tbody>
-                        <tr><th>전표번호</th><td>{`JV${entry.entry_date?.slice(0, 10).replaceAll('-', '')}${String(entry.entry_idx).padStart(3, '0')}`}</td></tr>
-                        <tr><th>유형</th><td>{entry.entry_type}</td></tr>
-                        <tr><th>거래처</th><td>{entry.custom_name || '-'}</td></tr>
-                        <tr><th>고객</th><td>{entry.customer_name || '-'}</td></tr>
-                        <tr><th>금액</th><td>{entry.amount?.toLocaleString()}원</td></tr>
-                        <tr><th>일자</th><td>{entry.entry_date?.slice(0, 10)}</td></tr>
-                        <tr><th>상태</th><td>{entry.status}</td></tr>
-                        <tr><th>작성자</th><td>{entry.user_name}</td></tr>
-                        <tr><th>승인자</th><td>{entry.approver_name || '-'}</td></tr>
-                        </tbody>
-                    </table>
-
-                    <div style={{ marginBottom: '10px' }}>
-                        {files.length ? (
-                            files.map(file => (
-                                <div key={file.file_idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                                    <strong>첨부파일:</strong>
-                                    <span>📎 {file.ori_filename}</span>
-                                    <button className="entryList-fabBtn blue" onClick={() => setSelectedFile(file)}>미리보기</button>
-                                    <button className="entryList-fabBtn gray" onClick={() => window.open(`http://localhost:8080/entryFileDown/${file.file_idx}`, '_blank')}>다운로드</button>
-                                </div>
-                            ))
-                        ) : (
-                            <div><strong>첨부파일:</strong> 없음</div>
-                        )}
+        <div>
+            <Header/>
+            <div className='wrap main-back padding-120 flex justify-content-center page-background'>
+                <div className='max-width-400'>
+                    <div>
+                        <img src="/logo.png" alt="logo" />
                     </div>
-
-                    {/* 분개 테이블 */}
-                    <div style={{ marginTop: '30px' }}>
-                        <div className="flex justify-between items-center mb-2">
-                            <h4>분개 목록</h4>
-                            <button className="entryList-fabBtn blue" onClick={() => setShowDeptRegist(true)}>분개 등록</button>
+                    {!find ?(
+                        /*로그인 화면*/
+                    <div className='flex flex-direction-col'>
+                        <div><p className='text-align-left '>아이디</p></div>
+                        <div className='margin-bottom-10'><input type='text' placeholder='아이디를 입력하세요' value={login.id} name='id' onChange={e=>loginChange(e)}/></div>
+                        <div><p className='text-align-left '>비밀번호</p></div>
+                        <div className='margin-bottom-10'><input type='password' placeholder='비밀번호를 입력하세요' value={login.pw} name='pw' onChange={e=>loginChange(e)} onKeyUp={e=>loginEnter(e)}/></div>
+                        {/*<div><p className='text-align-left '>부서</p></div>*/}
+                        {/*<div className='margin-y-10'>*/}
+                        {/*    <select className='width-100 login-select' id='dept' onChange={e=>loginChange(e)}>*/}
+                        {/*        {sampleDepart && sampleDepart.map(dept => (*/}
+                        {/*            <option key={dept.dept_idx} value={dept.dept_idx}>{dept.dept_name}</option>*/}
+                        {/*        ))}*/}
+                        {/*    </select>*/}
+                        {/*</div>*/}
+                        <div className='margin-bottom-10'>
+                            <div className='flex flex-direction-row justify-right gap_10'>
+                                <Link href='/component/join'><p className='login-link'>회원가입</p></Link>
+                                <p className='login-link cursor-pointer' onClick={()=>setFind(true)}>아이디/비밀번호 찾기</p>
+                            </div>
                         </div>
-
-                        <table className="entryDetail-table">
-                            <thead>
-                            <tr><th>번호</th><th>계정과목</th><th>차/대변</th><th>금액</th><th>파일</th><th>PDF</th><th>수정/삭제</th></tr>
-                            </thead>
-                            <tbody>
-                            {deptList.map(dept => (
-                                <tr key={dept.dept_idx}>
-                                    <td>{dept.dept_idx}</td>
-                                    <td>{dept.as_name}</td>
-                                    <td>{dept.type}</td>
-                                    <td>{dept.amount.toLocaleString()}원</td>
-                                    <td>{dept.file_idx ? <a href={`http://localhost:8080/deptfileDown/${dept.file_idx}`} target="_blank">다운</a> : '-'}</td>
-                                    <td>
-                                        <button className="entryList-fabBtn gray" onClick={async () => {
-                                            const res = await axios.post("http://localhost:8080/accountDeptPdf", {
-                                                dept_idx: dept.dept_idx,
-                                                template_idx: 14
-                                            })
-                                            if (res.data.success) {
-                                                setDeptPreviewUrl(`http://localhost:8080/entryFileDown/${res.data.file_idx}?preview=true`)
-                                            } else {
-                                                alert("PDF 실패")
-                                            }
-                                        }}>미리보기</button>
-                                    </td>
-                                    <td>
-                                        <button className="entryList-fabBtn gray" onClick={() => { setSelectedDept(dept); setEditDeptOpen(true) }}>✏️</button>
-                                        <button className="entryList-fabBtn red-del" onClick={() => handleDeleteDept(dept.dept_idx)}>🗑</button>
-                                    </td>
-                                </tr>
-                            ))}
-                            </tbody>
-                        </table>
+                        <div className='flex justify-content-center'>
+                            <button className='login-btn white-space-nowrap' onClick={toggleLogin}>로그인</button>
+                        </div>
                     </div>
-
-                    {/* 수정 버튼 */}
-                    {loginUserId && String(entry.user_id) === loginUserId && (
-                        <button className="entryList-fabBtn blue" onClick={() => setEditOpen(true)}>✏️ 수정하기</button>
-                    )}
-
-                    {/* 상태 버튼 */}
-                    <div style={{ marginTop: 20, textAlign: 'center' }}>
-                        {entry.status === "작성중" && loginUserId === entry.user_id && (
-                            <button className="entryList-fabBtn blue" onClick={() => updateStatus("제출")}>제출</button>
-                        )}
-                        {entry.status === "제출" && sessionStorage.getItem("user_type") === "admin" && (
-                            <>
-                                <button className="entryList-fabBtn blue" onClick={() => updateStatus("확정")}>확정</button>
-                                <button className="entryList-fabBtn red-del" onClick={() => updateStatus("반려")}>반려</button>
-                            </>
-                        )}
-                        {entry.status === "반려" && loginUserId === entry.user_id && (
-                            <button className="entryList-fabBtn blue" onClick={() => updateStatus("제출")}>재제출</button>
-                        )}
-                    </div>
-
-                    {/* 모달 연결 */}
-                    <EntryEditModal
-                        open={editOpen}
-                        onClose={() => setEditOpen(false)}
-                        entry={entry}
-                        onSuccess={() => { onClose(); window.location.reload(); }} />
-
-                    {showDeptRegist && (
-                        <DeptRegistModal
-                            entry_idx={entry.entry_idx}
-                            onClose={() => setShowDeptRegist(false)}
-                            onSuccess={() => {
-                                axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`)
-                                    .then(res => setDeptList(res.data.data || []))
-                            }}
-                        />
-                    )}
-
-                    {editDeptOpen && selectedDept && (
-                        <DeptEditModal
-                            entry_idx={entry.entry_idx}
-                            dept={selectedDept}
-                            onClose={() => setEditDeptOpen(false)}
-                            onSuccess={() => {
-                                axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`)
-                                    .then(res => setDeptList(res.data.data || []))
-                            }}
-                        />
-                    )}
-                </div>
-
-                {/* 오른쪽 미리보기 */}
-                <div style={modalRightPreviewStyle}>
-                    {selectedFile && (
+                    ):(
+                    <>
+                    {!result ? (
                         <>
-                            <h3 style={titleStyle}>미리보기</h3>
-                            {selectedFile.type === 'pdf' ? (
-                                <iframe src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} width="100%" height="500px" style={previewStyle} />
-                            ) : (
-                                <img src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} alt="첨부" style={previewStyle} />
-                            )}
-                        </>
-                    )}
-                    {deptPreviewUrl && (
-                        <>
-                            <h3 style={titleStyle}>📄 분개 PDF 미리보기</h3>
-                            <iframe src={deptPreviewUrl} width="100%" height="500px" style={previewStyle} />
-                            <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                <button className="entryList-fabBtn gray" onClick={() => setDeptPreviewUrl(null)}>닫기</button>
+                            {/* 탭 버튼 */}
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                gap: '12px',
+                                marginBottom: '24px'
+                            }}>
+                                <button
+                                    className={`btn label white_color ${tab === 'id' ? 'bg_primary_color_2' : 'bg_primary_color_2'}`}
+                                    style={{
+                                        padding: '8px 20px',
+                                        cursor: 'pointer',
+                                        fontWeight: tab === 'id' ? 'bold' : 'normal'
+                                    }}
+                                    onClick={() => setTab('id')}
+                                >
+                                    아이디 찾기
+                                </button>
+                                <button
+                                    className={`btn label white_color ${tab === 'pw' ? 'bg_primary_color_1' : 'bg_primary_color_2'}`}
+                                    style={{
+                                        padding: '8px 20px',
+                                        cursor: 'pointer',
+                                        fontWeight: tab === 'pw' ? 'bold' : 'normal'
+                                    }}
+                                    onClick={() => setTab('pw')}
+                                >
+                                    비밀번호 찾기
+                                </button>
+                            </div>
+                                {/*아이디 / 비밀번호 찾기 화면*/}
+                            <div className='flex flex-direction-col'>
+                                {/*비밀번호 찾기면 아이디도 입력*/}
+                                {tab === 'pw' &&
+                                    (<>
+                                        <div><p className='text-align-left margin-0'>아이디</p></div>
+                                        <div className='margin-bottom-10'><input type='text' placeholder='아이디를 입력하세요' value={findForm.id} name='id' onChange={e=>findChange(e)}/></div>
+                                    </>)}
+                                <div><p className='text-align-left margin-0'>이메일</p></div>
+                                <div className='margin-bottom-10'><input type='text' placeholder='이메일을 입력하세요' value={findForm.email} name='email' onChange={e=>findChange(e)}/></div>
+                                <div className='flex justify-content-center gap_20'>
+                                    <button className='login-find-btn' onClick={()=>setFind(false)}>뒤로가기</button>
+                                    <button className='login-find-btn' onClick={()=>setResult(true)}>본인 인증</button>
+                                </div>
                             </div>
                         </>
+                            ) : (
+                            /*결과 화면*/
+                            <>
+                                {/*아이디 찾기 일 경우*/}
+                                {tab === 'id' &&
+                                    <div className='flex flex-direction-col gap_10'>
+                                        <div className='flex justify-content-center gap_10 padding-30 white-space-nowrap' style={{fontSize:'20px',textAlign:'center'}}>
+                                            <p>회원님의 아이디는</p>
+                                            <p style={{fontSize:'25px', textAlign:'center', color:'#006DCC'}}>12345</p>
+                                            <p>입니다</p>
+                                        </div>
+                                        <div className='flex justify-content-center'><button className='login-btn cursor-pointer' style={{background:'#006DCC', color:'#fff'}} onClick={()=>findReset()}>로그인하기</button></div>
+                                    </div>
+                                }
+                                {/*비밀번호 찾기 일 경우*/}
+                                {tab === 'pw' &&
+                                    <div className='flex flex-direction-col gap_10'>
+                                        <div>
+                                            <p className='text-align-left'>새 비밀번호</p>
+                                            <input type='password'/>
+                                        </div>
+                                        <div>
+                                            <p className='text-align-left'>비밀번호 확인</p>
+                                            <input type='password'/>
+                                        </div>
+                                        <div className='flex justify-content-center'><button className='login-btn cursor-pointer' onClick={()=>findReset()}>비밀번호 변경하기</button></div>
+                                    </div>}
+                            </>
+                            )}
+                    </>
                     )}
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default EntryDetailModal
-
-// 💄 스타일 정의
-const modalOverlayStyle = {
-    position: 'fixed',
-    left: 0,
-    top: 0,
-    width: '100vw',
-    height: '100vh',
-    background: 'rgba(0,0,0,0.3)',
-    zIndex: 1000,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-}
-
-const modalContentWrapperStyle = {
-    display: 'flex',
-    background: '#fff',
-    borderRadius: '10px',
-    width: '75vw',
-    height: '85vh',
-    overflow: 'hidden',
-    position: 'relative'
-}
-
-const modalLeftPanelStyle = {
-    flex: 1.2,
-    padding: '30px',
-    overflowY: 'auto',
-    borderRight: '1px solid #eee'
-}
-
-const modalRightPreviewStyle = {
-    flex: 0.8,
-    padding: '20px',
-    backgroundColor: '#f9f9f9',
-    overflowY: 'auto'
-}
-
-const titleStyle = {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    marginBottom: '16px',
-    textAlign: 'center'
-}
-
-const previewStyle = {
-    width: '100%',
-    maxHeight: '500px',
-    border: '1px solid #ccc',
-    borderRadius: '8px'
-}
+export default LoginPage;
