@@ -1641,6 +1641,15 @@ input[type='text']:focus,input[type='password']:focus{
 .checkbox-table thead th:first-child{
     width:60px;
 }
+
+.text-overflow-table tbody td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-overflow-table tbody td.show-dropdown {
+    overflow: visible;
+}
 /*-------------------------회계 전표 css--------------------------------*/
 /* 전체 컨테이너 */
 .entryList-container {

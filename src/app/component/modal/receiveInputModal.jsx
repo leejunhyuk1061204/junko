@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import {useAlertModalStore} from "@/app/zustand/store";
 
-const receiveInputModal = ({open,onClose,setUpdateInfo,idx,status,getReceiveList}) => {
+const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
 
     const {openModal,closeModal} = useAlertModalStore();
     const [receiveProducts, setReceiveProducts] = useState([]);
