@@ -26,7 +26,7 @@ const mainMenus = [
         submenu: [
             { label: '상품 목록 / 등록 / 수정', href: '/component/product' },
             { label: '상품 옵션 / 카테고리 관리', href: '/component/category' },
-            { label: '거래처 관리', href: '/' },
+            { label: '거래처 관리', href: '/component/custom' },
             { label: '상품 관리', href: '/' },
             { label: '품절 / 재입고 관리', href: '/' },
             { label: '상품 신청 / 승인', href: '/' },

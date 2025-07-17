@@ -50,7 +50,7 @@ const ExamModal = ({open,onClose}) => {
                 >
                     ×
                 </button>
-                <h3 style={{fontSize: '15px', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>제목</h3>
+                <h3 style={{fontSize: '20px', fontWeight: 'bold', marginBottom: '20px', textAlign: 'center' }}>제목</h3>
                 <>
 
                     {/* 탭 내용 */}

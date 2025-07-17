@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import axios from "axios";
 import {useAlertModalStore} from "@/app/zustand/store";
 
-const receiveInputModal = ({open,onClose,setUpdateInfo,idx,status,getReceiveList}) => {
+const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
 
     const {openModal,closeModal} = useAlertModalStore();
     const [receiveProducts, setReceiveProducts] = useState([]);
@@ -51,47 +51,55 @@ const receiveInputModal = ({open,onClose,setUpdateInfo,idx,status,getReceiveList
     }, [userName]);
 
     const updateInfo = async () => {
-        try {
-            console.log(info);
-            const {data} = await axios.post('http://localhost:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser})
-            console.log(data);
-            if (!data.success) {
-                openModal({
-                    svg: '❗',
-                    msg1: '변경 실패',
-                    msg2: '진행 상태 변경에 실패했습니다',
-                    showCancel: false,
-                    onConfirm: () => {
-                        closeModal();
-                        handleClose();
+        openModal({
+            svg: '❓',
+            msg1: '변경 확인',
+            msg2: '상태를 변경하시겠습니까?',
+            showCancel: true,
+            onConfirm: async() => {
+                try {
+                    console.log(info);
+                    const {data} = await axios.post('http://localhost:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser})
+                    console.log(data);
+                    if (!data.success) {
+                        openModal({
+                            svg: '❗',
+                            msg1: '변경 실패',
+                            msg2: '진행 상태 변경에 실패했습니다',
+                            showCancel: false,
+                            onConfirm: () => {
+                                closeModal();
+                                handleClose();
+                            }
+                        })
+                    } else {
+                        openModal({
+                            svg: '❗',
+                            msg1: '변경 성공',
+                            msg2: '진행 상태 변경에 성공했습니다',
+                            showCancel: false,
+                            onConfirm: () => {
+                                closeModal();
+                                getReceiveList();
+                                handleClose();
+                            }
+                        })
                     }
-                })
-            } else {
-                openModal({
-                    svg: '❗',
-                    msg1: '변경 성공',
-                    msg2: '진행 상태 변경에 성공했습니다',
-                    showCancel: false,
-                    onConfirm: () => {
-                        closeModal();
-                        getReceiveList();
-                        handleClose();
-                    }
-                })
-            }
-        } catch (error) {
-            console.log(error);
-            openModal({
-                svg: '❗',
-                msg1: '오류 발생',
-                msg2: '서버 요청 중 문제가 발생했습니다',
-                showCancel: false,
-                onConfirm: () => {
-                    closeModal();
-                    handleClose();
+                } catch (error) {
+                    console.log(error);
+                    openModal({
+                        svg: '❗',
+                        msg1: '오류 발생',
+                        msg2: '서버 요청 중 문제가 발생했습니다',
+                        showCancel: false,
+                        onConfirm: () => {
+                            closeModal();
+                            handleClose();
+                        }
+                    })
                 }
-            })
-        }
+            }
+        })
     }
 
     // 모달이 닫힐 때 상태 초기화
