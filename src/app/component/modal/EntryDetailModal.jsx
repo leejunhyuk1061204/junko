@@ -100,7 +100,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                     {/* 분개 테이블 */}
                     <div style={{ marginTop: '30px' }}>
                         <div className="flex justify-between items-center mb-2">
-                            <h4>📘 분개 목록</h4>
+                            <h4>분개 목록</h4>
                             <button className="entryList-fabBtn blue" onClick={() => setShowDeptRegist(true)}>분개 등록</button>
                         </div>
 

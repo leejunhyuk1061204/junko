@@ -70,7 +70,7 @@ export default function DeptRegistModal({ entry_idx, onClose }) {
             console.error("분개 등록 오류", err)
             alert("오류 발생: " + err.message)
         }
-    
+
     }
 
     return (
