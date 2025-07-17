@@ -15,7 +15,9 @@ import getDay from "date-fns/getDay";
 import addDays from "date-fns/addDays";
 import CustomToolbar from "./CustomToolbar";
 import ko from "date-fns/locale/ko";
-import ScheduleModal from "@/app/component/modal/ScheduleModal";
+import ScheduleUpdateModal from "../modal/ScheduleUpdateModal";
+import ScheduleInsertModal from "../modal/ScheduleInsertModal";
+import ScheduleDetailModal from "../modal/ScheduleDetailModal";
 
 const locales = {'ko': ko,};
 const localizer = dateFnsLocalizer({format, parse, startOfWeek, getDay, locales,});
@@ -34,8 +36,8 @@ export default function SchedulePage() {
         description: '',
         start_time: '',
         end_time: '',
-        label_idx: '일정',
-    })
+        label_idx: 1,
+    });
     const [detailInfo, setDetailInfo] = useState({open:false, event:null, x:0, y:0});
     const [editForm, setEditForm] = useState(null);
     const [view, setView] = useState('month');
@@ -47,14 +49,14 @@ export default function SchedulePage() {
     const detailModalRef = useRef(null);
 
     const LABEL_COLORS = {
-        '일정': '#90A4AE',
-        '연차': '#D6BFA7',
-        '반차': '#D6BFA7',
-        '회의': '#AED9B4',
-        '외근': '#D6BFA7',
-        '출장': '#D6BFA7',
-        '행사': '#AED9B4',
-        '중요': '#D78888',
+        1: '#90A4AE', // 일정
+        2: '#D6BFA7', // 연차
+        3: '#D6BFA7', // 반차
+        4: '#AED9B4', // 회의
+        5: '#D6BFA7', // 외근
+        6: '#D6BFA7', // 출장
+        7: '#AED9B4', // 행사
+        8: '#D78888', // 중요
     }
 
     const fetchEvents = useCallback(async () => {
@@ -139,6 +141,7 @@ export default function SchedulePage() {
 
     // 일정 등록
     const insertEvent = async () => {
+        const token = sessionStorage.getItem("token");
         if (!form.title || form.title.trim() === '') {
             setErrors({title: true});
             openModal({
@@ -154,7 +157,7 @@ export default function SchedulePage() {
         }
         setErrors({});
 
-        // 날짜, 시간 데이터 가공
+        /*날짜, 시간 데이터 가공*/
         const startDate = format(inputInfo.start, 'yyyy-MM-dd');
         const endDate = format(inputInfo.end, 'yyyy-MM-dd');
 
@@ -166,16 +169,19 @@ export default function SchedulePage() {
                 end_date: endDate,
                 start_time: form.start_time,
                 end_time: form.end_time,
-                label_idx: parseInt(form.label_idx),
-            },);
-            setInputInfo({...inputInfo, open: false});
-            fetchEvents();
-            openModal({
-                svg: '✔',
-                msg1: '확인',
-                msg2: '일정 등록을 완료하였습니다.',
-                showCancel: false,
-            });
+                label_idx: parseInt(form.label_idx, 10),
+            },{headers: {Authorization: token}});
+
+            if (data.success && data.loginYN) {
+                openModal({
+                    svg: '✔',
+                    msg1: '확인',
+                    msg2: '일정 등록을 완료하였습니다.',
+                    showCancel: false,
+                });
+                setInputInfo({...inputInfo, open: false});
+                fetchEvents();
+            }
         }catch (err) {
             openModal({
                 svg: '❗',
@@ -188,6 +194,7 @@ export default function SchedulePage() {
 
     // 일정 수정
     const updateEvent = async (event, editData) => {
+        const token = sessionStorage.getItem("token");
         if (!editData.title || editData.title.trim() === '') {
             setEditForm(prev => ({...prev, title: prev.title || ''}));
             openModal({
@@ -200,7 +207,7 @@ export default function SchedulePage() {
         }
 
         try {
-            await axios.post('http://localhost:8080/schedule/update', {
+            const {data} = await axios.post('http://localhost:8080/schedule/update', {
                 schedule_idx: editData.schedule_idx,
                 title: editData.title,
                 description: editData.description,
@@ -209,9 +216,9 @@ export default function SchedulePage() {
                 start_time: editData.start_time,
                 end_time: editData.end_time,
                 label_idx: parseInt(editData.label_idx)
-            });
+            },{headers: {Authorization: token}});
 
-            if (data.success) {
+            if (data.success && data.loginYN) {
                 openModal({
                     svg: '✔',
                     msg1: '확인',
@@ -233,18 +240,64 @@ export default function SchedulePage() {
         }
     };
 
+    // 일정 삭제
+     const deleteEvent = async (schedule_idx) => {
+         const token = sessionStorage.getItem("token");
+         openModal({
+             svg: '❗',
+             msg1: '일정 삭제',
+             msg2: '정말 삭제하시겠습니까?',
+             showCancel: true,
+             onConfirm: async () => {
+                 try {
+                     const {data} = await axios.put('http://localhost:8080/schedule/del', null, {
+                         params: {schedule_idx},
+                         headers: {Authorization: token}
+                     });
+                     if (data.success && data.loginYN) {
+                         setDetailInfo({open: false, event: null, x:0, y: 0});
+                         setEditForm(null);
+                         fetchEvents();
+                     }
+                 }catch (err) {
+                     openModal({
+                         svg: '❗',
+                         msg1: '삭제 실패',
+                         msg2: err.response?.data?.message || '삭제 실패',
+                         showCancel: false,
+                     });
+                 }
+             }
+         });
+     };
 
+     // 상세정보에서 수정 버튼 클릭 시
+    const startEdit = () => {
+        setEditForm({
+            title: detailInfo.event.title,
+            description: detailInfo.event.resource.description,
+            start_time: detailInfo.event.resource.start_time,
+            end_time: detailInfo.event.resource.end_time,
+            label_idx: detailInfo.event.resource.label_idx
+        });
+    };
 
+    //  상세정보 수정 저장
+    const saveEdit = async () => {
+        await updateEvent(detailInfo.event, editForm);
+        setEditForm(null);
+    };
+
+    // 이벤트들 커스터마이징
     const eventPropGetter = (event, start, end, isSelected) => {
-        const label_idx = event.resource?.label_idx;
-        const bgColor =LABEL_COLORS[event.resource.label] || '#90A4AE';
+        const labelIdx = parseInt(event.resource?.label_idx, 10);
+        const backgroundColor = LABEL_COLORS[event.resource.label_idx] || '#90A4AE';
 
         return {
             style: {
-                bgColor,
+                backgroundColor,
                 color: '#fff',
                 borderRadius: '6px',
-                border: isSelected ? '2px solid #1976d2' : 'none',
                 cursor: 'pointer',
                 fontWeight: 600,
                 paddingLeft: 6,
@@ -298,20 +351,65 @@ export default function SchedulePage() {
                         }}
                         components={{toolbar: CustomToolbar, events: CustomEvent}}
                     />
-                    <ScheduleModal
-                        open={inputInfo.open}
-                        mode="insert"
-                        form={form}
-                        setForm={setForm}
-                        errors={errors}
-                        setErrors={setErrors}
-                        onSubmit={insertEvent}
-                        onClose={() => setInputInfo({...inputInfo, open: false})}
-                        dateInfo={inputInfo}
-                    />
-                    <ScheduleModal
 
-                    />
+                    {/*일정 등록 모달*/}
+                    {inputInfo.open && !editForm && (
+                        <ScheduleInsertModal
+                            open={inputInfo.open}
+                            mode="insert"
+                            form={form}
+                            setForm={setForm}
+                            errors={errors}
+                            setErrors={setErrors}
+                            onSubmit={insertEvent}
+                            onClose={() => setInputInfo({...inputInfo, open: false})}
+                            dateInfo={inputInfo}
+                        />
+                    )}
+
+                    {/*일정 상세보기 모달*/}
+                    {detailInfo.open && !editForm && !inputInfo.open && (
+                        <ScheduleDetailModal
+                            open={detailInfo.open && !editForm && !inputInfo.open}
+                            mode="detail"
+                            form={form}
+                            setForm={setForm}
+                            onClose={() => setDetailInfo({...detailInfo, open: false})}
+                            dateInfo={detailInfo.event}
+                            onDelete={() => deleteEvent(detailInfo.event?.resource?.schedule_idx)}
+                            onEditClick={() => {
+                                setDetailInfo({...detailInfo, open: false});
+                                setForm(detailInfo.event.resource);
+                                setInputInfo({
+                                    open: true,
+                                    start: detailInfo.event.start,
+                                    end: detailInfo.event.end,
+                                });
+                            }}
+                        />
+                    )}
+
+                    {/*일정 수정 모달*/}
+                    {editForm && (
+                        <ScheduleUpdateModal
+                            open={detailInfo.open}
+                            mode="update"
+                            form={editForm}
+                            setForm={setEditForm}
+                            errors={errors}
+                            setErrors={setErrors}
+                            onSubmit={(event) => updateEvent(detailInfo.event, editForm)}
+                            onClose={() => {
+                                setEditForm(null);
+                                setDetailInfo({...detailInfo, open: false});
+                            }}
+                            dateInfo={{
+                                start: new Date(editForm.start_date),
+                                end: new Date(editForm.end_date),
+                            }}
+                        />
+                    )}
+
                 </div>
             </div>
         </div>
