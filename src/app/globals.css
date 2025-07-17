@@ -1212,6 +1212,182 @@ input[type='text']:focus,input[type='password']:focus{
     font-size: 14px;
 }
 
+/* ------------------------------- 거래처 관련 ------------------------------- */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.custom-table th,
+.custom-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.custom-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}
+
+.custom-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.custom-modal-content {
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.custom-modal-content h3 {
+    margin-bottom: 20px;
+}
+
+.custom-form-row {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+.custom-input {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 35px;
+    padding: 0 10px;
+    font-size: 14px;
+}
+
+.custom-toolbar-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+/* 셀렉트박스 전체 영역 */
+.custom-select-wrapper {
+    position: relative;
+    width: fit-content;
+}
+
+/* 셀렉트 버튼 */
+.custom-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+    min-width: 100px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+}
+
+.custom-select-btn::after {
+    content: '▾';
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    pointer-events: none;
+}
+
+/* 셀렉트 옵션박스 */
+.custom-select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 10;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+/* 옵션 항목 */
+.custom-select-option-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.custom-select-option-item:hover {
+    background-color: #E6F0FF;
+    border-radius: 4px;
+}
+
+/* 검색 인풋 */
+.custom-search-input {
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 280px;
+    box-sizing: border-box;
+}
+
+/* 검색 버튼 */
+.custom-search-btn {
+    height: 36px;
+    padding: 0 12px;
+    background-color: #1c64f2;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.custom-search-btn:hover {
+    background-color: #1752cc;
+}
+
+.custom-search-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* 등록 버튼 */
+.custom-register-btn {
+    height: 36px;
+    width: 80px;
+    padding: 0 16px;
+    background-color: #006CCE;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.custom-register-btn:hover {
+    background-color: #1A82E3;
+}
+
+
 /* ------------------------------- 로그인 관련 ------------------------------- */
 
 .login-select {

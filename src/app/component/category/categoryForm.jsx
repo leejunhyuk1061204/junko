@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 export default function CategoryForm({ data = [], onSuccess, editItem, setEditItem }) {
     const [name, setName] = useState("");
@@ -28,16 +29,11 @@ export default function CategoryForm({ data = [], onSuccess, editItem, setEditIt
         if (editItem) {
             // 수정 모드
             payload.category_idx = editItem.category_idx;
-            const res = await fetch("http://localhost:8080/cate/update", {
-                method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: token,
-                },
-                body: JSON.stringify(payload),
+            const res = await axios.put("http://localhost:8080/cate/update", {
+                headers: { Authorization: sessionStorage.getItem("token") },
             });
-            const result = await res.json();
-            if (result.success) {
+            const data = res.data;
+            if (data.success) {
                 alert("수정 완료");
                 setEditItem(null); // 수정 모드 종료
                 onSuccess();
@@ -46,16 +42,11 @@ export default function CategoryForm({ data = [], onSuccess, editItem, setEditIt
             }
         } else {
             // 등록 모드
-            const res = await fetch("http://localhost:8080/cate/insert", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: token,
-                },
-                body: JSON.stringify(payload),
+            const res = await axios.post("http://localhost:8080/cate/insert", {
+                    Authorization: sessionStorage.getItem("token"),
             });
-            const result = await res.json();
-            if (result.success) {
+            const data = res.data;
+            if (data.success) {
                 alert("등록 완료");
                 setName("");
                 setParent("");
