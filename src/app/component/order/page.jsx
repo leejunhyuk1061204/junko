@@ -199,7 +199,7 @@ const OrderListPage = () => {
                 </div>
             </div>
 
-            <table className='order-list-table'>
+            <table className='order-list-table text-overflow-table'>
                 <thead>
                     <tr>
                         {/*<th><input type='checkbox'/></th>*/}
@@ -224,7 +224,7 @@ const OrderListPage = () => {
                             <td>{order.price}</td>
                             <td>{order.reg_date}</td>
                             <td>{order.user_name}</td>
-                            <td className='position-relative cursor-pointer' onClick={(e)=>{e.stopPropagation();changeStatusClicked(i)}} ref={el => (statusRef.current[i] = el)}>
+                            <td className={`position-relative cursor-pointer ${statusClicked[i] ? 'show-dropdown':''} `} onClick={(e)=>{e.stopPropagation();changeStatusClicked(i)}} ref={el => (statusRef.current[i] = el)}>
                                 {order.status}
                                 {statusClicked[i]
                                 // && order.status ==='요청'

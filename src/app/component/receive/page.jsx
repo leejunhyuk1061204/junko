@@ -9,6 +9,7 @@ import {useAlertModalStore, useDatePickerStore} from "@/app/zustand/store";
 import {FaRegCalendarCheck} from "react-icons/fa6";
 import { format } from 'date-fns';
 import ReceiveInputModal from "@/app/component/modal/receiveInputModal";
+import ReceiveProductModal from "@/app/component/modal/receiveProductModal";
 
 const sortOptions = [
     { id: 1, name: '최신순' , orderColumn : 'receive_date', orderDirection: 'desc' },
@@ -17,8 +18,8 @@ const sortOptions = [
 ];
 
 const receiveStatusList = [
-    // {idx:1, name:'입고예정'},
-    {idx:2, name:'입고완료'},
+    {idx:1, name:'입고완료'},
+    {idx:2, name:'입고예정'},
 ]
 const statusList = [
     {idx:1, name:'전체'},
@@ -40,8 +41,7 @@ const ReceivingPage = () => {
     const statusRef = useRef({});
     const [selectedDate, setSelectedDate] = useState({});
     const [inputModalOpen, setInputModalOpen] = useState({bool:false,idx:0,status:null});
-    const [updateInfo, setUpdateInfo] = useState([]);
-
+    const [receiveProductModalOpen, setReceiveProductModalOpen] = useState({bool:false,idx:0});
 
     useEffect(() => {
         getReceiveList();
@@ -193,7 +193,7 @@ const ReceivingPage = () => {
                         </Listbox>
                     </div>
                 </div>
-                <table className={'checkbox-table'}>
+                <table className={'checkbox-table text-overflow-table'}>
                     <thead>
                         <tr>
                             <th><input type='checkbox'/></th>
@@ -212,11 +212,11 @@ const ReceivingPage = () => {
                             <td><input type='checkbox'/></td>
                             <td>{receive.receive_idx}</td>
                             <td>{receive.order_idx}</td>
-                            <td>{receive.product_name}{receive.product_cnt === 1?'':` 외 ${receive.product_cnt-1}개`}</td>
+                            <td className='cursor-pointer' onClick={()=>setReceiveProductModalOpen({bool:true,idx:receive.receive_idx})}>{receive.product_name}{receive.product_cnt === 1?'':` 외 ${receive.product_cnt-1}개`}</td>
                             <td>{receive.warehouse_name}</td>
                             <td>{receive.receive_date}</td>
                             <td>{receive.user_name}</td>
-                            <td className='position-relative cursor-pointer' onClick={(e)=>{e.stopPropagation();changeStatusClicked(i)}} ref={el => (statusRef.current[i] = el)}>
+                            <td className={`position-relative cursor-pointer ${statusClicked[i] && receive.status === '입고예정' ? 'show-dropdown' : ''}`} onClick={(e)=>{e.stopPropagation();changeStatusClicked(i)}} ref={el => (statusRef.current[i] = el)}>
                                 {receive.status}
                                 {statusClicked[i]
                                     && receive.status === '입고예정'
@@ -251,7 +251,8 @@ const ReceivingPage = () => {
                     </div>
                 </div>
             </div>
-            <ReceiveInputModal open={inputModalOpen.bool} onClose={()=>setInputModalOpen({bool:false,idx:0,status:null})} setUpdateInfo={setUpdateInfo} idx={inputModalOpen.idx} status={inputModalOpen.status} getReceiveList={getReceiveList}/>
+            <ReceiveInputModal open={inputModalOpen.bool} onClose={()=>setInputModalOpen({bool:false,idx:0,status:null})} idx={inputModalOpen.idx} status={inputModalOpen.status} getReceiveList={getReceiveList}/>
+            <ReceiveProductModal open={receiveProductModalOpen.bool} onClose={()=>setReceiveProductModalOpen({bool:false,idx:0})} idx={receiveProductModalOpen.idx}/>
         </div>
     );
 };
