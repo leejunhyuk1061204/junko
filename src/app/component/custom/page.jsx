@@ -62,6 +62,28 @@ export default function CustomPage() {
         setPage(1);
     };
 
+    const handleDelete = async (custom_idx) => {
+        if (!window.confirm("정말 삭제하시겠습니까?")) return;
+
+        const token = sessionStorage.getItem("token");
+        try {
+            const res = await axios.put("http://localhost:8080/custom/del", null, {
+                headers: { Authorization: token },
+                params: { custom_idx }
+            });
+
+            if (res.data?.success) {
+                alert("삭제되었습니다.");
+                fetchList();
+            } else {
+                alert("삭제에 실패했습니다.");
+            }
+        } catch (err) {
+            console.error(err);
+            alert("오류가 발생했습니다.");
+        }
+    };
+
     return (
         <div className="productPage wrap page-background" style={{ overflowX: 'hidden' }}>
             <Header />
@@ -125,6 +147,8 @@ export default function CustomPage() {
                                     setEditItem(item);
                                     setShowModal(true);
                                 }}>수정</button>
+
+                                <button className="product-btn-del" onClick={() => handleDelete(item.custom_idx)}>삭제</button>
                             </td>
                         </tr>
                     ))}
