@@ -35,7 +35,6 @@ const LoginPage = () => {
     const toggleLogin = async () =>{
         try {
             const {data} = await axios.post('http://localhost:8080/login',{user_id:login.id,pw:login.pw});
-            console.log(data);
             if(data.success) {
                 sessionStorage.setItem('loginId', login.id);
                 sessionStorage.setItem('token', data.token);
@@ -62,7 +61,6 @@ const LoginPage = () => {
             ...login,
             [name]: value
         });
-        console.log(login);
     }
 
     // 찾기 form 입력
