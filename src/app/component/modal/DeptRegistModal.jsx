@@ -28,6 +28,11 @@ export default function DeptRegistModal({ entry_idx, onClose }) {
         const token = sessionStorage.getItem("token")
         const user_idx = sessionStorage.getItem("user_idx")
 
+        if (!form.as_idx || !form.amount) {
+            alert("계정과목과 금액을 입력해주세요")
+            return
+        }
+
         try {
             // 1. 분개 등록
             const res = await axios.post(
@@ -45,8 +50,11 @@ export default function DeptRegistModal({ entry_idx, onClose }) {
                 }
             )
 
-            if (res.data.result === "success") {
-                // 2. 파일 업로드
+            console.log("등록 응답:", res.data)
+
+            const success = res.data.success || res.data.result === 'success'
+
+            if (success) {
                 if (form.file) {
                     const fileData = new FormData()
                     fileData.append("file", form.file)
@@ -56,12 +64,13 @@ export default function DeptRegistModal({ entry_idx, onClose }) {
                 alert("분개 등록 완료")
                 onClose()
             } else {
-                alert("분개 등록 실패")
+                alert("분개 등록 실패: " + (res.data.message || '서버 응답 실패'))
             }
         } catch (err) {
             console.error("분개 등록 오류", err)
-            alert("오류 발생")
+            alert("오류 발생: " + err.message)
         }
+    
     }
 
     return (
