@@ -161,7 +161,7 @@ export const useChartStore = create((set) => ({
 
 }));
 
-// datePicker
+// datePicker Date
 export const useDatePickerStore = create((set) => ({
     isOpen : false,
     mode : 'single',
@@ -186,5 +186,25 @@ export const useDatePickerStore = create((set) => ({
 
     setSelectedDate: (date) => set({selectedDate:date}),
     setSelectedDates:(dates) => set({selectedDates:dates}),
+
+}));
+
+// timePicker Time
+export const useTimePickerStore = create((set) => ({
+    isOpen : false,
+    targetIndex: null,
+    selectedTime: null,
+    onConfirm: null,
+
+    openTimePicker: ({index = null, initialTime = null, onConfirm}) =>
+        set({
+            isOpen: true,
+            targetIndex: index,
+            selectedTime: initialTime,
+            onConfirm,
+        }),
+
+    closeTimePicker: () => set({isOpen: false, onConfirm:null}),
+    setSelectedTime: (time) => set({selectedTime:time}),
 
 }));

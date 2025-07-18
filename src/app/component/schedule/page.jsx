@@ -6,7 +6,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import {useCallback, useEffect, useRef, useState} from "react";
 import {Calendar, dateFnsLocalizer, momentLocalizer} from "react-big-calendar";
 import {useRouter} from "next/navigation";
-import {useAlertModalStore} from "@/app/zustand/store";
+import {useAlertModalStore, useTimePickerStore} from "@/app/zustand/store";
 import axios from "axios";
 import format from "date-fns/format";
 import parse from "date-fns/parse";
@@ -28,6 +28,7 @@ export default function SchedulePage() {
 
     const router = useRouter();
     const {openModal} = useAlertModalStore();
+    const {closeTimePicker} = useTimePickerStore();
 
     const [event, setEvent] = useState([]);
     const [inputInfo, setInputInfo] = useState({open: false, start: null, end: null, x: 0, y: 0});
@@ -71,17 +72,21 @@ export default function SchedulePage() {
             });
             return;
         }
+
         try {
 
             // 일정 불러오기
-            const [personalRes, deptRes] = await Promise.all([
-                axios.post('http://localhost:8080/schedule/list', {label_idx: 1}, {headers: {Authorization: token}}),
-                axios.post('http://localhost:8080/schedule/list', {label_idx: 0}, {headers: {Authorization: token}}),
+            const [personalRes, deptRes, workRes] = await Promise.all([
+                axios.post('http://localhost:8080/schedule/list', {type: 'personal'}, {headers: {Authorization: token}}),
+                axios.post('http://localhost:8080/schedule/list', {type: 'dept'}, {headers: {Authorization: token}}),
+                axios.post('http://localhost:8080/schedule/list', {type: 'work'}, {headers: {Authorization: token}}),
             ]);
 
-            const personalList = personalRes.data.list || [];
-            const deptList = deptRes.data.list || [];
-            const allEvents = [...personalList, ...deptList];
+            const allEvents = [
+                ...personalRes.data.list,
+                ...deptRes.data.list,
+                ...workRes.data.list,
+            ];
 
             const mappedEvents = allEvents.map(item => ({
                 id: item.schedule_idx,
@@ -100,7 +105,6 @@ export default function SchedulePage() {
     useEffect(() => {
         fetchEvents();
     }, [fetchEvents]);
-
 
     // 날짜 클릭
     const handleSelectSlot = (slotInfo) => {
@@ -309,7 +313,7 @@ export default function SchedulePage() {
 
     // 캘린더에 보여지는 이벤트
     const CustomEvent = ({event}) => {
-        const {title, start_time, end_time, description} = event.resource || {};
+        const {title, start_time, end_time} = event.resource || {};
 
         if (!title || !start_time || !end_time) {
             return (
@@ -355,14 +359,17 @@ export default function SchedulePage() {
                     {/*일정 등록 모달*/}
                     {inputInfo.open && !editForm && (
                         <ScheduleInsertModal
-                            open={inputInfo.open}
+                            open={true}
                             mode="insert"
                             form={form}
                             setForm={setForm}
                             errors={errors}
                             setErrors={setErrors}
                             onSubmit={insertEvent}
-                            onClose={() => setInputInfo({...inputInfo, open: false})}
+                            onClose={() => {
+                                closeTimePicker();
+                                setInputInfo({...inputInfo, open: false});
+                            }}
                             dateInfo={inputInfo}
                         />
                     )}
@@ -370,16 +377,20 @@ export default function SchedulePage() {
                     {/*일정 상세보기 모달*/}
                     {detailInfo.open && !editForm && !inputInfo.open && (
                         <ScheduleDetailModal
-                            open={detailInfo.open && !editForm && !inputInfo.open}
+                            open={true}
                             mode="detail"
                             form={form}
                             setForm={setForm}
-                            onClose={() => setDetailInfo({...detailInfo, open: false})}
+                            onClose={() => {
+                                closeTimePicker();
+                                setDetailInfo({...detailInfo, open: false});
+                            }}
                             dateInfo={detailInfo.event}
+                            event={detailInfo.event}
                             onDelete={() => deleteEvent(detailInfo.event?.resource?.schedule_idx)}
                             onEditClick={() => {
-                                setDetailInfo({...detailInfo, open: false});
                                 setForm(detailInfo.event.resource);
+                                setDetailInfo({...detailInfo, open: false});
                                 setInputInfo({
                                     open: true,
                                     start: detailInfo.event.start,
