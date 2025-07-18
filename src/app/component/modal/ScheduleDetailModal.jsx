@@ -1,6 +1,7 @@
 'use client'
 
 import {useEffect, useRef} from "react";
+import format from "date-fns/format";
 
 export default function ScheduleDetailModal ({
     open,
@@ -13,7 +14,7 @@ export default function ScheduleDetailModal ({
 
     if (!open || !event) return null;
 
-    const data = event.resources || {};
+    const data = event.resource || {};
     const start = event.start;
     const end = event.end;
 

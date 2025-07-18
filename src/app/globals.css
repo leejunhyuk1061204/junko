@@ -2721,6 +2721,14 @@ input[type='text']:focus,input[type='password']:focus{
     z-index: 2;
 }
 
+.schedule-box .rbc-day-bg {
+    cursor: pointer;
+}
+
+.schedule-box .rbc-button-link {
+    cursor: default;
+}
+
 .schedule-box .rbc-header {
     padding: 9px 0;
     font-weight: 600;
@@ -2883,12 +2891,12 @@ input[type='text']:focus,input[type='password']:focus{
     display: flex;
     flex-direction: column;
     gap:10px;
-    width: 800px;
+    width: 500px;
     left: 50%;
     top: 50%;
     transform: translate(-50%,-50%);
     border: 1px solid #ccc;
-    padding: 35px;
+    padding: 24px;
 }
 
 .schedule-modal-overlay h4 {
@@ -2914,4 +2922,107 @@ input[type='text']:focus,input[type='password']:focus{
     display: flex;
     gap: 10px;
     justify-content: end;
+}
+
+/* 제목 input */
+.schedule-custom-modal input.title-input {
+    height: 35px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    margin-bottom: 7px;
+}
+
+/* 내용 input (2줄 높이) */
+.schedule-custom-modal input.description-input {
+    height: 64px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+    resize: none;
+    margin-bottom: 12px;
+}
+
+.schedule-custom-modal input[placeholder] {
+    font-size: 13px;
+    color: #aaa;
+}
+
+
+/* 시간 선택 셀렉트 */
+.schedule-custom-modal .time-select .react-select__control {
+    height: 36px;
+    font-size: 14px;
+    min-height: 36px;
+    padding: 0 8px;
+}
+
+/* react-select 커스텀: hover 시 자동 열기 */
+.schedule-custom-modal .time-select .react-select__control:hover + .react-select__menu {
+    display: block !important;
+}
+
+.schedule-custom-modal .label-opt-opt {
+    margin-top: 12px;
+}
+
+
+
+
+
+/* =============== TimePicker =============== */
+.time-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.time-modal {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.react-datepicker__time-list {
+    max-height: 200px;
+    scroll-behavior: smooth;
+}
+
+.react-datepicker__time-list {
+    max-height: 200px;     /* 높이 제한 */
+    scroll-behavior: smooth; /* 부드럽게 */
+    font-size: 16px;
+}
+
+.react-datepicker__time-list-item {
+    padding: 8px 12px;
+}
+
+/* 직접 타이핑 방지 - 이중 보호 */
+.custom-time-picker {
+    caret-color: transparent;
+    pointer-events: auto;
+}
+
+.time-input {
+    cursor: pointer;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+.time-input:focus {
+    outline: none;
+    border-color: #2196f3;
 }
