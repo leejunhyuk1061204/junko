@@ -38,7 +38,7 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
         }
 
         try {
-            const token = localStorage.getItem("token");
+            const token = sessionStorage.getItem("token");
 
             // 거래처 / 고객 idx 조회
             let custom_idx = null;
@@ -59,17 +59,21 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
             }
 
             // 수정 요청
-            const res = await axios.put(`http://localhost:8080/accountUpdate/${entry.entry_idx}`, {
-                entry_type: form.entry_type,
-                amount: form.amount,
-                entry_date: form.entry_date,
-                custom_idx,
-                sales_idx
-            }, {
-                headers: {
-                    Authorization: `Bearer ${token}`
+            const res = await axios.put(
+                `http://localhost:8080/accountUpdate/${entry.entry_idx}`,
+                {
+                    entry_type: form.entry_type,
+                    amount: form.amount,
+                    entry_date: form.entry_date,
+                    custom_name: form.custom_name,
+                    customer_name: form.customer_name
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`, // 꼭 Bearer 붙여서
+                    }
                 }
-            });
+            );
 
             if (res.data.success) {
                 alert("수정 완료!");
