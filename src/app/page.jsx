@@ -23,8 +23,14 @@ const localizer = dateFnsLocalizer({format, parse, startOfWeek, getDay, locales,
 
 const MainPage = () => {
 
-    if(sessionStorage.getItem('token') === null || sessionStorage.getItem('token') === '' || typeof sessionStorage.getItem('token') === 'undefined') {
-        location.href="/component/login";
+    if (typeof window !== 'undefined') {
+        if (
+            sessionStorage.getItem('token') === null ||
+            sessionStorage.getItem('token') === '' ||
+            typeof sessionStorage.getItem('token') === 'undefined'
+        ) {
+            location.href = "/component/login";
+        }
     }
 
     const {openModal} = useAlertModalStore();
