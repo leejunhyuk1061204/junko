@@ -715,6 +715,11 @@ input[type='text']:focus,input[type='password']:focus{
     border-radius: 6px;
     margin-right: 10px;
     font-size: 14px;
+    appearance: none; /* 브라우저 기본 스타일 제거 */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'%3E%3Cpath fill='%23666' d='M5.516 7.548l4.484 4.484 4.484-4.484a.999.999 0 1 1 1.414 1.414l-5.192 5.192a.997.997 0 0 1-1.41 0L4.102 8.962a.999.999 0 1 1 1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 12px;
 }
 
 .select-option{
@@ -730,15 +735,6 @@ input[type='text']:focus,input[type='password']:focus{
     width: 92%;
     font-size: 14px;
     z-index: 10;
-}
-
-.select-btn::after {
-    content: '▾';
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
 }
 
 .select-option-item {
@@ -1167,6 +1163,14 @@ input[type='text']:focus,input[type='password']:focus{
     margin-left: 50px;
 }
 
+.category-select{
+    appearance: none; /* 브라우저 기본 스타일 제거 */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'%3E%3Cpath fill='%23666' d='M5.516 7.548l4.484 4.484 4.484-4.484a.999.999 0 1 1 1.414 1.414l-5.192 5.192a.997.997 0 0 1-1.41 0L4.102 8.962a.999.999 0 1 1 1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 12px;
+}
+
 .category-item {
     display: flex;
     align-items: center;
@@ -1200,7 +1204,6 @@ input[type='text']:focus,input[type='password']:focus{
     cursor: pointer;
     width: 40px;
     height: 16px;
-    box-shadow: var(--shadow);
     background-color: #006CCE;
     color: white;
     border-radius: 6px;
@@ -1216,7 +1219,6 @@ input[type='text']:focus,input[type='password']:focus{
     cursor: pointer;
     width: 40px;
     height: 16px;
-    box-shadow: var(--shadow);
     background-color: #E86060;
     color: white;
     border-radius: 6px;
@@ -1310,16 +1312,11 @@ input[type='text']:focus,input[type='password']:focus{
     border-radius: 6px;
     cursor: pointer;
     position: relative;
-}
-
-.custom-select-btn::after {
-    content: '▾';
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 10px;
-    pointer-events: none;
+    appearance: none; /* 브라우저 기본 스타일 제거 */
+    background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20'%3E%3Cpath fill='%23666' d='M5.516 7.548l4.484 4.484 4.484-4.484a.999.999 0 1 1 1.414 1.414l-5.192 5.192a.997.997 0 0 1-1.41 0L4.102 8.962a.999.999 0 1 1 1.414-1.414z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 5px center;
+    background-size: 12px;
 }
 
 /* 셀렉트 옵션박스 */
@@ -1399,6 +1396,153 @@ input[type='text']:focus,input[type='password']:focus{
     background-color: #1A82E3;
 }
 
+/* ------------------------------- 로그인 관련 ------------------------------- */
+.template-list-back{
+    width: auto;
+    background-color: white;
+    padding: 10px;
+    margin: 30px;
+}
+
+.template-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: white;
+    border: 1px solid #ccc;
+}
+
+.template-table th, .template-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.template-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.template-btn-small {
+    padding: 4px 8px;
+    font-size: 12px;
+    margin-right: 4px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.template-btn {
+    height: 24px;
+    width: 40px;
+    padding: 0 16px;
+    background-color: #006CCE;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.template-btn:hover {
+    background-color: #1A82E3;
+}
+
+.template-btn-del{
+    cursor: pointer;
+    width: 40px;
+    height: 14px;
+    background-color: #E86060;
+    color: white;
+    border-radius: 6px;
+    padding: 5px 15px;
+    font-size: 14px;
+}
+
+.template-form-container {
+    display: flex;
+    gap: 30px;
+    background-color: white;
+    padding: 20px;
+    margin: 30px;
+    align-items: flex-start;
+    width: auto;
+}
+
+.template-form-left {
+    flex: 1;
+}
+
+.template-form-right {
+    flex: 1;
+}
+
+.template-form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.template-label {
+    width: 100px;
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.template-input{
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.template-btn-submit {
+    padding: 8px 20px;
+    background-color: #006CCE;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.template-btn-submit:hover {
+    background-color: #1A82E3;
+}
+
+.template-btn-back {
+    padding: 8px 20px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.template-preview-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.template-preview-frame {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #ccc;
+}
+
+.template-form-right {
+    flex: 1;
+    padding-left: 20px;
+    border-left: 1px solid #eee;
+}
 
 /* ------------------------------- 로그인 관련 ------------------------------- */
 

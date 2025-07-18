@@ -90,7 +90,7 @@ const mainMenus = [
             { label: '문서 관리', href: '/' },
             { label: '업무 진행 현황', href: '/' },
             { label: '사내 공지 / 회의록', href: '/' },
-            { label: '첨부파일 / 자료실', href: '/' },
+            { label: '첨부파일 / 자료실', href: '/component/template' },
         ],
         href: '/',
     },
