@@ -41,6 +41,7 @@ const LoginPage = () => {
                 sessionStorage.setItem('token', data.token);
                 sessionStorage.setItem('user_idx', data.user_idx);
                 sessionStorage.setItem('user_name', data.user_name);
+                sessionStorage.setItem('user_id', data.user_id);
                 location.href = '/';
             }else {
                 openModal({

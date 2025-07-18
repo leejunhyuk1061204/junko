@@ -54,6 +54,7 @@ const SalesPage = () => {
     const [salesList, setSalesList] = useState([]);
     const [productModalOpen, setProductModalOpen] = useState({bool:false,idx:0});
     const [waybillInsertModalOpen, setWaybillInsertModalOpen] = useState({bool:false,idxList:[]});
+    const [salesInsertModalOpen, setSalesInsertModalOpen] = useState(false);
 
     useEffect(() => {
         getSalesList();
@@ -302,13 +303,13 @@ const SalesPage = () => {
                         </div>
                         <div className='flex width-fit margin-right-10 gap_10'>
                             <button className='btn white-space-nowrap' onClick={waybillInsert}>송장 등록</button>
-                            <button className='btn white-space-nowrap'>주문 등록</button>
+                            <button className='btn white-space-nowrap' onClick={()=>{location.href='/component/sales/insert'}}>주문 등록</button>
                         </div>
                     </div>
                 </div>
             </div>
             <ProductModal open={productModalOpen.bool} onClose={()=>setProductModalOpen({bool:false,idx:0})} sales_idx={productModalOpen.idx}/>
-            <WaybillInsertModal open={waybillInsertModalOpen.bool} onClose={()=>setWaybillInsertModalOpen({bool:false,idxList:[]})} idxList={waybillInsertModalOpen.idxList}/>
+            <WaybillInsertModal open={waybillInsertModalOpen.bool} onClose={()=>setWaybillInsertModalOpen({bool:false,idxList:[]})} idxList={waybillInsertModalOpen.idxList} getSalesList={getSalesList}/>
         </div>
     );
 };
