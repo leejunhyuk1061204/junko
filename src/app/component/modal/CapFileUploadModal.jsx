@@ -25,17 +25,30 @@ const CapFileUploadModal = ({ capIdx, onClose, onSuccess }) => {
     };
 
     return (
-        <div className="modal-cap">
-            <h3>증빙 파일 업로드</h3>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
-                    required
-                />
-                <button type="submit">업로드</button>
-                <button type="button" onClick={onClose}>닫기</button>
-            </form>
+        <div className="entryRegist-modal">
+            <div className="entryRegist-modal-box">
+                <button className="entryRegist-modal-close" onClick={onClose}>×</button>
+                <h3 className="entryRegist-modal-title">증빙 파일 업로드</h3>
+                <form onSubmit={handleSubmit}>
+                    <table className="entryRegist-table">
+                        <tbody>
+                        <tr>
+                            <th>파일 선택</th>
+                            <td>
+                                <input
+                                    type="file"
+                                    onChange={(e) => setFile(e.target.files[0])}
+                                    required
+                                />
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                    <button type="submit" className="entryList-fabBtn blue">업로드</button>
+                    <button type="button" className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
+                </form>
+            </div>
         </div>
     );
 };

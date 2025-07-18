@@ -1,5 +1,6 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import Select from 'react-select';
 import {
     capRegist,
     getCustomList,
@@ -7,7 +8,7 @@ import {
     uploadCapFile,
     generatePdf
 } from '../collectionAndPayment/CapService';
-import '../../globals.css'
+import '../../globals.css';
 
 const CapRegistModal = ({ onClose, onSuccess }) => {
     const [form, setForm] = useState({
@@ -21,7 +22,6 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
     const [file, setFile] = useState(null);
     const [customList, setCustomList] = useState([]);
     const [linkedList, setLinkedList] = useState([]);
-
     const token = localStorage.getItem('token');
 
     useEffect(() => {
@@ -42,16 +42,12 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
         try {
             const res = await capRegist(form, token);
             const cap_idx = res.data.cap_idx;
 
-            if (file) {
-                await uploadCapFile(cap_idx, file);
-            }
+            if (file) await uploadCapFile(cap_idx, file);
 
-            //  등록 후 PDF 자동 생성 + 다운로드
             try {
                 const pdfRes = await generatePdf(cap_idx, 15);
                 const link = document.createElement('a');
@@ -73,64 +69,95 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
     };
 
     return (
-        <div className="modal-cap">
-            <h3>입금 / 지급 등록</h3>
-            <form onSubmit={handleSubmit}>
-                <label>
-                    유형
-                    <select name="type" value={form.type} onChange={handleChange}>
-                        <option value="수금">수금</option>
-                        <option value="지급">지급</option>
-                    </select>
-                </label>
+        <div className="entryRegist-modal">
+            <div className="entryRegist-modal-box">
+                <button className="entryRegist-modal-close" onClick={onClose}>×</button>
+                <h3 className="entryRegist-modal-title">입금 / 지급 등록</h3>
+                <form onSubmit={handleSubmit}>
+                    <table className="entryRegist-table">
+                        <tbody>
+                        <tr>
+                            <th>유형</th>
+                            <td>
+                                <select name="type" value={form.type} onChange={handleChange}>
+                                    <option value="수금">수금</option>
+                                    <option value="지급">지급</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>거래처</th>
+                            <td>
+                                <Select
+                                    name="custom_idx"
+                                    options={customList.map(c => ({
+                                        value: c.custom_idx,
+                                        label: c.custom_name
+                                    }))}
+                                    value={customList.find(c => c.custom_idx == form.custom_idx) && {
+                                        value: form.custom_idx,
+                                        label: customList.find(c => c.custom_idx == form.custom_idx).custom_name
+                                    }}
+                                    onChange={(selected) =>
+                                        setForm(prev => ({ ...prev, custom_idx: selected?.value || '' }))
+                                    }
+                                    placeholder="거래처 선택"
+                                    isClearable
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>금액</th>
+                            <td>
+                                <input type="number" name="amount" value={form.amount} onChange={handleChange} required />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>일자</th>
+                            <td>
+                                <input type="date" name="date" value={form.date} onChange={handleChange} required />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>전표 연동</th>
+                            <td>
+                                <Select
+                                    name="entry_idx"
+                                    options={linkedList.map(i => ({
+                                        value: i.idx,
+                                        label: `[${i.type}] ${i.title}`
+                                    }))}
+                                    value={linkedList.find(i => i.idx == form.entry_idx) && {
+                                        value: form.entry_idx,
+                                        label: `[${linkedList.find(i => i.idx == form.entry_idx).type}] ${linkedList.find(i => i.idx == form.entry_idx).title}`
+                                    }}
+                                    onChange={(selected) =>
+                                        setForm(prev => ({ ...prev, entry_idx: selected?.value || '' }))
+                                    }
+                                    placeholder="전표 선택"
+                                    isClearable
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>메모</th>
+                            <td>
+                                <input type="text" name="memo" value={form.memo} onChange={handleChange} />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>증빙파일</th>
+                            <td>
+                                <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
 
-                <label>
-                    거래처
-                    <select name="custom_idx" value={form.custom_idx} onChange={handleChange} required>
-                        <option value="">선택</option>
-                        {customList.map(c => (
-                            <option key={`custom-${c.custom_idx}`} value={c.custom_idx}>
-                                {c.custom_name}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label>
-                    금액
-                    <input type="number" name="amount" value={form.amount} onChange={handleChange} required />
-                </label>
-
-                <label>
-                    일자
-                    <input type="date" name="date" value={form.date} onChange={handleChange} required />
-                </label>
-
-                <label>
-                    전표 연동 (선택)
-                    <select name="entry_idx" value={form.entry_idx} onChange={handleChange}>
-                        <option value="">없음</option>
-                        {linkedList.map(i => (
-                            <option key={`${i.type}-${i.idx}`} value={i.idx}>
-                                [{i.type}] {i.title}
-                            </option>
-                        ))}
-                    </select>
-                </label>
-
-                <label>
-                    메모
-                    <input type="text" name="memo" value={form.memo} onChange={handleChange} />
-                </label>
-
-                <label>
-                    증빙파일
-                    <input type="file" onChange={(e) => setFile(e.target.files[0])} />
-                </label>
-
-                <button type="submit">등록</button>
-                <button type="button" onClick={onClose}>닫기</button>
-            </form>
+                    <button type="submit" className="entryList-fabBtn blue">등록</button>
+                    <button type="button" className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
+                </form>
+            </div>
         </div>
     );
 };

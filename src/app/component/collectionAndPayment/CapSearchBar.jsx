@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import '../../globals.css'
+import { TbSearch } from 'react-icons/tb';
+import '../../globals.css';
 
 const CapSearchBar = ({ onSearch }) => {
     const [form, setForm] = useState({
@@ -40,9 +41,9 @@ const CapSearchBar = ({ onSearch }) => {
     };
 
     return (
-        <form className="cap-search-bar" onSubmit={handleSubmit}>
+        <form className="entryList-searchBar" onSubmit={handleSubmit}>
             <select name="type" value={form.type} onChange={handleChange}>
-                <option value="">전체</option>
+                <option value="">전체 유형</option>
                 <option value="수금">수금</option>
                 <option value="지급">지급</option>
             </select>
@@ -61,6 +62,7 @@ const CapSearchBar = ({ onSearch }) => {
                 value={form.startDate}
                 onChange={handleChange}
             />
+            <span style={{ margin: '0 4px', color: '#666' }}>~</span>
             <input
                 type="date"
                 name="endDate"
@@ -93,8 +95,12 @@ const CapSearchBar = ({ onSearch }) => {
                 <option value="asc">오름차순</option>
             </select>
 
-            <button type="submit">🔍 검색</button>
-            <button type="button" onClick={handleReset}>↩ 초기화</button>
+            <button type="submit" className="entryList-fabBtn blue" title="검색">
+                <TbSearch size={16} />
+            </button>
+            <button type="button" className="entryList-fabBtn gray" onClick={handleReset}>
+                초기화
+            </button>
         </form>
     );
 };

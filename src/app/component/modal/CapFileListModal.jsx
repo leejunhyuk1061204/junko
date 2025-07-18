@@ -1,6 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { getCapFileList, deleteCapFile, downloadCapFile } from '../collectionAndPayment/CapService';
+import {
+    getCapFileList,
+    deleteCapFile,
+    downloadCapFile
+} from '../collectionAndPayment/CapService';
 import '../../globals.css';
 
 const CapFileListModal = ({ capIdx, onClose }) => {
@@ -44,22 +48,45 @@ const CapFileListModal = ({ capIdx, onClose }) => {
     };
 
     return (
-        <div className="modal-cap">
-            <h3>첨부파일 목록</h3>
-            {files.length > 0 ? (
-                <ul>
-                    {files.map(file => (
-                        <li key={file.file_idx}>
-                            📎 {file.ori_filename} ({new Date(file.reg_date).toLocaleString()})
-                            <button onClick={() => handleDownload(file.file_idx, file.ori_filename)}>⬇</button>
-                            <button onClick={() => handleDelete(file.file_idx)}>🗑</button>
-                        </li>
-                    ))}
-                </ul>
-            ) : (
-                <p>첨부된 파일이 없습니다.</p>
-            )}
-            <button onClick={onClose}>닫기</button>
+        <div className="entryRegist-modal">
+            <div className="entryRegist-modal-box">
+                <button className="entryRegist-modal-close" onClick={onClose}>×</button>
+                <h3 className="entryRegist-modal-title">첨부파일 목록</h3>
+                <table className="entryRegist-table">
+                    <thead>
+                    <tr>
+                        <th>파일명</th>
+                        <th>등록일</th>
+                        <th>관리</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {files.length > 0 ? (
+                        files.map(file => (
+                            <tr key={file.file_idx}>
+                                <td>{file.ori_filename}</td>
+                                <td>{new Date(file.reg_date).toLocaleString()}</td>
+                                <td>
+                                    <button className="entryList-fabBtn blue"
+                                            onClick={() => handleDownload(file.file_idx, file.ori_filename)}>
+                                        ⬇ 다운로드
+                                    </button>
+                                    <button className="entryList-fabBtn red-del"
+                                            onClick={() => handleDelete(file.file_idx)}>
+                                        🗑 삭제
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="3">첨부된 파일이 없습니다.</td>
+                        </tr>
+                    )}
+                    </tbody>
+                </table>
+                <button className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
+            </div>
         </div>
     );
 };

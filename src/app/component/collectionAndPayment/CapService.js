@@ -15,7 +15,7 @@ export const getCapDetail = async (cap_idx) => {
     return await axios.get(`${API}/capList/${cap_idx}`);
 };
 
-//  수금/지급 검색
+// 수금/지급 검색
 export const searchCap = async (searchDto) => {
     return await axios.post(`${API}/searchCap`, searchDto);
 };
@@ -27,7 +27,7 @@ export const updateCap = async (cap_idx, data, token) => {
     });
 };
 
-//  수금/지급 삭제
+// 수금/지급 삭제
 export const deleteCap = async (cap_idx, token) => {
     return await axios.delete(`${API}/capDel/${cap_idx}`, {
         headers: { Authorization: token }
