@@ -54,7 +54,6 @@ const SalesPage = () => {
     const [salesList, setSalesList] = useState([]);
     const [productModalOpen, setProductModalOpen] = useState({bool:false,idx:0});
     const [waybillInsertModalOpen, setWaybillInsertModalOpen] = useState({bool:false,idxList:[]});
-    const [salesInsertModalOpen, setSalesInsertModalOpen] = useState(false);
 
     useEffect(() => {
         getSalesList();
@@ -161,6 +160,22 @@ const SalesPage = () => {
             ...prev,
             [i]:!prev[i]
         }));
+    }
+
+    // 외부 클릭 감지
+    useEffect(() => {
+        document.addEventListener('mousedown',handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown',handleClickOutside);
+        }
+    }, [statusClicked]);
+
+    const handleClickOutside = (e) => {
+        Object.entries(statusClicked).forEach(([key, value]) => {
+            if(value && statusRef.current[key] && ! statusRef.current[key].contains(e.target)){
+                setStatusClicked(prev=>({...prev,[key]:false}));
+            }
+        })
     }
 
     // 체크박스 전체 선택

@@ -1,11 +1,27 @@
 'use client'
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Header from "@/app/header";
 import {format} from "date-fns";
 import axios from "axios";
+import {useAlertModalStore} from "@/app/zustand/store";
+
+const salesStatusList = [
+    {idx:1, name:'결제 대기'},
+    {idx:2, name:'결제 취소'},
+    {idx:3, name:'결제 완료'},
+    {idx:4, name:'출고 예정'},
+    {idx:5, name:'배송중'},
+    {idx:6, name:'배송완료'},
+]
+
+const paymentOptionList = [
+    {idx:1, name:'현금'},
+    {idx:2, name:'카드'},
+]
 
 const SalesInsertPage = () => {
 
+    const {openModal, closeModal} = useAlertModalStore();
     const [salesForm, setSalesForm] = useState({});
     const [salesProductForm, setSalesProductForm] = useState([]);
     const [productOptionList, setProductOptionList] = useState([]);
@@ -22,6 +38,11 @@ const SalesInsertPage = () => {
     const [optionSearch1, setOptionSearch1] = useState({});
     const [optionSearch2, setOptionSearch2] = useState({});
     const [optionFocused, setOptionFocused] = useState(false);
+
+    const [statusClicked, setStatusClicked] = useState(false);
+    const [paymentOptionClicked, setPaymentOptionClicked] = useState(false);
+    const statusRef = useRef(null);
+    const paymentOptionRef = useRef(null);
 
     useEffect(() => {
         getProductList();
@@ -52,17 +73,20 @@ const SalesInsertPage = () => {
             setOptionSearch2(prev=>({...prev,[selectedRow]:optionSearch1[selectedRow]}));
         }, 300);
 
+        console.log('optionSearch1[selectedRow]',optionSearch1[selectedRow]);
         return () => clearTimeout(timer);
     }, [optionSearch1[selectedRow]]);
 
     useEffect(() => {
         filterOptionList(selectedRow,optionSearch2[selectedRow]);
+        console.log('optionSearch2[selectedRow]',optionSearch2[selectedRow]);
     }, [optionSearch2[selectedRow]]);
 
     // salesForm 입력
     const changeSalesFrom = (e) => {
         const {name, value} = e.target;
-        if(name !== 'payment_date') {
+        console.log(name, value);
+        if(name === 'payment_date') {
             const date = format(value, 'yyyy-MM-dd');
             setSalesForm(prev => ({
                 ...prev,
@@ -100,12 +124,84 @@ const SalesInsertPage = () => {
     // 옵션 리스트 필터
     const filterOptionList = (i,search) => {
         if(search===''){
-            setFilteredOptionList(prev=>({...prev,[i]:optionList}));
+            if(filteredOptionList?.[i]?.length === 1 && typeof filteredOptionList[i][0].combined_name === 'undefined'){
+                setFilteredOptionList(prev=>({...prev,[i]:[{combined_name:'없음'}]}));
+            } else {
+                setFilteredOptionList(prev => ({
+                    ...prev,
+                    [i]: optionList[i]
+                }));
+            }
             return;
         }
-        const filteredList = optionList[i]?.filter(f=>f.combined_name && f.combined_name.toLowerCase().includes(search.toLowerCase())) || [];
-        setFilteredOptionList(prev=>({...prev,[i]:filteredList}));
+        const filteredList = optionList[i]?.filter(f=>(typeof f.combined_name === 'string') && f.combined_name.toLowerCase().includes(search.toLowerCase())) || [];
+        setFilteredOptionList(prev => ({
+            ...prev,
+            [i]: filteredList
+        }));
         console.log('옵션 리스트 필터',filteredList);
+    }
+
+    // 외부 클릭 감지
+    const handleClickOutside = (e) => {
+        if (statusRef.current && !statusRef.current.contains(e.target)) {
+            setStatusClicked(false);
+        }
+        if (paymentOptionRef.current && !paymentOptionRef.current.contains(e.target)) {
+            setPaymentOptionClicked(false);
+        }
+    };
+
+    useEffect(() => {
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    // 주문 입력
+    const insertSales = async() => {
+        console.log(salesForm);
+        console.log(salesProductForm);
+
+        openModal({
+            svg: '❓',
+            msg1: '주문 등록 확인',
+            msg2: '주문을 등록하시겠습니까?',
+            showCancel: true,
+            onConfirm: async() => {
+                try {
+                    const {data} = await axios.post('http://localhost:8080/sales/insert',{sales:salesForm,products:salesProductForm});
+                    console.log(data);
+                    if (!data.success) {
+                        openModal({
+                            svg: '❗',
+                            msg1: '등록 실패',
+                            msg2: '주문 등록에 실패했습니다',
+                            showCancel: false,
+                        })
+                    } else {
+                        openModal({
+                            svg: '❗',
+                            msg1: '등록 성공',
+                            msg2: '주문 등록에 성공했습니다',
+                            showCancel: false,
+                            onConfirm: () => {
+                                location.href='/component/sales';
+                            }
+                        })
+                    }
+                } catch (error) {
+                    console.log(error);
+                    openModal({
+                        svg: '❗',
+                        msg1: '오류 발생',
+                        msg2: '서버 요청 중 문제가 발생했습니다',
+                        showCancel: false,
+                    })
+                }
+            }
+        })
+
     }
 
     return (
@@ -137,8 +233,49 @@ const SalesInsertPage = () => {
                                         <td><input className='input-border-none' type='text' name='customer' value={salesForm.customer||''} onChange={e=>changeSalesFrom(e)}/></td>
                                         <td><input className='input-border-none' type='text' name='customer_phone' value={salesForm.customer_phone||''} onChange={e=>changeSalesFrom(e)}/></td>
                                         <td><input className='input-border-none' type='text' name='customer_address' value={salesForm.customer_address||''} onChange={e=>changeSalesFrom(e)}/></td>
-                                        <td><input className='input-border-none' type='text' name='payment_option' value={salesForm.payment_option||''} onChange={e=>changeSalesFrom(e)}/></td>
+                                        <td className='position-relative cursor-pointer' onClick={()=>setPaymentOptionClicked(true)} ref={paymentOptionRef}>
+                                            {salesForm.payment_option || ''}
+                                            {paymentOptionClicked
+                                                ? (
+                                                    <ul className="listBox-option">
+                                                        {paymentOptionList.filter(f=>f.name !== salesForm.payment_option)?.map((pl) => (
+                                                            <li
+                                                                key={pl.idx}
+                                                                className="listBox-option-item margin-0"
+                                                                onClick={(e)=>{
+                                                                    e.stopPropagation();
+                                                                    changeSalesFrom({target : {name:'payment_option',value:pl.name}});
+                                                                    setPaymentOptionClicked(false);
+                                                                }}
+                                                            >
+                                                                {pl.name}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ):('')}
+                                        </td>
                                         <td><input className='input-border-none' type='date' name='payment_date' value={salesForm.payment_date||''} onChange={e=>changeSalesFrom(e)}/></td>
+                                        <td className='position-relative cursor-pointer' onClick={()=>setStatusClicked(true)} ref={statusRef}>
+                                            {salesForm.status || ''}
+                                            {statusClicked
+                                                ? (
+                                                    <ul className="listBox-option">
+                                                        {salesStatusList.filter(f=>f.name !== salesForm.status)?.map((sl) => (
+                                                            <li
+                                                                key={sl.idx}
+                                                                className="listBox-option-item margin-0"
+                                                                onClick={(e)=>{
+                                                                    e.stopPropagation();
+                                                                    changeSalesFrom({target : {name:'status',value:sl.name}});
+                                                                    setStatusClicked(false);
+                                                                }}
+                                                            >
+                                                                {sl.name}
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                ):('')}
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -167,13 +304,14 @@ const SalesInsertPage = () => {
                                                             type="text"
                                                             className="width-100 border rounded"
                                                             placeholder="상품 검색"
-                                                            value={productSearch1[i]}
+                                                            value={productSearch1[i]?productSearch1[i]:''}
                                                             onChange={(e) => setProductSearch1(prev=>({...prev,[i]:e.target.value}))}
                                                             onFocus={() => {
                                                                 setSelectedRow(i);
                                                                 setProductFocused(prev=>({...prev,[i]:true}));
                                                                 getProductList('');
                                                                 setProductSearch1(prev=>({...prev,[i]:''}));
+                                                                setOptionSearch1(prev=>({...prev,[i]:''}));
                                                             }}
                                                             onBlur={() => setTimeout(() => setProductFocused(prev=>({...prev,[i]:false})), 120)}
                                                         />
@@ -212,25 +350,27 @@ const SalesInsertPage = () => {
                                                             type="text"
                                                             className="width-100 border rounded"
                                                             placeholder="옵션 검색"
-                                                            // value={!optionList[i] || optionList[i].length === 0 ? '없음' : optionList[i].length === 1 ? (optionList[i][0]?.combined_name || '없음'):(optionList[i].combined_name || '')}
-                                                            value={(salesProductForm?.[i]?.product_idx !==null) ?'':(typeof filteredOptionList?.[i]?.[0]?.combined_name === 'undefined')?'없음': optionSearch1[i]}
+                                                            value={optionSearch1[i]?optionSearch1[i]:''}
                                                             onChange={(e) => setOptionSearch1(prev=>({...prev,[i]:e.target.value}))}
                                                             onFocus={() => {
                                                                 setSelectedRow(i);
                                                                 setOptionFocused(prev=>({...prev,[i]:true}));
                                                                 filterOptionList(i,'');
+                                                                setOptionSearch1(prev=>({...prev,[i]:''}));
                                                             }}
                                                             onBlur={() => setTimeout(() => setOptionFocused(prev=>({...prev,[i]:false})), 120)}
                                                         />
                                                         {optionFocused[i] ? (<>
-                                                            {filteredOptionList[i]?.length > 0 && (
+                                                            {filteredOptionList?.[i]?.length > 0 && (
                                                                 <ul className="listBox-option">
-                                                                    {filteredOptionList[i]?.map((ol) => (
+                                                                    {filteredOptionList[i]?.map((ol,index) => (
                                                                         <li
-                                                                            key={ol.product_option_idx}
+                                                                            key={index}
                                                                             onClick={() => {
                                                                                 setOptionSearch1(prev=>({...prev,[i]:ol.combined_name}));
-                                                                                filterOptionList(i,'')
+                                                                                if(typeof ol.product_option_idx !=='undefined') {
+                                                                                    changeProductForm(i, 'product_option_idx', ol.product_option_idx);
+                                                                                }
                                                                             }}
                                                                             className="listBox-option-item margin-0"
                                                                         >
@@ -242,15 +382,12 @@ const SalesInsertPage = () => {
                                                             {filteredOptionList[i]?.length === 0 && optionSearch1[i] && (
                                                                 <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">검색 결과 없음</div>
                                                             )}
-                                                            {filteredOptionList[i]?.length === 1 && (typeof filteredOptionList?.[i]?.[0]?.combined_name === 'undefined') && (
-                                                                <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">없음</div>
-                                                            )}
                                                         </>):('')}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><input className='input-border-none' type='text'/></td>
+                                        <td><input className='input-border-none' type='text' value={salesProductForm?.[i]?.product_cnt || ''} onChange={(e)=>changeProductForm(i,'product_cnt',e.target.value)} /></td>
                                     </tr>
                                 ))}
                                 </tbody>
@@ -258,7 +395,7 @@ const SalesInsertPage = () => {
                             <div className='flex justify-right margin-y-20'><button className='btn' onClick={()=>setRow(row+1)}>상품 추가</button></div>
                         </div>
                     </div>
-                    <div><button className='btn' >주문 등록</button></div>
+                    <div><button className='btn' onClick={insertSales}>주문 등록</button></div>
                 </div>
             </div>
         </div>
