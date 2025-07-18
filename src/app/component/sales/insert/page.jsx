@@ -30,10 +30,8 @@ const SalesInsertPage = () => {
     // 상품 리스트
     const getProductList = async (searchText='') => {
         const {data} = await axios.post('http://localhost:8080/productNoption/list',{search:searchText});
-        console.log(data);
         setProductOptionList(data.list);
         const filteredList = data.list.filter((item,index,self)=>index === self.findIndex(v=>v.product_idx===item.product_idx));
-        console.log(filteredList);
         setProductList(filteredList);
     }
 
@@ -96,6 +94,7 @@ const SalesInsertPage = () => {
         const filteredList = productOptionList.filter(f=>f.product_idx === idx);
         setOptionList(prev=>({...prev,[i]:filteredList}));
         setFilteredOptionList(prev=>({...prev,[i]:filteredList}));
+        console.log('옵션 리스트 변경',filteredList);
     }
 
     // 옵션 리스트 필터
@@ -106,6 +105,7 @@ const SalesInsertPage = () => {
         }
         const filteredList = optionList[i]?.filter(f=>f.combined_name && f.combined_name.toLowerCase().includes(search.toLowerCase())) || [];
         setFilteredOptionList(prev=>({...prev,[i]:filteredList}));
+        console.log('옵션 리스트 필터',filteredList);
     }
 
     return (
@@ -167,12 +167,13 @@ const SalesInsertPage = () => {
                                                             type="text"
                                                             className="width-100 border rounded"
                                                             placeholder="상품 검색"
-                                                            value={productSearch1[i]||''}
+                                                            value={productSearch1[i]}
                                                             onChange={(e) => setProductSearch1(prev=>({...prev,[i]:e.target.value}))}
                                                             onFocus={() => {
                                                                 setSelectedRow(i);
                                                                 setProductFocused(prev=>({...prev,[i]:true}));
-                                                                getProductList(productSearch1[i]);
+                                                                getProductList('');
+                                                                setProductSearch1(prev=>({...prev,[i]:''}));
                                                             }}
                                                             onBlur={() => setTimeout(() => setProductFocused(prev=>({...prev,[i]:false})), 120)}
                                                         />
@@ -183,7 +184,7 @@ const SalesInsertPage = () => {
                                                                         <li
                                                                             key={pl.product_idx}
                                                                             onClick={() => {
-                                                                                setProductSearch1(prev=>({...prev,[i]:pl.user_name}));
+                                                                                setProductSearch1(prev=>({...prev,[i]:pl.product_name}));
                                                                                 changeProductForm(i,'product_idx',pl.product_idx);
                                                                                 changeOptionList(i,pl.product_idx);
                                                                             }}
@@ -212,18 +213,12 @@ const SalesInsertPage = () => {
                                                             className="width-100 border rounded"
                                                             placeholder="옵션 검색"
                                                             // value={!optionList[i] || optionList[i].length === 0 ? '없음' : optionList[i].length === 1 ? (optionList[i][0]?.combined_name || '없음'):(optionList[i].combined_name || '')}
-                                                            value={
-                                                                !salesProductForm[i]?.product_idx
-                                                                    ? ''
-                                                                    : optionList[i]?.length === 1
-                                                                        ? (optionList[i]?.[0]?.combined_name || '없음')
-                                                                        : (optionSearch1?.[i] || '')
-                                                            }
+                                                            value={(salesProductForm?.[i]?.product_idx !==null) ?'':(typeof filteredOptionList?.[i]?.[0]?.combined_name === 'undefined')?'없음': optionSearch1[i]}
                                                             onChange={(e) => setOptionSearch1(prev=>({...prev,[i]:e.target.value}))}
                                                             onFocus={() => {
                                                                 setSelectedRow(i);
                                                                 setOptionFocused(prev=>({...prev,[i]:true}));
-                                                                filterOptionList(i,optionSearch1[i]);
+                                                                filterOptionList(i,'');
                                                             }}
                                                             onBlur={() => setTimeout(() => setOptionFocused(prev=>({...prev,[i]:false})), 120)}
                                                         />
@@ -236,19 +231,19 @@ const SalesInsertPage = () => {
                                                                             onClick={() => {
                                                                                 setOptionSearch1(prev=>({...prev,[i]:ol.combined_name}));
                                                                                 filterOptionList(i,'')
-
-                                                                                setOptionList(prev => ({ ...prev, [i]: [] }));
-                                                                                setFilteredOptionList(prev => ({ ...prev, [i]: [] }));
                                                                             }}
                                                                             className="listBox-option-item margin-0"
                                                                         >
-                                                                            {ol.product_name}
+                                                                            {ol.combined_name}
                                                                         </li>
                                                                     ))}
                                                                 </ul>
                                                             )}
-                                                            {filteredOptionList?.length === 0 && optionSearch1[i] && (
+                                                            {filteredOptionList[i]?.length === 0 && optionSearch1[i] && (
                                                                 <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">검색 결과 없음</div>
+                                                            )}
+                                                            {filteredOptionList[i]?.length === 1 && (typeof filteredOptionList?.[i]?.[0]?.combined_name === 'undefined') && (
+                                                                <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">없음</div>
                                                             )}
                                                         </>):('')}
                                                     </div>
