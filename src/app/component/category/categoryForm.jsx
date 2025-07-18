@@ -59,7 +59,7 @@ export default function CategoryForm({ data = [], onSuccess, editItem, setEditIt
 
     return (
         <form onSubmit={handleSubmit}>
-            <h3>{editItem ? "카테고리 수정" : "카테고리 등록"}</h3>
+            <h3 className="margin-bottom-10 font-bold" style={{ fontSize: "18px"}}>{editItem ? "카테고리 수정" : "카테고리 등록"}</h3>
             <input
                 type="text"
                 style={{ width: "50%", marginRight: "10px", height: "25px" }}
@@ -69,13 +69,14 @@ export default function CategoryForm({ data = [], onSuccess, editItem, setEditIt
                 required
             />
             <select
+                className="category-select"
                 style={{ border: "1px solid #ccc", borderRadius: "3px", width: "150px", height: "25px" }}
                 value={parent}
                 onChange={(e) => setParent(e.target.value)}
             >
                 <option value="">상위 카테고리 없음</option>
                 {data
-                    .filter(cat => !editItem || cat.category_idx !== editItem.category_idx) // 자기 자신은 부모로 설정 불가
+                    .filter(cat => !editItem || cat.category_idx !== editItem.category_idx)
                     .map((cat) => (
                         <option key={cat.category_idx} value={cat.category_idx}>
                             {'—'.repeat(cat.depth)} {cat.category_name}

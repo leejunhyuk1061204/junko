@@ -1,12 +1,12 @@
 'use client'
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
+import {useAlertModalStore} from "@/app/zustand/store";
 
-const WaybillInsertModal = ({open,onClose, idxList}) => {
+const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
 
+    const {openModal,closeModal} = useAlertModalStore();
     const [waybillForm,setWaybillForm] = useState({});
-
-
 
     const [custom, setCustom] = useState([]);
     const [customSearch, setCustomSearch] = useState('');
@@ -37,10 +37,10 @@ const WaybillInsertModal = ({open,onClose, idxList}) => {
 
     // 거래처 리스트
     const getCustom = async (searchText='') => {
-        const {data} = await axios.get(`http://localhost:8080/custom/list?start=0&size=10&search=${searchText}`);
+        const {data} = await axios.post(`http://localhost:8080/custom/list2`,{custom_type:'택배사',search:searchText});
         // 택배사 메서드 하나 만들던가 ;;
-        setCustom(data);
-        // console.log(data);
+        setCustom(data.list);
+        console.log(data);
     }
 
     useEffect(() => {
@@ -84,6 +84,55 @@ const WaybillInsertModal = ({open,onClose, idxList}) => {
             warehouse_idx,
          }));
          console.log(body);
+
+
+
+        openModal({
+            svg: '❓',
+            msg1: '생성 확인',
+            msg2: '송장을 생성하시겠습니까?',
+            showCancel: true,
+            onConfirm: async () => {
+                try {
+                    let result = [];
+                    for (const b of body) {
+                        const {data} = await axios.post('http://localhost:8080/waybill/insert', b);
+                        console.log(data);
+                        result.push(data.success);
+                    }
+                    closeModal();
+                    setTimeout(() => {
+
+                        if (result.length > 0 && result.every(v=>v === true)) {
+                            openModal({
+                                svg: '✔',
+                                msg1: '생성 완료',
+                                msg2: '송장이 생성되었습니다.',
+                                showCancel: false,
+                                onConfirm: () => {
+                                    getSalesList();
+                                }
+                            });
+                        } else if(result.length > 0 && result.some(v=>v === false)){
+                            openModal({
+                                svg: '❗',
+                                msg1: '변경 실패',
+                                msg2: '주문 변경에 실패했습니다.',
+                                showCancel: false,
+                            });
+                        }
+                    }, 100);
+                    } catch (err) {
+                        openModal({
+                            svg: '❗',
+                            msg1: '오류',
+                            msg2: err.response?.data?.message || err.message,
+                            showCancel: false,
+                        });
+                    }
+
+            }
+        })
     }
 
     if (!open) return null;
@@ -176,7 +225,7 @@ const WaybillInsertModal = ({open,onClose, idxList}) => {
                                 </div>
                             </div>
                             <div className='flex align-center gap_15'>
-                                <div className='max-width-80 white-space-nowrap'>입고 창고</div>
+                                <div className='max-width-80 white-space-nowrap'>출고 창고</div>
                                 <div>
                                     <div className="listBox-container">
                                         <input

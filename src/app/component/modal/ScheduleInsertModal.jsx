@@ -2,6 +2,10 @@
 
 import {useEffect, useRef} from "react";
 import format from "date-fns/format";
+import {useTimePickerStore} from "@/app/zustand/store";
+import TimePickerModal from "@/app/component/modal/TimePickerModal";
+import "../../globals.css";
+import TimeSelect from "@/app/component/schedule/TimeSelect";
 
 export default function ScheduleInsertModal ({
     open,
@@ -41,7 +45,6 @@ export default function ScheduleInsertModal ({
                 <h4>일정 등록</h4>
                 {dateInfo && (
                     <>
-                        <label className="label">날짜</label>
                         <div className="label" style={{ marginBottom: 8 }}>
                             {format(dateInfo.start, 'yyyy-MM-dd') === format(dateInfo.end, 'yyyy-MM-dd')
                                 ? format(dateInfo.start, 'yyyy-MM-dd')
@@ -49,41 +52,42 @@ export default function ScheduleInsertModal ({
                         </div>
                     </>
                 )}
-                <label className="label">제목</label>
+                <label className="label">일정 내용</label>
                 <input
                     ref={inputRef}
                     type="text"
                     value={form.title || ''}
                     onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    className={errors.title ? 'input-error' : ''}
+                    className="title-input"
                 />
-                <label className="label">내용</label>
+                <label className="label"></label>
                 <input
-                    type="text"
+                    type="textarea"
                     value={form.description || ''}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    className="description-input"
+                    placeholder="상세 내용을 작성해 주세요."
                 />
                 <div className="flex gap_10">
                     <div className="flex column gap_10">
                         <label className="label">시작시간</label>
-                        <input
-                            type="time"
-                            value={form.start_time || ''}
-                            onChange={(e) => setForm({ ...form, start_time: e.target.value })}
+                        <TimeSelect
+                            value={form.start_time}
+                            onChange={(value) => setForm({ ...form, start_time: value })}
+                            placeholder="시작시간"
                         />
                     </div>
                     <div className="flex column gap_10">
                         <label className="label">종료시간</label>
-                        <input
-                            type="time"
-                            value={form.end_time || ''}
-                            onChange={(e) => setForm({ ...form, end_time: e.target.value })}
+                        <TimeSelect
+                            value={form.end_time}
+                            onChange={(value) => setForm({ ...form, end_time: value })}
+                            placeholder="종료시간"
                         />
                     </div>
                 </div>
-
                 <select
-                    className="label"
+                    className="label-opt-opt"
                     value={form.label_idx || 1}
                     onChange={(e) => setForm({ ...form, label_idx: e.target.value })}
                 >
