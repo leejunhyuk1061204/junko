@@ -1399,6 +1399,15 @@ input[type='text']:focus,input[type='password']:focus{
     background-color: #1A82E3;
 }
 
+.input-border-none {
+    border : none !important
+}
+
+.input-border-none:focus {
+    border : none !important;
+    outline: none !important;
+}
+
 
 /* ------------------------------- 로그인 관련 ------------------------------- */
 
@@ -1808,6 +1817,8 @@ input[type='text']:focus,input[type='password']:focus{
     width: 100%;
     font-size: 14px;
     z-index: 10;
+    max-height: 320px;
+    overflow-y: auto;
 }
 
 .listBox-option-item {
