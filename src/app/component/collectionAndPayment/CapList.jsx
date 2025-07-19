@@ -8,6 +8,7 @@ import CapFileListModal from '@/app/component/modal/CapFileListModal';
 import CapDetailModal from '@/app/component/modal/CapDetailModal';
 import { searchCap, deleteCap } from './CapService';
 import '../../globals.css';
+import Pagination from 'react-js-pagination';
 
 const CapList = () => {
     const [capList, setCapList] = useState([]);
@@ -28,10 +29,20 @@ const CapList = () => {
     const [viewFileCapIdx, setViewFileCapIdx] = useState(null);
     const [selectedCapIdx, setSelectedCapIdx] = useState(null);
 
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+
     const fetchData = async () => {
         try {
             const res = await searchCap(searchDto);
-            setCapList(Array.isArray(res.data.data) ? res.data.data : []);
+            if (res.data && Array.isArray(res.data.data)) {
+                setCapList(res.data.data);
+                setTotalCount(res.data.data.length); // 또는 백엔드에서 전체 개수 제공 시 res.data.totalCount
+            } else {
+                setCapList([]);
+                setTotalCount(0);
+            }
         } catch (e) {
             console.error('조회 실패:', e);
         }
@@ -39,11 +50,11 @@ const CapList = () => {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [searchDto]);
 
     const handleSearch = (dto) => {
         setSearchDto(dto);
-        fetchData();
+        setPage(1);
     };
 
     const handleDelete = async (cap_idx) => {
@@ -63,6 +74,9 @@ const CapList = () => {
             alert('삭제 중 오류 발생');
         }
     };
+
+    const offset = (page - 1) * limit;
+    const currentList = capList.slice(offset, offset + limit);
 
     return (
         <div className="cap-wrapper">
@@ -84,14 +98,14 @@ const CapList = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {capList.length > 0 ? (
-                    capList.map((item, index) => (
+                {currentList.length > 0 ? (
+                    currentList.map((item, index) => (
                         <tr
                             key={item.cap_idx}
                             onClick={() => setSelectedCapIdx(item.cap_idx)}
                             style={{ cursor: 'pointer' }}
                         >
-                            <td>{index + 1}</td>
+                            <td>{offset + index + 1}</td>
                             <td>{item.date}</td>
                             <td style={{ color: item.type === '수금' ? 'blue' : 'red' }}>{item.type}</td>
                             <td>{item.customName}</td>
@@ -114,12 +128,21 @@ const CapList = () => {
                 </tbody>
             </table>
 
-            {/* 모달 */}
             {showModal && <CapRegistModal onClose={() => setShowModal(false)} onSuccess={fetchData} />}
             {editCapIdx && <CapEditModal capIdx={editCapIdx} onClose={() => setEditCapIdx(null)} onSuccess={fetchData} />}
             {fileCapIdx && <CapFileUploadModal capIdx={fileCapIdx} onClose={() => setFileCapIdx(null)} onSuccess={fetchData} />}
             {viewFileCapIdx && <CapFileListModal capIdx={viewFileCapIdx} onClose={() => setViewFileCapIdx(null)} />}
             {selectedCapIdx && <CapDetailModal capIdx={selectedCapIdx} onClose={() => setSelectedCapIdx(null)} />}
+
+            <div className="product-pagination">
+                <Pagination
+                    activePage={page}
+                    itemsCountPerPage={limit}
+                    totalItemsCount={totalCount}
+                    pageRangeDisplayed={5}
+                    onChange={(page) => setPage(page)}
+                />
+            </div>
 
             <button
                 className="cap-fab"

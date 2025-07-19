@@ -21,15 +21,11 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
     const handleSubmit = async () => {
         try {
             const token = localStorage.getItem('token');
-
-            // 1. 정산 등록
             const res = await axios.post('http://localhost:8080/psRegister', form, {
                 headers: { Authorization: token }
             });
-
             const { settlement_idx } = res.data.data;
 
-            // 2. 파일 업로드
             if (file) {
                 const formData = new FormData();
                 formData.append('files', file);
@@ -48,9 +44,8 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
             }
 
             alert('정산이 등록되었습니다!');
-            onSuccess(); // 부모 컴포넌트에서 리스트 새로고침
-            onClose();   // 모달 닫기
-
+            onSuccess();
+            onClose();
         } catch (err) {
             console.error('등록 실패:', err);
             alert('정산 등록 실패!');
@@ -58,56 +53,57 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
     };
 
     return (
-        <div className="modal">
-            <div className="modal-content">
-                <h3>정산 등록</h3>
+        <div className="entryRegist-modal">
+            <div className="entryRegist-modal-box">
+                <button className="entryRegist-modal-close" onClick={onClose}>&times;</button>
+                <h2 className="entryRegist-modal-title">정산 등록</h2>
 
-                <input
-                    type="text"
-                    name="custom_idx"
-                    placeholder="거래처 ID"
-                    value={form.custom_idx}
-                    onChange={handleChange}
-                />
+                <table className="entryRegist-table">
+                    <tbody>
+                    <tr>
+                        <th>거래처 ID</th>
+                        <td>
+                            <input type="text" name="custom_idx" value={form.custom_idx} onChange={handleChange} />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>정산일</th>
+                        <td>
+                            <input type="date" name="settlement_day" value={form.settlement_day} onChange={handleChange} />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>정산 금액</th>
+                        <td>
+                            <input
+                                type="number"
+                                name="total_amount"
+                                value={form.total_amount}
+                                onChange={(e) => {
+                                    const val = e.target.value;
+                                    setForm({ ...form, total_amount: val, amount: val });
+                                }}
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>잔액</th>
+                        <td>
+                            <input type="number" name="amount" value={form.amount} onChange={handleChange} />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>첨부파일</th>
+                        <td>
+                            <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
-                <input
-                    type="date"
-                    name="settlement_day"
-                    value={form.settlement_day}
-                    onChange={handleChange}
-                />
-
-                <input
-                    type="number"
-                    name="total_amount"
-                    placeholder="정산금액"
-                    value={form.total_amount}
-                    onChange={(e) => {
-                        const val = e.target.value;
-                        setForm({
-                            ...form,
-                            total_amount: val,
-                            amount: val // 잔액도 자동 입력
-                        });
-                    }}
-                />
-
-                <input
-                    type="number"
-                    name="amount"
-                    placeholder="잔액"
-                    value={form.amount}
-                    onChange={handleChange}
-                />
-
-                <input
-                    type="file"
-                    onChange={(e) => setFile(e.target.files[0])}
-                />
-
-                <div className="modal-actions">
-                    <button className="btn-blue" onClick={handleSubmit}>등록</button>
-                    <button className="btn-gray" onClick={onClose}>취소</button>
+                <div className="flex justify-end gap-2">
+                    <button className="entryList-fabBtn blue" onClick={handleSubmit}>등록</button>
+                    <button className="entryList-fabBtn gray" onClick={onClose}>취소</button>
                 </div>
             </div>
         </div>

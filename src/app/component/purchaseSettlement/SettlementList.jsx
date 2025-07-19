@@ -1,33 +1,25 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import '../../globals.css';
-import SettlementRow from './SettlementRow';
-import SettlementFilter from './SettlementFilter';
 import axios from 'axios';
-import SettlementRegistModal from "@/app/component/modal/SettlementRegistModal";
-import SettlementDetailModal from "@/app/component/modal/SettlementDetailModal";
-import SettlementChart from './SettlementChart';
-import PdfPreviewModal from "@/app/component/modal/PdfPreviewModal";
+import Pagination from 'react-js-pagination';
+import SettlementFilter from './SettlementFilter';
+import SettlementDetailModal from '@/app/component/modal/SettlementDetailModal';
+import SettlementRegistModal from '@/app/component/modal/SettlementRegistModal';
+import PdfPreviewModal from '@/app/component/modal/PdfPreviewModal';
+import '../../globals.css';
 
 export default function SettlementList() {
     const [list, setList] = useState([]);
-    const [showModal, setShowModal] = useState(false);
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalCount, setTotalCount] = useState(0);
+    const [filter, setFilter] = useState({ status: '', customName: '', startDate: '', endDate: '' });
     const [selectedData, setSelectedData] = useState(null);
+    const [showRegistModal, setShowRegistModal] = useState(false);
     const [showPdf, setShowPdf] = useState(false);
 
-    const [filter, setFilter] = useState({
-        status: '',
-        customName: '',
-        startDate: '',
-        endDate: ''
-    });
-
-    useEffect(() => {
-        fetchList();
-    }, []);
-
-    const fetchList = async () => {
+    const fetchList = async (pageNum = 1) => {
         try {
             const res = await axios.get('http://localhost:8080/settlementList', {
                 params: {
@@ -37,37 +29,25 @@ export default function SettlementList() {
                     end: filter.endDate
                 }
             });
-
-            console.log("🔥 raw response:", res);
-            console.log("🔥 res.data:", res.data);
-            console.log("🔥 res.data.data:", res.data?.data);
-            console.log("🔥 res.data.data.length:", res.data?.data?.length);
-
-            setList(res.data.data || []);
+            const fullList = res.data.data || [];
+            setList(fullList.slice((pageNum - 1) * limit, pageNum * limit));
+            setTotalCount(fullList.length);
         } catch (err) {
             console.error('리스트 조회 실패:', err);
             setList([]);
         }
     };
 
-    const fetchDetail = async (idx) => {
-        try {
-            const res = await axios.get(`http://localhost:8080/${idx}`);
-            setSelectedData(res.data.data);
-        } catch (err) {
-            console.error("상세 조회 실패:", err);
-        }
-    };
+    useEffect(() => { fetchList(page); }, [page]);
 
     const handleInputChange = (e) => {
         setFilter({ ...filter, [e.target.name]: e.target.value });
     };
 
     const handleDelete = async () => {
-        if (!selectedData) return alert("삭제할 항목을 선택해주세요");
+        if (!selectedData) return alert("삭제할 항목 선택 필요");
         const token = localStorage.getItem("accessToken");
-        const confirmDelete = window.confirm("정말 삭제하시겠습니까?");
-        if (!confirmDelete) return;
+        if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
         try {
             const res = await axios.delete(`http://localhost:8080/settlementDel/${selectedData.settlement_idx}`, {
@@ -76,85 +56,89 @@ export default function SettlementList() {
             if (res.data.result === 'success') {
                 alert("삭제 완료");
                 setSelectedData(null);
-                fetchList();
-            } else {
-                alert("삭제 실패: " + res.data.message);
-            }
+                fetchList(page);
+            } else alert("삭제 실패: " + res.data.message);
         } catch (err) {
             console.error("삭제 오류:", err);
         }
     };
 
     return (
-        <div className="settlement-wrapper">
-            <h2>정산 현황</h2>
+        <main className="entryList-container">
+            <div className="entryList-title">정산 현황</div>
+            <div className="entryList-layout">
+                <section className="entryList-left">
+                    <div className="entryList-searchBar">
+                        <SettlementFilter filter={filter} onChange={handleInputChange} onSearch={() => fetchList(1)} />
+                    </div>
 
-            {/*  필터 컴포넌트 */}
-            <SettlementFilter
-                filter={filter}
-                onChange={handleInputChange}
-                onSearch={fetchList}
-            />
-            <SettlementChart data={list} />
+                    <table className="entryList-table">
+                        <thead>
+                        <tr>
+                            <th>NO.</th>
+                            <th>정산번호</th>
+                            <th>상태</th>
+                            <th>거래처</th>
+                            <th>정산일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {list.map((item, idx) => (
+                            <tr
+                                key={item.settlement_idx}
+                                onClick={() => setSelectedData(item)}
+                                className={selectedData?.settlement_idx === item.settlement_idx ? 'selected' : ''}
+                            >
+                                <td>{(page - 1) * limit + idx + 1}</td>
+                                <td className="entryList-entryNo link">정산 #{item.settlement_idx}</td>
+                                <td className={`status ${item.status}`}>{item.status}</td>
+                                <td>{item.custom_name}</td>
+                                <td>{item.settlement_day}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </table>
 
-            {showModal && (
-                <SettlementRegistModal
-                    onClose={() => setShowModal(false)}
-                    onSuccess={fetchList}
-                />
-            )}
+                    <div className="product-pagination">
+                        <Pagination
+                            activePage={page}
+                            itemsCountPerPage={limit}
+                            totalItemsCount={totalCount}
+                            pageRangeDisplayed={5}
+                            onChange={(page) => setPage(page)}
+                        />
+                    </div>
 
-            <SettlementDetailModal
-                data={selectedData}
-                onClose={() => setSelectedData(null)}
-                showPdf={showPdf}
-                setShowPdf={setShowPdf}
-            />
-            {selectedData && (
-                <div className="settlement-bottom">
-                    <button onClick={() => setShowPdf(true)} className="btn-blue">PDF 미리보기</button>
-                </div>
-            )}
+                    <div className="flex gap-2 mt-4">
+                        <button className="entryList-fabBtn blue" onClick={() => setShowRegistModal(true)}>정산 등록</button>
+                        <button className="entryList-fabBtn red-del" onClick={handleDelete}>삭제</button>
+                    </div>
+                </section>
 
-            {showPdf && selectedData && (
-                <PdfPreviewModal
-                    settlementIdx={selectedData.settlement_idx}
-                    templateIdx={1} // 임시
-                    onClose={() => setShowPdf(false)}
-                />
-            )}
-            {/* 리스트 출력 */}
-            <table className="settlement-table">
-                <thead>
-                <tr>
-                    <th>NO.</th>
-                    <th>제목</th>
-                    <th>진행상태</th>
-                    <th>작성자</th>
-                    <th>등록일</th>
-                    <th>거래처</th>
-                    <th>정산 마감일</th>
-                </tr>
-                </thead>
-                <tbody>
-                {list.map((item, index) => (
-                    <SettlementRow
-                        key={item.settlement_idx}
-                        item={item}
-                        index={index + 1}
-                        onClick={() => fetchDetail(item.settlement_idx)}
+                {selectedData && (
+                    <SettlementDetailModal
+                        data={selectedData}
+                        onClose={() => setSelectedData(null)}
+                        showPdf={showPdf}
+                        setShowPdf={setShowPdf}
                     />
-                ))}
-                </tbody>
-            </table>
+                )}
 
-            <div className="settlement-bottom">
-                <button className="btn-blue" onClick={() => setShowModal(true)}>작성하기</button>
-                <button className="btn-red" onClick={handleDelete}>삭제</button>
+                {showPdf && selectedData && (
+                    <PdfPreviewModal
+                        settlementIdx={selectedData.settlement_idx}
+                        templateIdx={1}
+                        onClose={() => setShowPdf(false)}
+                    />
+                )}
 
+                {showRegistModal && (
+                    <SettlementRegistModal
+                        onClose={() => setShowRegistModal(false)}
+                        onSuccess={() => fetchList(page)}
+                    />
+                )}
             </div>
-
-        </div>
+        </main>
     );
 }
-
