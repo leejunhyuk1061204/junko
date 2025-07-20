@@ -41,9 +41,15 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
     };
 
     const handleSubmit = async (e) => {
+        console.log('등록 응답:', res.data);
         e.preventDefault();
         try {
             const res = await capRegist(form, token);
+            if (!res.data?.success || !res.data?.cap_idx) {
+                alert('등록 실패: cap_idx 없음');
+                return;
+            }
+
             const cap_idx = res.data.cap_idx;
 
             if (file) await uploadCapFile(cap_idx, file);
@@ -60,7 +66,7 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
             }
 
             alert('등록 완료!');
-            onSuccess();
+            onSuccess(); // ✅ 등록 후 리스트 갱신
             onClose();
         } catch (err) {
             console.error('등록 실패:', err);

@@ -2322,6 +2322,8 @@ input[type='text']:focus,input[type='password']:focus{
 
 /*-------------------------수금 / 지급 css--------------------------------*/
 
+
+
 /* 전체 컨테이너 */
 .cap-wrapper {
     padding: 24px;
@@ -2503,6 +2505,53 @@ input[type='text']:focus,input[type='password']:focus{
 .cap-fab:hover {
     background-color: #2563eb;
 }
+
+/*----------------------입금 / 지급 상세 보기 (PDF 우측 배치용)----------------------*/
+
+/* 모달 내부 구조: 좌우 분할 */
+.capDetail-modal-box {
+    display: flex;
+    gap: 24px;
+    max-height: 90vh;
+    overflow: hidden;
+    background: #fff;
+    padding: 36px 40px;
+    border-radius: 10px;
+    position: relative;
+    width: 960px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 좌측 정보 영역 */
+.capDetail-left {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 12px;
+}
+
+/* 우측 PDF 영역 */
+.capDetail-right {
+    flex: 1;
+    border-left: 1px solid #ccc;
+    padding-left: 12px;
+}
+
+/* PDF 제목 */
+.capDetail-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 12px 0 6px;
+    color: #2d3748;
+}
+
+/* PDF iframe 미리보기 */
+.capDetail-pdf {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 
 
 /*-------------------------정산 현황 css--------------------------------*/
