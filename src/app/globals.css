@@ -3401,3 +3401,146 @@ input[type='number']:focus {
     border-color: #2196f3;
 }
 
+/* =============== 차트 페이지 =============== */
+.chart-background {
+    min-height: 145vh;
+    background-color: var(--background-color);
+    overflow: hidden;
+    /*padding: 20px;*/
+}
+
+.dash-list-back{
+    width: auto;
+    min-height: 110vh;
+    overflow: hidden;
+    background-color: white;
+    padding: 10px 20px;
+    margin: 30px;
+    overflow-x: auto;
+}
+
+/* 차트 카테고리 */
+.dashboard-tab-wrapper {
+    white-space: nowrap;
+    display: flex;
+    gap: 20px;
+}
+
+.dashboard-header{
+    font-weight: bold;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 23px 13px 23px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 4px solid var(--background-color);
+}
+
+.dashboard-header-active {
+    border-bottom: 4px solid #1d4ed8;
+    font-weight: 600;
+}
+
+.label-small {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 차트 */
+.dashboard-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    align-items: flex-start;
+}
+
+.dashboard-box {
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    height: 450px;
+    position: relative;
+    margin-top: 32px;
+    width: 90%;
+}
+
+.dash-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 20px 70px;
+}
+
+.dash-card {
+    width: 48%;
+    max-width: none;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-box {
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    height: 400px;
+    min-height: 400px;
+    position: relative;
+}
+
+.dashboard-box h3,
+.dash-box h3,
+.dash-ctn-box h3,
+.order-chart-box h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.dash-stack-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    margin-top: 24px;
+}
+
+.dash-ctn-box {
+    width: 90%;
+    height: 450px;
+    margin-top: 21px;
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    text-align: center;
+}
+
+.order-chart-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 48px;
+    margin-top: 45px;
+    flex-wrap: wrap;
+}
+
+.order-chart-card {
+    flex: 1 1 44%;
+    max-width: 43.4%;
+    min-width: 480px;
+}
+
+.order-chart-box {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    text-align: center;
+    min-height: 400px;
+}
