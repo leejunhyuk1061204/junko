@@ -128,6 +128,20 @@ input[type='text']:focus,input[type='password']:focus{
     outline-color: var(--gray-color);
 }
 
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number']:hover {
+    outline:none;
+}
+
+input[type='number']:focus {
+    outline:none;
+}
+
 .content_text {
     font-family: "Noto Sans", sans-serif;
     font-size: 15px;
@@ -1126,6 +1140,10 @@ input[type='text']:focus,input[type='password']:focus{
     background-repeat: no-repeat;
     background-position: right 5px center;
     background-size: 12px;
+}
+
+.fileBox {
+    display: none;
 }
 
 /* ------------------------------- 카테고리 관련 ------------------------------- */

@@ -44,6 +44,9 @@ const SalesInsertPage = () => {
     const statusRef = useRef(null);
     const paymentOptionRef = useRef(null);
 
+    const [mode, setMode] = useState(false);
+    const [csvFile, setCsvFile] = useState(null);
+
     useEffect(() => {
         getProductList();
     },[])
@@ -160,8 +163,9 @@ const SalesInsertPage = () => {
 
     // 주문 입력
     const insertSales = async() => {
-        console.log(salesForm);
-        console.log(salesProductForm);
+        console.log(salesForm); // {}
+        console.log(salesProductForm); // []
+        console.log(csvFile); // null
 
         openModal({
             svg: '❓',
@@ -169,39 +173,112 @@ const SalesInsertPage = () => {
             msg2: '주문을 등록하시겠습니까?',
             showCancel: true,
             onConfirm: async() => {
-                try {
-                    const {data} = await axios.post('http://localhost:8080/sales/insert',{sales:salesForm,products:salesProductForm});
-                    console.log(data);
-                    if (!data.success) {
-                        openModal({
-                            svg: '❗',
-                            msg1: '등록 실패',
-                            msg2: '주문 등록에 실패했습니다',
-                            showCancel: false,
-                        })
-                    } else {
-                        openModal({
-                            svg: '❗',
-                            msg1: '등록 성공',
-                            msg2: '주문 등록에 성공했습니다',
-                            showCancel: false,
-                            onConfirm: () => {
-                                location.href='/component/sales';
-                            }
-                        })
-                    }
-                } catch (error) {
-                    console.log(error);
+                let csvSuccess = true;
+                let insertSuccess = true;
+
+                const hasSalesInput = Object.keys(salesForm).length > 0;
+                console.log('hasSalesInput', hasSalesInput);
+                const hasProductInput = salesProductForm.length > 0;
+                console.log('hasProductInput', hasProductInput);
+
+                const salesValid = hasSalesInput && salesForm.customer && salesForm.customer_phone && salesForm.customer_address && salesForm.payment_option && salesForm.status;
+                console.log('salesValid', salesValid);
+                const productValid = hasProductInput && salesProductForm.length>0 && salesProductForm.every(item=>
+                    item.product_idx && item.product_cnt
+                );
+                console.log('productValid', productValid);
+                console.log(csvFile);
+
+                if((hasSalesInput || hasProductInput) && !salesValid && !productValid) {
                     openModal({
                         svg: '❗',
-                        msg1: '오류 발생',
-                        msg2: '서버 요청 중 문제가 발생했습니다',
+                        msg1: '입력 오류',
+                        msg2: '입력한 주문 정보 또는 상품 정보에 누락된 항목이 있습니다.',
                         showCancel: false,
-                    })
+                    });
+                    return;
                 }
+
+                if(salesValid && productValid) {
+                    try {
+                        const {data} = await axios.post('http://localhost:8080/sales/insert', {
+                            sales: salesForm,
+                            products: salesProductForm
+                        });
+                        console.log(data);
+                        if (!data.success) {
+                            insertSuccess = false;
+                        }
+                    } catch (err) {
+                        console.error('주문 등록 에러:', err);
+                        insertSuccess = false;
+                    }
+                }
+
+                if (csvFile) {
+                    try {
+                        const formData = new FormData();
+                        formData.append('file', csvFile);
+
+                        const { data } = await axios.post('http://localhost:8080/sales/csv', formData, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                            }
+                        });
+
+                        if (!data.success) {
+                            csvSuccess = false;
+                        }
+                    } catch (err) {
+                        console.error('CSV 업로드 에러:', err);
+                        csvSuccess = false;
+                    }
+                }
+
+                closeModal();
+                setTimeout(()=>{
+                    if (salesValid && productValid && csvFile) {
+                        // 1. sales & product 유효하고 CSV도 있음
+                        if (insertSuccess && csvSuccess) {
+                            openModal({ svg: '✔', msg1: '등록 성공', msg2: '모든 등록에 성공했습니다.'
+                                ,onConfirm: ()=>{location.href='/component/sales'}
+                                });
+                        } else if (insertSuccess && !csvSuccess) {
+                            openModal({ svg: '⚠️', msg1: '부분 성공', msg2: 'CSV 업로드에 실패했습니다.' });
+                        } else if (!insertSuccess && csvSuccess) {
+                            openModal({ svg: '⚠️', msg1: '부분 성공', msg2: '주문 등록에 실패했습니다.' });
+                        } else {
+                            openModal({ svg: '❌', msg1: '등록 실패', msg2: 'CSV 업로드와 주문 등록 모두 실패했습니다.' });
+                        }
+                    } else if (salesValid && productValid && !csvFile) {
+                        // 2. 주문만 등록
+                        if (insertSuccess) {
+                            openModal({ svg: '✔', msg1: '등록 성공', msg2: '주문 등록에 성공했습니다.'
+                                ,onConfirm: ()=>{location.href='/component/sales'}
+                            });
+                        } else {
+                            openModal({ svg: '❌', msg1: '등록 실패', msg2: '주문 등록에 실패했습니다.' });
+                        }
+                    } else if (!salesValid && !productValid && csvFile) {
+                        // 3. CSV만 있음
+                        if (csvSuccess) {
+                            openModal({ svg: '✔', msg1: 'CSV 업로드 성공', msg2: '상품 정보 등록에 성공했습니다.'
+                                ,onConfirm: ()=>{location.href='/component/sales'}
+                            });
+                        } else {
+                            openModal({ svg: '❌', msg1: 'CSV 업로드 실패', msg2: '상품 정보 등록에 실패했습니다.' });
+                        }
+                    } else {
+                        // 4. 아무것도 유효하지 않음
+                        openModal({
+                            svg: '❗',
+                            msg1: '입력 없음',
+                            msg2: '등록할 주문 정보나 CSV 파일이 없습니다.',
+                        });
+                    }
+                },100);
             }
         })
-
     }
 
     return (
@@ -219,64 +296,64 @@ const SalesInsertPage = () => {
                         <div>
                             <table>
                                 <thead>
-                                    <tr>
-                                        <th>고객 이름</th>
-                                        <th>연락처</th>
-                                        <th>주소</th>
-                                        <th>결제 옵션</th>
-                                        <th>결제일자</th>
-                                        <th>결제상태</th>
-                                    </tr>
+                                <tr>
+                                    <th>고객 이름</th>
+                                    <th>연락처</th>
+                                    <th>주소</th>
+                                    <th>결제 옵션</th>
+                                    <th>결제일자</th>
+                                    <th>결제상태</th>
+                                </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><input className='input-border-none' type='text' name='customer' value={salesForm.customer||''} onChange={e=>changeSalesFrom(e)}/></td>
-                                        <td><input className='input-border-none' type='text' name='customer_phone' value={salesForm.customer_phone||''} onChange={e=>changeSalesFrom(e)}/></td>
-                                        <td><input className='input-border-none' type='text' name='customer_address' value={salesForm.customer_address||''} onChange={e=>changeSalesFrom(e)}/></td>
-                                        <td className='position-relative cursor-pointer' onClick={()=>setPaymentOptionClicked(true)} ref={paymentOptionRef}>
-                                            {salesForm.payment_option || ''}
-                                            {paymentOptionClicked
-                                                ? (
-                                                    <ul className="listBox-option">
-                                                        {paymentOptionList.filter(f=>f.name !== salesForm.payment_option)?.map((pl) => (
-                                                            <li
-                                                                key={pl.idx}
-                                                                className="listBox-option-item margin-0"
-                                                                onClick={(e)=>{
-                                                                    e.stopPropagation();
-                                                                    changeSalesFrom({target : {name:'payment_option',value:pl.name}});
-                                                                    setPaymentOptionClicked(false);
-                                                                }}
-                                                            >
-                                                                {pl.name}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                ):('')}
-                                        </td>
-                                        <td><input className='input-border-none' type='date' name='payment_date' value={salesForm.payment_date||''} onChange={e=>changeSalesFrom(e)}/></td>
-                                        <td className='position-relative cursor-pointer' onClick={()=>setStatusClicked(true)} ref={statusRef}>
-                                            {salesForm.status || ''}
-                                            {statusClicked
-                                                ? (
-                                                    <ul className="listBox-option">
-                                                        {salesStatusList.filter(f=>f.name !== salesForm.status)?.map((sl) => (
-                                                            <li
-                                                                key={sl.idx}
-                                                                className="listBox-option-item margin-0"
-                                                                onClick={(e)=>{
-                                                                    e.stopPropagation();
-                                                                    changeSalesFrom({target : {name:'status',value:sl.name}});
-                                                                    setStatusClicked(false);
-                                                                }}
-                                                            >
-                                                                {sl.name}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                ):('')}
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td><input className='input-border-none' type='text' name='customer' value={salesForm.customer||''} onChange={e=>changeSalesFrom(e)}/></td>
+                                    <td><input className='input-border-none' type='text' name='customer_phone' value={salesForm.customer_phone||''} onChange={e=>changeSalesFrom(e)}/></td>
+                                    <td><input className='input-border-none' type='text' name='customer_address' value={salesForm.customer_address||''} onChange={e=>changeSalesFrom(e)}/></td>
+                                    <td className='position-relative cursor-pointer' onClick={()=>setPaymentOptionClicked(true)} ref={paymentOptionRef}>
+                                        {salesForm.payment_option || ''}
+                                        {paymentOptionClicked
+                                            ? (
+                                                <ul className="listBox-option">
+                                                    {paymentOptionList.filter(f=>f.name !== salesForm.payment_option)?.map((pl) => (
+                                                        <li
+                                                            key={pl.idx}
+                                                            className="listBox-option-item margin-0"
+                                                            onClick={(e)=>{
+                                                                e.stopPropagation();
+                                                                changeSalesFrom({target : {name:'payment_option',value:pl.name}});
+                                                                setPaymentOptionClicked(false);
+                                                            }}
+                                                        >
+                                                            {pl.name}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ):('')}
+                                    </td>
+                                    <td><input className='input-border-none' type='date' name='payment_date' value={salesForm.payment_date||''} onChange={e=>changeSalesFrom(e)}/></td>
+                                    <td className='position-relative cursor-pointer' onClick={()=>setStatusClicked(true)} ref={statusRef}>
+                                        {salesForm.status || ''}
+                                        {statusClicked
+                                            ? (
+                                                <ul className="listBox-option">
+                                                    {salesStatusList.filter(f=>f.name !== salesForm.status)?.map((sl) => (
+                                                        <li
+                                                            key={sl.idx}
+                                                            className="listBox-option-item margin-0"
+                                                            onClick={(e)=>{
+                                                                e.stopPropagation();
+                                                                changeSalesFrom({target : {name:'status',value:sl.name}});
+                                                                setStatusClicked(false);
+                                                            }}
+                                                        >
+                                                            {sl.name}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            ):('')}
+                                    </td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -284,13 +361,14 @@ const SalesInsertPage = () => {
                     <div className='flex flex-direction-col'>
                         <div className='order-product-text margin-bottom-10 text-align-left'>상품 정보</div>
                         <div>
+
                             <table>
                                 <thead>
-                                    <tr>
-                                        <th>상품 이름</th>
-                                        <th>상품 옵션</th>
-                                        <th>수량</th>
-                                    </tr>
+                                <tr>
+                                    <th>상품 이름</th>
+                                    <th>상품 옵션</th>
+                                    <th>수량</th>
+                                </tr>
                                 </thead>
                                 <tbody>
                                 {Array.from({ length: row }, (_, i) => (
@@ -392,8 +470,22 @@ const SalesInsertPage = () => {
                                 ))}
                                 </tbody>
                             </table>
-                            <div className='flex justify-right margin-y-20'><button className='btn' onClick={()=>setRow(row+1)}>상품 추가</button></div>
                         </div>
+                    </div>
+                    <div className='flex justify-right margin-y-20 gap_10'>
+                        <div className='flex align-center justify-content-center width-fit'>
+                            <input
+                                type="file"
+                                id='salesFile'
+                                accept=".csv"
+                                onChange={(e) => setCsvFile(e.target.files[0])}
+                                className="margin-bottom-20 fileBox"
+                            />
+                            <label htmlFor='salesFile'>
+                                <div className='cursor-pointer btn'>파일 선택</div>
+                            </label>
+                        </div>
+                        <button className='btn' onClick={()=>setRow(row+1)}>상품 추가</button>
                     </div>
                     <div><button className='btn' onClick={insertSales}>주문 등록</button></div>
                 </div>
