@@ -72,7 +72,7 @@ const mainMenus = [
     },
     {
         title: '통계',
-        href: './chart',
+        href: '/component/chart',
     },
     {
         title: '문서 / 업무 관리',

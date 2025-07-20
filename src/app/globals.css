@@ -3544,3 +3544,25 @@ input[type='number']:focus {
     text-align: center;
     min-height: 400px;
 }
+
+.dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.dash-table th,
+.dash-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.dash-table td {
+    font-size: 13px;
+}
+
+.dash-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
+}

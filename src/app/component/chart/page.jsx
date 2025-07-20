@@ -29,6 +29,10 @@ const donutColors = [
     '#A3D9A5', // 연두
     '#9E91E7', // 연보라
 ];
+const chartColors = [
+    '#748FFC', '#F783AC', '#63E6BE', '#FF922B', '#A9E34B', '#BE4BDB',
+    '#4DABF7', '#FFD43B', '#69DB7C', '#E64980', '#9775FA', '#FFA94D'
+];
 
 export default function SalesChart() {
 
@@ -50,6 +54,8 @@ export default function SalesChart() {
     const orderTrendRef = useRef(null);
     const orderStatusRef = useRef(null);
     const returnRateRef = useRef(null);
+    const marginRateRef = useRef(null);
+    const netProfitRef = useRef(null);
 
     const filteredSubCategories = selectedParent
         ? subCategories.filter(sub => sub.category_parent === selectedParent.category_idx)
@@ -201,7 +207,7 @@ export default function SalesChart() {
     // 재고 회전율 (가로 막대)
     useEffect(() => {
         if (activeTab !== '재고/입출고 분석') return;
-        const turnoverData = chartData.getInventoryTurnoverStats;
+        const turnoverData = chartData.getInventoryTurnoverStats || [];
         if (!turnoverData?.length) return;
         const ctx = document.getElementById("inventoryTurnover");
         if (!ctx) return;
@@ -246,7 +252,7 @@ export default function SalesChart() {
     // 입출고 현황 (라인)
     useEffect(() => {
         if (activeTab !== '재고/입출고 분석') return;
-        const inOutData = chartData.getInOutProduct;
+        const inOutData = chartData.getInOutProduct || [];
         if (!inOutData?.length) return;
         const ctx = document.getElementById("inOutProd");
         if (!ctx) return;
@@ -292,7 +298,7 @@ export default function SalesChart() {
     // 주문/취소 (라인)
     useEffect(() => {
         if (activeTab !== '주문/반품 분석') return;
-        const orderStatData = chartData.getRecentOrderStats;
+        const orderStatData = chartData.getRecentOrderStats || [];
         if (!orderStatData?.length) return;
         const ctx = document.getElementById("orderTrend");
         if (!ctx) return;
@@ -336,7 +342,7 @@ export default function SalesChart() {
     // 주문 상태 분포 (막대)
     useEffect(() => {
         if (activeTab !== '주문/반품 분석') return;
-        const orderStatusData = chartData.getOrderStatus;
+        const orderStatusData = chartData.getOrderStatus || [];
         if (!orderStatusData?.length) return;
         const ctx = document.getElementById("orderStatus");
         if (!ctx) return;
@@ -374,7 +380,7 @@ export default function SalesChart() {
     // 반품률 (막대)
     useEffect(() => {
         if (activeTab !== '주문/반품 분석') return;
-        const returnRateData = chartData.returnProduct;
+        const returnRateData = chartData.returnProduct || [];
         if (!returnRateData?.length) return;
         const ctx = document.getElementById("returnRate");
         if (!ctx) return;
@@ -411,6 +417,92 @@ export default function SalesChart() {
             }
         });
     }, [chartData.returnProduct]);
+
+    // 마진율 (라인)
+    useEffect(() => {
+        if (activeTab !== '정산/마진 분석') return;
+        const marginData = chartData.getProductMarginStats || [];
+        if (!marginData?.length) return;
+        const ctx = document.getElementById("marginRate");
+        if (!ctx) return;
+
+        marginRateRef.current?.destroy();
+        const labels = Array.from({ length: 12 }, (_, i) => `${(i + 1).toString().padStart(2, '0')}월`);
+
+        // category_name 기준으로 월별 데이터 정리
+        const categoryMap = {};
+        marginData.forEach(item => {
+            const cat = item.category_name;
+            const month = Number(item.month) - 1; // 0 ~ 11
+            if (!categoryMap[cat]) {
+                categoryMap[cat] = Array(12).fill(0);
+            }
+            categoryMap[cat][month] = item.margin_rate ?? 0;
+        });
+
+        const datasets = Object.entries(categoryMap).map(([category, data], idx) => ({
+            label: category,
+            data,
+            borderColor: prodColors[idx % prodColors.length],
+            backgroundColor: prodColors[idx % prodColors.length],
+            tension: 0.3,
+            fill: false,
+            pointRadius: 4,
+        }));
+
+        marginRateRef.current = new Chart(ctx, {
+            type: 'line',
+            data: {labels, datasets},
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {legend: {position: 'bottom'},},
+                tooltip: {mode: 'index',  intersect: false},
+            },
+            scales: {
+                x: {grid: {display: false}},
+                y: {beginAtZero: true, title: {display: true, text: '%'}},
+            }
+        });
+    }, [chartData.getProductMarginStats]);
+
+    // 순이익률
+    useEffect(() => {
+        if (activeTab !== '정산/마진 분석') return;
+        const profitStat = chartData.getNetProfitStats || [];
+        if (!profitStat?.length) return;
+        const ctx = document.getElementById("netProfit");
+        if (!ctx) return;
+
+        netProfitRef.current?.destroy();
+
+        const labels = profitStat.map(item => item.product_name);
+        const data = profitStat.map(item => item.net_profit_margin ?? 0);
+
+        netProfitRef.current = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels,
+                datasets: [{
+                    data,
+                    backgroundColor: chartColors,
+                    borderWidth: 0,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                rotation: -90,
+                circumference:180,
+                plugins: {legend: {position: 'bottom'},},
+                tooltip: {callbacks: {
+                        label: function (ctx) {
+                            return `${ctx.label}: ${ctx.raw}%`;
+                        }}},
+            }
+        });
+    }, [chartData.getNetProfitStats]);
 
     // datePicker 핸들러
     const handleDatePicker = () => {
@@ -547,7 +639,7 @@ export default function SalesChart() {
                             <div className="order-chart-box">
                                 <h3>누적 지연 건수</h3>
                                 {chartData.getDelayedProduct?.length > 0 ? (
-                                    <table className="custom-table">
+                                    <table className="dash-table">
                                         <thead>
                                         <tr>
                                             <th>카테고리</th>
@@ -585,12 +677,24 @@ export default function SalesChart() {
                             setSelectedParent={setSelectedParent}
                             selectedSub={selectedSub}
                             setSelectedSub={setSelectedSub}
-                            handleDatePicker={handleDatePicker}
                             parentCategories={parentCategories}
                             filteredSubCategories={filteredSubCategories}
                         />
                     </div>
-
+                    <div className="order-chart-row">
+                        <div className="order-chart-card">
+                            <div className="order-chart-box">
+                                <h3>마진율</h3>
+                                <canvas id="marginRate"></canvas>
+                            </div>
+                        </div>
+                        <div className="order-chart-card">
+                            <div className="order-chart-box">
+                                <h3>순이익률</h3>
+                                <canvas id="netProfit"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )}
 
