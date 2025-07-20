@@ -18,6 +18,28 @@ export default function SettlementList() {
     const [selectedData, setSelectedData] = useState(null);
     const [showRegistModal, setShowRegistModal] = useState(false);
     const [showPdf, setShowPdf] = useState(false);
+    const [selectedIds, setSelectedIds] = useState([]);
+
+
+
+
+    const toggleSelect = (id) => {
+        setSelectedIds(prev =>
+            prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+        );
+    };
+
+
+
+
+    const toggleSelectAll = () => {
+        if (selectedIds.length === list.length) {
+            setSelectedIds([]);
+        } else {
+            setSelectedIds(list.map(item => item.settlement_idx));
+        }
+    };
+
 
     const fetchList = async (pageNum = 1) => {
         try {
@@ -46,7 +68,7 @@ export default function SettlementList() {
 
     const handleDelete = async () => {
         if (!selectedData) return alert("삭제할 항목 선택 필요");
-        const token = localStorage.getItem("accessToken");
+        const token = sessionStorage.getItem("accessToken");
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
         try {
@@ -75,6 +97,13 @@ export default function SettlementList() {
                     <table className="entryList-table">
                         <thead>
                         <tr>
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    checked={selectedIds.length === list.length && list.length > 0}
+                                    onChange={toggleSelectAll}
+                                />
+                            </th>
                             <th>NO.</th>
                             <th>정산번호</th>
                             <th>상태</th>
@@ -86,17 +115,25 @@ export default function SettlementList() {
                         {list.map((item, idx) => (
                             <tr
                                 key={item.settlement_idx}
-                                onClick={() => setSelectedData(item)}
-                                className={selectedData?.settlement_idx === item.settlement_idx ? 'selected' : ''}
+                                className={selectedIds.includes(item.settlement_idx) ? 'selected' : ''}
                             >
+                                <td>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedIds.includes(item.settlement_idx)}
+                                        onChange={() => toggleSelect(item.settlement_idx)}
+                                        onClick={(e) => e.stopPropagation()}
+                                    />
+                                </td>
                                 <td>{(page - 1) * limit + idx + 1}</td>
-                                <td className="entryList-entryNo link">정산 #{item.settlement_idx}</td>
+                                <td className="entryList-entryNo link" onClick={() => setSelectedData(item)}>정산 #{item.settlement_idx}</td>
                                 <td className={`status ${item.status}`}>{item.status}</td>
                                 <td>{item.custom_name}</td>
                                 <td>{item.settlement_day}</td>
                             </tr>
                         ))}
                         </tbody>
+
                     </table>
 
                     <div className="product-pagination">

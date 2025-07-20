@@ -22,7 +22,7 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
     const [file, setFile] = useState(null);
     const [customList, setCustomList] = useState([]);
     const [linkedList, setLinkedList] = useState([]);
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
 
     useEffect(() => {
         fetchDropdowns();
@@ -41,10 +41,10 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
     };
 
     const handleSubmit = async (e) => {
-        console.log('등록 응답:', res.data);
         e.preventDefault();
         try {
             const res = await capRegist(form, token);
+            console.log('등록 응답:', res.data);
             if (!res.data?.success || !res.data?.cap_idx) {
                 alert('등록 실패: cap_idx 없음');
                 return;
