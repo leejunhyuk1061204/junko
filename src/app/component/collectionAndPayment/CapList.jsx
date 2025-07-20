@@ -6,7 +6,7 @@ import CapEditModal from '@/app/component/modal/CapEditModal';
 import CapFileUploadModal from '@/app/component/modal/CapFileUploadModal';
 import CapFileListModal from '@/app/component/modal/CapFileListModal';
 import CapDetailModal from '@/app/component/modal/CapDetailModal';
-import { searchCap, deleteCap } from './CapService';
+import { searchCapPaged, deleteCap } from './CapService';
 import '../../globals.css';
 import Pagination from 'react-js-pagination';
 
@@ -20,7 +20,9 @@ const CapList = () => {
         minAmount: '',
         maxAmount: '',
         sortBy: 'date',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
+        limit: 10,
+        offset: 0
     });
 
     const [showModal, setShowModal] = useState(false);
@@ -33,32 +35,45 @@ const CapList = () => {
     const [limit] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
 
-    const fetchData = async () => {
+    const fetchData = async (searchParams = searchDto, currentPage = page) => {
         try {
-            const res = await searchCap(searchDto);
-            if (res.data && Array.isArray(res.data.data)) {
-                setCapList(res.data.data);
-                setTotalCount(res.data.data.length); // 또는 백엔드에서 전체 개수 제공 시 res.data.totalCount
+            const dtoWithPaging = {
+                ...searchParams,
+                limit,
+                offset: (currentPage - 1) * limit
+            };
+
+            const res = await searchCapPaged(dtoWithPaging);
+
+            if (res.data?.success) {
+                const { list, total } = res.data.data;
+                setCapList(list || []);
+                setTotalCount(total || 0);
             } else {
                 setCapList([]);
                 setTotalCount(0);
             }
         } catch (e) {
             console.error('조회 실패:', e);
+            setCapList([]);
+            setTotalCount(0);
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, [searchDto]);
-
+// 🔁 검색 바뀌면 초기 페이지로 이동 + 조회
     const handleSearch = (dto) => {
         setSearchDto(dto);
-        setPage(1);
+        setPage(1); // 페이지 먼저 바꾸고
+        fetchData(dto, 1); // 강제 호출로 초기 페이징 안정화
     };
 
+// 🔁 페이지 바뀔 때만 fetch 호출
+    useEffect(() => {
+        fetchData(searchDto, page);
+    }, [page]);
+
     const handleDelete = async (cap_idx) => {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (!window.confirm('정말 삭제하시겠습니까?')) return;
 
         try {
@@ -74,9 +89,6 @@ const CapList = () => {
             alert('삭제 중 오류 발생');
         }
     };
-
-    const offset = (page - 1) * limit;
-    const currentList = capList.slice(offset, offset + limit);
 
     return (
         <div className="cap-wrapper">
@@ -98,14 +110,14 @@ const CapList = () => {
                 </tr>
                 </thead>
                 <tbody>
-                {currentList.length > 0 ? (
-                    currentList.map((item, index) => (
+                {capList.length > 0 ? (
+                    capList.map((item, index) => (
                         <tr
                             key={item.cap_idx}
                             onClick={() => setSelectedCapIdx(item.cap_idx)}
                             style={{ cursor: 'pointer' }}
                         >
-                            <td>{offset + index + 1}</td>
+                            <td>{(page - 1) * limit + index + 1}</td>
                             <td>{item.date}</td>
                             <td style={{ color: item.type === '수금' ? 'blue' : 'red' }}>{item.type}</td>
                             <td>{item.customName}</td>

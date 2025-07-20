@@ -19,7 +19,6 @@ export default function ScheduleInsertModal ({
     inputRef = null,
 }) {
     const modalRef = useRef(null);
-
     const LABEL_OPTIONS = [
         { label: '일정', value: '1' },
         { label: '연차', value: '2' },
@@ -30,6 +29,7 @@ export default function ScheduleInsertModal ({
         { label: '행사', value: '7' },
         { label: '중요', value: '8' },
     ];
+    const workLabels = [2, 3, 5, 6];
 
     useEffect(() => {
         if (open && inputRef?.current) {
@@ -38,6 +38,16 @@ export default function ScheduleInsertModal ({
     }, [open, inputRef]);
 
     if (!open) return null;
+
+    const handleLabelChange = (e) => {
+        const selectedValue = parseInt(e.target.value, 10);
+
+        setForm(prev => ({
+            ...prev,
+            label_idx: selectedValue,
+            title: workLabels.includes(selectedValue) ? '' : prev.title,
+        }));
+    };
 
     return (
         <div className="schedule-modal-overlay" onClick={onClose}>
@@ -53,20 +63,22 @@ export default function ScheduleInsertModal ({
                     </>
                 )}
                 <label className="label">일정 내용</label>
+                {!workLabels.includes(parseInt(form.label_idx, 10)) && (
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={form.title || ''}
+                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                        className="title-input"
+                        placeholder="제목을 입력하세요."
+                    />
+                )}
                 <input
-                    ref={inputRef}
                     type="text"
-                    value={form.title || ''}
-                    onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    className="title-input"
-                />
-                <label className="label"></label>
-                <input
-                    type="textarea"
                     value={form.description || ''}
                     onChange={(e) => setForm({ ...form, description: e.target.value })}
                     className="description-input"
-                    placeholder="상세 내용을 작성해 주세요."
+                    placeholder="상세 내용을 작성하세요."
                 />
                 <div className="flex gap_10">
                     <div className="flex column gap_10">
@@ -74,7 +86,8 @@ export default function ScheduleInsertModal ({
                         <TimeSelect
                             value={form.start_time}
                             onChange={(value) => setForm({ ...form, start_time: value })}
-                            placeholder="시작시간"
+                            menuPlacement="auto"
+                            menuPosition="absolute"
                         />
                     </div>
                     <div className="flex column gap_10">
@@ -82,17 +95,18 @@ export default function ScheduleInsertModal ({
                         <TimeSelect
                             value={form.end_time}
                             onChange={(value) => setForm({ ...form, end_time: value })}
-                            placeholder="종료시간"
+                            menuPlacement="auto"
+                            menuPosition="absolute"
                         />
                     </div>
                 </div>
                 <select
                     className="label-opt-opt"
-                    value={form.label_idx || 1}
-                    onChange={(e) => setForm({ ...form, label_idx: e.target.value })}
+                    value={form.label_idx}
+                    onChange={handleLabelChange}
                 >
                     {LABEL_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
+                        <option key={opt.value} value={opt.value} className="opt-menu">
                             {opt.label}
                         </option>
                     ))}

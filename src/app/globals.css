@@ -217,6 +217,10 @@ input[type='number']:focus {
     display: flex;
 }
 
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
 .flex-direction-row {
     flex-direction: row;
 }
@@ -491,6 +495,7 @@ input[type='number']:focus {
 .page-background {
     min-height: 100vh;
     background-color: var(--background-color);
+    overflow: hidden;
     /*padding: 20px;*/
 }
 
@@ -2340,6 +2345,8 @@ input[type='number']:focus {
 
 /*-------------------------수금 / 지급 css--------------------------------*/
 
+
+
 /* 전체 컨테이너 */
 .cap-wrapper {
     padding: 24px;
@@ -2521,6 +2528,53 @@ input[type='number']:focus {
 .cap-fab:hover {
     background-color: #2563eb;
 }
+
+/*----------------------입금 / 지급 상세 보기 (PDF 우측 배치용)----------------------*/
+
+/* 모달 내부 구조: 좌우 분할 */
+.capDetail-modal-box {
+    display: flex;
+    gap: 24px;
+    max-height: 90vh;
+    overflow: hidden;
+    background: #fff;
+    padding: 36px 40px;
+    border-radius: 10px;
+    position: relative;
+    width: 960px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 좌측 정보 영역 */
+.capDetail-left {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 12px;
+}
+
+/* 우측 PDF 영역 */
+.capDetail-right {
+    flex: 1;
+    border-left: 1px solid #ccc;
+    padding-left: 12px;
+}
+
+/* PDF 제목 */
+.capDetail-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 12px 0 6px;
+    color: #2d3748;
+}
+
+/* PDF iframe 미리보기 */
+.capDetail-pdf {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 
 
 /*-------------------------정산 현황 css--------------------------------*/
@@ -2770,7 +2824,6 @@ input[type='number']:focus {
     gap: 10px;
     margin-top: 24px;
     align-items: flex-start;
-
 }
 
 .chart-card {
@@ -2927,6 +2980,14 @@ input[type='number']:focus {
     padding-top: 4px;
 }
 
+.calendar-sunday {
+    color: #e57373 !important;
+}
+
+.calendar-saturday {
+    color: #64b5f6 !important;
+}
+
 .rbc-day-bg.rbc-today {
     background-color: #f5faff !important;
 }
@@ -2934,17 +2995,19 @@ input[type='number']:focus {
 .rbc-event {
     background-color: #f47c7c;
     border-radius: 10px;
-    height: 20px;
+    /*height: 20px;*/
     font-size: 11px;
     padding: 1px 4px;
-    line-height: 18px;
+    /*line-height: 18px;*/
     border: none;
+    height: auto !important;
+    line-height: 1.4 !important;
+    overflow: visible !important;
 }
 
 .rbc-event-label {
     display: none;
 }
-
 
 /* =============== 스케줄 =============== */
 .schedule-box .rbc-event {
@@ -2955,9 +3018,22 @@ input[type='number']:focus {
     color: #fff;
     border: none;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible !important;
+    text-overflow: initial;
+    white-space: normal !important;
+    height: auto !important;
+    line-height: 1.4;
+}
+
+.custom-evt {
+    white-space: normal;
+    line-height: 1.4;
+    font-size: 13px;
+}
+
+.evt-time {
+    font-size: 11px;
+    color: #ddd;
 }
 
 /* 오늘 날짜 원 스타일 */
@@ -2996,6 +3072,10 @@ input[type='number']:focus {
     border-bottom: 2px solid #ddd;
 }
 
+.rbc-overlay {
+    width: 16px !important;
+}
+
 .schedule-box .rbc-header:first-child {
     color: #e57373;
 }
@@ -3013,6 +3093,15 @@ input[type='number']:focus {
 /* 월간 기본 캘린더 셀 높이 */
 .schedule-box .rbc-month-view {
     border: none;
+}
+
+.schedule-box .rbc-show-more {
+    color: #6b7280 !important;
+}
+
+.schedule-box .rbc-show-more:hover {
+    color: #222;
+    cursor: pointer;
 }
 
 .schedule-toolbar-wrapper {
@@ -3153,7 +3242,11 @@ input[type='number']:focus {
     top: 50%;
     transform: translate(-50%,-50%);
     border: 1px solid #ccc;
-    padding: 24px;
+    padding: 24px 30px;
+}
+
+.css-portal {
+    z-index: 9999 !important;
 }
 
 .schedule-modal-overlay h4 {
@@ -3167,18 +3260,31 @@ input[type='number']:focus {
 
 .schedule-modal-overlay .label {
     font-family: "Noto Sans", sans-serif;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 400;
-    line-height: 25px;
-    letter-spacing: -1px;
+    line-height: 20px;
+    letter-spacing: -0.3px;
     word-break: keep-all;
 }
 
 .schedule-custom-modal .modal-btns {
     margin-top: 10px;
     display: flex;
-    gap: 10px;
+    gap: 6px;
     justify-content: end;
+}
+
+.schedule-custom-modal .modal-btns .label {
+    background-color: #f7f7f7;
+    border: 1px solid #999;
+    color: #555;
+    font-size: 13px;
+    font-weight: 550;
+    padding: 1px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    height: 23px;
 }
 
 /* 제목 input */
@@ -3190,6 +3296,7 @@ input[type='number']:focus {
     font-size: 14px;
     box-sizing: border-box;
     margin-bottom: 7px;
+    color: #444;
 }
 
 /* 내용 input (2줄 높이) */
@@ -3202,13 +3309,19 @@ input[type='number']:focus {
     box-sizing: border-box;
     resize: none;
     margin-bottom: 12px;
+    color: #444;
 }
 
-.schedule-custom-modal input[placeholder] {
+.schedule-custom-modal input::placeholder {
     font-size: 13px;
     color: #aaa;
 }
 
+.writer {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 16px;
+}
 
 /* 시간 선택 셀렉트 */
 .schedule-custom-modal .time-select .react-select__control {
@@ -3218,18 +3331,22 @@ input[type='number']:focus {
     padding: 0 8px;
 }
 
-/* react-select 커스텀: hover 시 자동 열기 */
-.schedule-custom-modal .time-select .react-select__control:hover + .react-select__menu {
-    display: block !important;
-}
-
 .schedule-custom-modal .label-opt-opt {
     margin-top: 12px;
 }
 
+.schedule-custom-modal .label-opt-opt:hover {
+    display: block !important;
+}
+.schedule-custom-modal .label-opt-opt:focus {
+    outline: none;
+    border-color: initial;
+    box-shadow: none;
+}
 
-
-
+.schedule-custom-modal .label-opt-opt .opt-menu {
+    font-size: 13px;
+}
 
 /* =============== TimePicker =============== */
 .time-modal-overlay {
@@ -3282,4 +3399,170 @@ input[type='number']:focus {
 .time-input:focus {
     outline: none;
     border-color: #2196f3;
+}
+
+/* =============== 차트 페이지 =============== */
+.chart-background {
+    min-height: 145vh;
+    background-color: var(--background-color);
+    overflow: hidden;
+    /*padding: 20px;*/
+}
+
+.dash-list-back{
+    width: auto;
+    min-height: 110vh;
+    overflow: hidden;
+    background-color: white;
+    padding: 10px 20px;
+    margin: 30px;
+    overflow-x: auto;
+}
+
+/* 차트 카테고리 */
+.dashboard-tab-wrapper {
+    white-space: nowrap;
+    display: flex;
+    gap: 20px;
+}
+
+.dashboard-header{
+    font-weight: bold;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 4px 23px 13px 23px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease-in-out;
+    border-bottom: 4px solid var(--background-color);
+}
+
+.dashboard-header-active {
+    border-bottom: 4px solid #1d4ed8;
+    font-weight: 600;
+}
+
+.label-small {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* 차트 */
+.dashboard-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 24px;
+    align-items: flex-start;
+}
+
+.dashboard-box {
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    height: 450px;
+    position: relative;
+    margin-top: 32px;
+    width: 90%;
+}
+
+.dash-row {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 20px 70px;
+}
+
+.dash-card {
+    width: 48%;
+    max-width: none;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.dash-box {
+    background-color: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    height: 400px;
+    min-height: 400px;
+    position: relative;
+}
+
+.dashboard-box h3,
+.dash-box h3,
+.dash-ctn-box h3,
+.order-chart-box h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.dash-stack-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    margin-top: 24px;
+}
+
+.dash-ctn-box {
+    width: 90%;
+    height: 450px;
+    margin-top: 21px;
+    background: #fff;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    text-align: center;
+}
+
+.order-chart-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 48px;
+    margin-top: 45px;
+    flex-wrap: wrap;
+}
+
+.order-chart-card {
+    flex: 1 1 44%;
+    max-width: 43.4%;
+    min-width: 480px;
+}
+
+.order-chart-box {
+    background: #fff;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    text-align: center;
+    min-height: 400px;
+}
+
+.dash-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.dash-table th,
+.dash-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.dash-table td {
+    font-size: 13px;
+}
+
+.dash-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
 }

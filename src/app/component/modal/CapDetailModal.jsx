@@ -43,72 +43,55 @@ const CapDetailModal = ({ capIdx, onClose }) => {
 
     return (
         <div className="entryRegist-modal">
-            <div className="entryRegist-modal-box">
-                <button className="entryRegist-modal-close" onClick={onClose}>×</button>
-                <h2 className="entryRegist-modal-title">입금 / 지급 상세</h2>
+            <div className="capDetail-modal-box">
+                {/* 좌측 */}
+                <div className="capDetail-left">
+                    <button className="entryRegist-modal-close" onClick={onClose}>×</button>
+                    <h3 className="entryRegist-modal-title">입금 / 지급 상세</h3>
 
-                <table className="entryRegist-table">
-                    <tbody>
-                    <tr>
-                        <th>일자</th>
-                        <td>{detail.date}</td>
-                    </tr>
-                    <tr>
-                        <th>유형</th>
-                        <td style={{ color: detail.type === '수금' ? 'blue' : 'red' }}>{detail.type}</td>
-                    </tr>
-                    <tr>
-                        <th>금액</th>
-                        <td>{detail.amount.toLocaleString()}원</td>
-                    </tr>
-                    <tr>
-                        <th>거래처</th>
-                        <td>{detail.customName}</td>
-                    </tr>
-                    <tr>
-                        <th>계좌</th>
-                        <td>{detail.accountBank} / {detail.accountNumber}</td>
-                    </tr>
-                    <tr>
-                        <th>전표</th>
-                        <td>{detail.entryTitle || '-'}</td>
-                    </tr>
-                    <tr>
-                        <th>메모</th>
-                        <td>{detail.memo || '-'}</td>
-                    </tr>
-                    </tbody>
-                </table>
+                    <table className="entryRegist-table">
+                        <tbody>
+                        <tr><th>일자</th><td>{detail.date}</td></tr>
+                        <tr><th>유형</th><td style={{ color: detail.type === '수금' ? 'blue' : 'red' }}>{detail.type}</td></tr>
+                        <tr><th>금액</th><td>{detail.amount.toLocaleString()}원</td></tr>
+                        <tr><th>거래처</th><td>{detail.customName}</td></tr>
+                        <tr><th>계좌</th><td>{detail.accountBank} / {detail.accountNumber}</td></tr>
+                        <tr><th>전표</th><td>{detail.entryTitle || '-'}</td></tr>
+                        <tr><th>메모</th><td>{detail.memo || '-'}</td></tr>
+                        </tbody>
+                    </table>
 
-                <h4 style={{ marginTop: '20px' }}>변경 이력</h4>
-                <ul style={{ marginBottom: '20px' }}>
+                    <h4 style={{ marginTop: '20px' }}>🔁 변경 이력</h4>
                     {logs.length > 0 ? (
-                        logs.map((log) => (
-                            <li key={log.log_Idx}>
-                                <strong>{log.actionType}</strong> ({log.regDate})
-                            </li>
-                        ))
+                        <ul>
+                            {logs.map((log) => (
+                                <li key={log.log_Idx}>
+                                    <strong>{log.actionType}</strong> ({log.regDate})
+                                </li>
+                            ))}
+                        </ul>
                     ) : (
-                        <li>이력이 없습니다.</li>
+                        <p>이력이 없습니다.</p>
                     )}
-                </ul>
 
-                <h4>📄 PDF 미리보기</h4>
-                {loading ? (
-                    <p>PDF 생성 중...</p>
-                ) : pdfUrl ? (
-                    <iframe
-                        src={pdfUrl}
-                        width="100%"
-                        height="500px"
-                        title="PDF 미리보기"
-                        style={{ border: '1px solid #ccc', marginBottom: '16px' }}
-                    ></iframe>
-                ) : (
-                    <p>PDF 생성 실패 또는 파일 없음</p>
-                )}
+                    <button className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
+                </div>
 
-                <button className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
+                {/* 우측 */}
+                <div className="capDetail-right">
+                    <h3 className="capDetail-title">📄 PDF 미리보기</h3>
+                    {loading ? (
+                        <p>PDF 생성 중...</p>
+                    ) : pdfUrl ? (
+                        <iframe
+                            src={pdfUrl}
+                            className="capDetail-pdf"
+                            title="PDF 미리보기"
+                        />
+                    ) : (
+                        <p>PDF 없음 또는 생성 실패</p>
+                    )}
+                </div>
             </div>
         </div>
     );

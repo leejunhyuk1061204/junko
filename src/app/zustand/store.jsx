@@ -57,6 +57,7 @@ export const useMainChartStore = create((set) => ({
         getPendingShipment: [],
         getShippedToday: [],
         getReceiveThisMonth: [],
+        getSalesByCategory: [],
     },
     loading: false,
 
@@ -91,9 +92,12 @@ export const useScheduleStore = create((set) => ({
     scheduleList: [],
     fetchSchedules: async(token) => {
         try {
+            const user_id = typeof window !== "undefined" ? sessionStorage.getItem("user_id") : "";
+            const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : "";
+
             const {data} = await axios.post('http://localhost:8080/schedule/list', {},
                 {headers: {Authorization: token}});
-            if (data.success) {
+            if (data.success && data.loginYN) {
                 set({scheduleList: data.list});
             }
         }catch (err) {
@@ -114,12 +118,21 @@ export const useChartStore = create((set) => ({
         getPopularProduct: [],
         getHighReturnProduct: [],
         getInventoryTurnoverStats: [],
+        returnProduct: [],
+        returnProductThisMonth: [],
         getDelayedProduct: [],
         getOrderStatus: [],
         getProductMarginStats: [],
         getNetProfitStats: [],
         getInOutProduct: [],
-        getMonthlySalesYoY: []
+        getMonthlySalesYoY: [],
+        getLowStockProduct: [],
+        getSalesThisMonth: [],
+        newOrder: [],
+        getPendingShipment: [],
+        getShippedToday: [],
+        getReceiveThisMonth: [],
+        getSalesByCategory: [],
     },
     loading: false,
 
@@ -127,22 +140,22 @@ export const useChartStore = create((set) => ({
     setStartDate: (startDate) => set({startDate}),
     setEndDate: (endDate) => set({endDate}),
 
-    fetchChart: async () => {
+    fetchChart: async (filters = {}) => {
         set({ loading: true });
-
         try {
             const user_id = typeof window !== "undefined" ? sessionStorage.getItem("user_id") : "";
-            set({ loading: false });
-            const headers = {
-                Authorization: sessionStorage.getItem("authorization"),
-            };
+            const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : "";
+
+            const {categoryIdx, startDate, endDate} = filters;
             const payload = {
+                categoryIdx: categoryIdx ?? null,
+                startDate: startDate ?? null,
+                endDate: endDate ?? null,
                 user_id,
-                ...(categoryIdx && { categoryIdx }),
-                ...(startDate && endDate && { startDate, endDate })
             };
 
-            const {data} = await axios.post('http://localhost/list/chart', payload, {headers});
+            const {data} = await axios.post('http://localhost:8080/list/chart', payload,
+                {headers: {Authorization: token}});
 
             if (data.success && data.loginYN) {
                 set({
@@ -150,15 +163,41 @@ export const useChartStore = create((set) => ({
                     loading: false,
                 });
             } else {
-                console.warn("LOGIN FALSE");
+                console.warn("FALSE", data);
                 set({loading: false});
             }
         } catch (err) {
             console.error("Chart fetch error:", err);
             set({loading: false});
         }
-    }
+    },
+}));
 
+// 카테고리 상태
+export const useCategoryStore = create((set) => ({
+    parentCategories: [],
+    subCategories: [],
+    categoryLoading: false,
+
+    fetchCategories: async () => {
+        set({categoryLoading: true});
+        try {
+            const token = sessionStorage.getItem("token");
+            const {data} = await axios.get('http://localhost:8080/chart/category/list', {
+                headers: {Authorization: token}});
+
+            if (data.loginYN) {
+                set({
+                    parentCategories: data.parents,
+                    subCategories: data.subs,
+                    categoryLoading: false,
+                });
+            }
+        }catch (err) {
+            console.error("카테고리 조회 실패: ", err);
+            set({categoryLoading: false});
+        }
+    },
 }));
 
 // datePicker Date

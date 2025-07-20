@@ -59,6 +59,7 @@ export default function SchedulePage() {
         7: '#AED9B4', // 행사
         8: '#D78888', // 중요
     }
+    const workLabels = [2, 3, 5, 6];
 
     const fetchEvents = useCallback(async () => {
         const token = sessionStorage.getItem("token");
@@ -88,14 +89,28 @@ export default function SchedulePage() {
                 ...workRes.data.list,
             ];
 
-            const mappedEvents = allEvents.map(item => ({
-                id: item.schedule_idx,
-                title: item.title,
-                start: new Date(`${item.start_date}T${item.start_time}`),
-                end: new Date(`${item.end_date}T${item.end_time}`),
-                allDay: false,
-                resource: item
-            }));
+            const mappedEvents = allEvents.map(item => {
+                const haveTime = item.start_time && item.end_time;
+                const workStatus = [2, 3, 5, 6].includes(item.label_idx); // 연차,반차,외근,출장
+                return {
+                    id: item.schedule_idx,
+                    title: workStatus
+                        ? `${item.user} - ${item.label_name}`
+                        : item.title,
+                    start: new Date(
+                        haveTime
+                            ? `${item.start_date}T${item.start_time}`
+                            : `${item.start_date}T00:00:00`,
+                    ),
+                    end: new Date(
+                        haveTime
+                            ? `${item.end_date}T${item.end_time}`
+                            : `${item.end_date}T23:59:59`
+                    ),
+                    allDay: !haveTime,
+                    resource: item
+                };
+            });
             setEvent(mappedEvents);
         }catch (err) {
             console.error("일정 불러오기 실패: ", err);
@@ -118,13 +133,14 @@ export default function SchedulePage() {
             x: 0,
             y: 0
         });
-        setForm({
+        setForm((prev) => ({
+            ...prev,
             title: '',
             description: '',
             start_time: '',
             end_time: '',
-            label_name: '',
-        });
+            label_idx: 1,
+        }));
         setErrors({});
         setTimeout(() => {
             inputRef.current && inputRef.current.focus();
@@ -133,7 +149,6 @@ export default function SchedulePage() {
 
     // 일정 클릭 (상세정보)
     const selectEvent = (event) => {
-        console.log(event);
         setDetailInfo({
             open: true,
             event: event,
@@ -146,7 +161,10 @@ export default function SchedulePage() {
     // 일정 등록
     const insertEvent = async () => {
         const token = sessionStorage.getItem("token");
-        if (!form.title || form.title.trim() === '') {
+        const label = parseInt(form.label_idx, 10);
+        const titleToSend = workLabels.includes(label) ? '' : form.title?.trim() || '';
+
+        if (!workLabels.includes(label) && (!form.title || form.title.trim() === '')) {
             setErrors({title: true});
             openModal({
                 svg: '❗',
@@ -167,7 +185,7 @@ export default function SchedulePage() {
 
         try {
             const {data} = await axios.post('http://localhost:8080/schedule/insert', {
-                title: form.title,
+                title: titleToSend,
                 description: form.description,
                 start_date: startDate,
                 end_date: endDate,
@@ -175,6 +193,7 @@ export default function SchedulePage() {
                 end_time: form.end_time,
                 label_idx: parseInt(form.label_idx, 10),
             },{headers: {Authorization: token}});
+            console.log("전송하는 label_idx:", form.label_idx);
 
             if (data.success && data.loginYN) {
                 openModal({
@@ -245,7 +264,7 @@ export default function SchedulePage() {
     };
 
     // 일정 삭제
-     const deleteEvent = async (schedule_idx) => {
+     const deleteEvent = async (schedule_idx, user_idx) => {
          const token = sessionStorage.getItem("token");
          openModal({
              svg: '❗',
@@ -255,7 +274,7 @@ export default function SchedulePage() {
              onConfirm: async () => {
                  try {
                      const {data} = await axios.put('http://localhost:8080/schedule/del', null, {
-                         params: {schedule_idx},
+                         params: {schedule_idx, user_idx},
                          headers: {Authorization: token}
                      });
                      if (data.success && data.loginYN) {
@@ -309,20 +328,23 @@ export default function SchedulePage() {
                 minHeight: 24
             },
         };
-    }
+    };
 
     // 캘린더에 보여지는 이벤트
     const CustomEvent = ({event}) => {
         const {title, start_time, end_time} = event.resource || {};
 
-        if (!title || !start_time || !end_time) {
-            return (
-                <div style={{whiteSpace: 'pre-line'}}>
-                    {event.title}
-                </div>
-            );
-        }
-    }
+        return (
+            <div className="custom-evt">
+                <div>{event.title}</div>
+                {start_time && end_time && (
+                    <div className="evt-time">
+                        {start_time} - {end_time}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     return (
         <div>
@@ -345,15 +367,9 @@ export default function SchedulePage() {
                         eventPropGetter={eventPropGetter}
                         style={{ height: '100%' }}
                         messages={{
-                            next: "다음달",
-                            previous: "이전달",
-                            today: "Today",
-                            month: "월",
-                            week: "주",
-                            day: "일",
                             showMore: total => `+${total}개 더보기`
                         }}
-                        components={{toolbar: CustomToolbar, events: CustomEvent}}
+                        components={{toolbar: CustomToolbar, event: CustomEvent}}
                     />
 
                     {/*일정 등록 모달*/}
@@ -367,7 +383,6 @@ export default function SchedulePage() {
                             setErrors={setErrors}
                             onSubmit={insertEvent}
                             onClose={() => {
-                                closeTimePicker();
                                 setInputInfo({...inputInfo, open: false});
                             }}
                             dateInfo={inputInfo}
@@ -387,7 +402,7 @@ export default function SchedulePage() {
                             }}
                             dateInfo={detailInfo.event}
                             event={detailInfo.event}
-                            onDelete={() => deleteEvent(detailInfo.event?.resource?.schedule_idx)}
+                            onDelete={() => deleteEvent(detailInfo.event?.id)}
                             onEditClick={() => {
                                 setForm(detailInfo.event.resource);
                                 setDetailInfo({...detailInfo, open: false});

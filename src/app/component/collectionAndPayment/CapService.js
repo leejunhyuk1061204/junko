@@ -16,8 +16,12 @@ export const getCapDetail = async (cap_idx) => {
 };
 
 // 수금/지급 검색
-export const searchCap = async (searchDto) => {
-    return await axios.post(`${API}/searchCap`, searchDto);
+export const searchCap = (dto) => {
+    return axios.post(`${API}/searchCap`, dto);
+};
+
+export const searchCapPaged = (dto) => {
+    return axios.post(`${API}/searchCapPaged`, dto);
 };
 
 //  수금/지급 수정
@@ -28,9 +32,11 @@ export const updateCap = async (cap_idx, data, token) => {
 };
 
 // 수금/지급 삭제
-export const deleteCap = async (cap_idx, token) => {
-    return await axios.delete(`${API}/capDel/${cap_idx}`, {
-        headers: { Authorization: token }
+export const deleteCap = (cap_idx, token) => {
+    return axios.delete(`${API}/capDel/${cap_idx}`, {
+        headers: {
+            Authorization: token
+        }
     });
 };
 

@@ -86,7 +86,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
     };
 
     const handleRequestReopen = async () => {
-        const token = localStorage.getItem('accessToken');
+        const token = sessionStorage.getItem('accessToken');
         try {
             const res = await axios.post(`http://localhost:8080/settlementReq/${data.settlement_idx}`, null, {
                 headers: { Authorization: token }

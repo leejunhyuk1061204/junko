@@ -39,7 +39,12 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
 
         try {
             const token = sessionStorage.getItem("token");
+            console.log("✅ 수정 요청 시 session 토큰:", token);
 
+            if (!token) {
+                alert("로그인 필요");
+                return;
+            }
             // 거래처 / 고객 idx 조회
             let custom_idx = null;
             let sales_idx = null;

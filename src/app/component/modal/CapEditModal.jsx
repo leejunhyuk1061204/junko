@@ -1,96 +1,162 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { getCapDetail, getCapLog, generatePdf } from '../collectionAndPayment/CapService';
+import Select from 'react-select';
+import {
+    updateCap,
+    getCapDetail,
+    getCustomList,
+    getLinkedItems,
+} from '../collectionAndPayment/CapService';
 import '../../globals.css';
 
-const CapDetailModal = ({ capIdx, onClose }) => {
-    const [detail, setDetail] = useState(null);
-    const [logs, setLogs] = useState([]);
-    const [pdfUrl, setPdfUrl] = useState(null);
-    const [loading, setLoading] = useState(true);
+const CapEditModal = ({ capIdx, onClose, onSuccess }) => {
+    const [form, setForm] = useState({
+        type: '수금',
+        amount: '',
+        date: '',
+        custom_idx: '',
+        entry_idx: '',
+        memo: ''
+    });
+
+    const [customList, setCustomList] = useState([]);
+    const [linkedList, setLinkedList] = useState([]);
+    const token = sessionStorage.getItem('token');
 
     useEffect(() => {
         fetchDetail();
-        fetchLog();
-        generatePdfPreview();
-    }, [capIdx]);
+        fetchDropdowns();
+    }, []);
 
     const fetchDetail = async () => {
         const res = await getCapDetail(capIdx);
-        setDetail(res.data.data);
+        const data = res.data.data;
+        setForm({
+            type: data.type,
+            amount: data.amount,
+            date: data.date,
+            custom_idx: data.custom_idx,
+            entry_idx: data.entry_idx,
+            memo: data.memo
+        });
     };
 
-    const fetchLog = async () => {
-        const res = await getCapLog(capIdx);
-        setLogs(res.data.data);
+    const fetchDropdowns = async () => {
+        const cRes = await getCustomList();
+        const lRes = await getLinkedItems();
+        setCustomList(cRes.data.data);
+        setLinkedList(lRes.data.data);
     };
 
-    const generatePdfPreview = async () => {
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setForm((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
         try {
-            const res = await generatePdf(capIdx, 15); // template_idx는 상황에 맞게 조정
-            const filename = res.data.new_filename || res.data.filename;
-            const webPath = `/files/${filename}`;
-            setPdfUrl(webPath);
-        } catch (e) {
-            console.error('PDF 미리보기 실패:', e);
-            setPdfUrl(null);
-        } finally {
-            setLoading(false);
+            console.log(form);
+            const res = await updateCap(capIdx, form, token);
+            if (res.data.success) {
+                alert('수정 완료!');
+                onSuccess();
+                onClose();
+            } else {
+                alert(res.data.message || '수정 실패');
+            }
+        } catch (err) {
+            console.error('수정 실패:', err);
+            alert('수정 중 오류 발생');
         }
     };
-
-    if (!detail) return null;
 
     return (
         <div className="entryRegist-modal">
             <div className="entryRegist-modal-box">
                 <button className="entryRegist-modal-close" onClick={onClose}>×</button>
-                <h3 className="entryRegist-modal-title">입금 / 지급 상세보기</h3>
+                <h3 className="entryRegist-modal-title">입금 / 지급 수정</h3>
+                <form onSubmit={handleSubmit}>
+                    <table className="entryRegist-table">
+                        <tbody>
+                        <tr>
+                            <th>유형</th>
+                            <td>
+                                <select name="type" value={form.type} onChange={handleChange}>
+                                    <option value="수금">수금</option>
+                                    <option value="지급">지급</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>거래처</th>
+                            <td>
+                                <Select
+                                    name="custom_idx"
+                                    options={customList.map(c => ({
+                                        value: c.custom_idx,
+                                        label: c.custom_name
+                                    }))}
+                                    value={customList.find(c => c.custom_idx == form.custom_idx) && {
+                                        value: form.custom_idx,
+                                        label: customList.find(c => c.custom_idx == form.custom_idx).custom_name
+                                    }}
+                                    onChange={(selected) =>
+                                        setForm(prev => ({ ...prev, custom_idx: selected?.value || '' }))
+                                    }
+                                    placeholder="거래처 선택"
+                                    isClearable
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>금액</th>
+                            <td>
+                                <input type="number" name="amount" value={form.amount} onChange={handleChange} required />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>일자</th>
+                            <td>
+                                <input type="date" name="date" value={form.date} onChange={handleChange} required />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>전표 연동</th>
+                            <td>
+                                <Select
+                                    name="entry_idx"
+                                    options={linkedList.map(i => ({
+                                        value: i.idx,
+                                        label: `[${i.type}] ${i.title}`
+                                    }))}
+                                    value={linkedList.find(i => i.idx == form.entry_idx) && {
+                                        value: form.entry_idx,
+                                        label: `[${linkedList.find(i => i.idx == form.entry_idx).type}] ${linkedList.find(i => i.idx == form.entry_idx).title}`
+                                    }}
+                                    onChange={(selected) =>
+                                        setForm(prev => ({ ...prev, entry_idx: selected?.value || '' }))
+                                    }
+                                    placeholder="전표 선택"
+                                    isClearable
+                                />
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>메모</th>
+                            <td>
+                                <input type="text" name="memo" value={form.memo} onChange={handleChange} />
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
 
-                <table className="entryRegist-table">
-                    <tbody>
-                    <tr><th>일자</th><td>{detail.date}</td></tr>
-                    <tr><th>유형</th><td style={{ color: detail.type === '수금' ? 'blue' : 'red' }}>{detail.type}</td></tr>
-                    <tr><th>금액</th><td>{detail.amount.toLocaleString()}원</td></tr>
-                    <tr><th>거래처</th><td>{detail.customName}</td></tr>
-                    <tr><th>계좌</th><td>{detail.accountBank} / {detail.accountNumber}</td></tr>
-                    <tr><th>전표</th><td>{detail.entryTitle || '-'}</td></tr>
-                    <tr><th>메모</th><td>{detail.memo || '-'}</td></tr>
-                    </tbody>
-                </table>
-
-                <h4 style={{ marginTop: '16px' }}>📄 PDF 미리보기</h4>
-                {loading ? (
-                    <p>PDF 생성 중...</p>
-                ) : pdfUrl ? (
-                    <iframe
-                        src={pdfUrl}
-                        width="100%"
-                        height="400px"
-                        title="PDF 미리보기"
-                        style={{ border: '1px solid #ccc' }}
-                    ></iframe>
-                ) : (
-                    <p>PDF 없음 또는 생성 실패</p>
-                )}
-
-                <h4 style={{ marginTop: '20px' }}>🔁 변경 이력</h4>
-                {logs.length > 0 ? (
-                    <ul>
-                        {logs.map((log) => (
-                            <li key={log.log_Idx}>
-                                <strong>{log.actionType}</strong> ({log.regDate})
-                            </li>
-                        ))}
-                    </ul>
-                ) : (
-                    <p>이력이 없습니다.</p>
-                )}
-
-                <button className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
+                    <button type="submit" className="entryList-fabBtn blue">수정</button>
+                    <button type="button" className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
+                </form>
             </div>
         </div>
     );
 };
 
-export default CapDetailModal;
+export default CapEditModal;

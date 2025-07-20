@@ -1,26 +1,58 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../../globals.css';
+import Select from 'react-select';
 
 export default function SettlementRegistModal({ onClose, onSuccess }) {
     const [form, setForm] = useState({
         custom_idx: '',
+        entry_idx: '',
         settlement_day: '',
         total_amount: '',
         amount: ''
     });
 
+
     const [file, setFile] = useState(null);
+    const [customList, setCustomList] = useState([]);
+    const [entryList, setEntryList] = useState([]);
+
+
+
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    useEffect(() => {
+        const fetchInitialData = async () => {
+            try {
+                // 거래처 리스트
+                const customRes = await axios.get("http://localhost:8080/custom/list");
+                setCustomList(customRes.data.list || []);
+
+                // 전표 리스트
+                const res = await axios.get("http://localhost:8080/entryListForSettlement");
+                setEntryList(res.data.data || []);
+            } catch (err) {
+                console.error("초기 데이터 조회 실패:", err);
+            }
+        };
+
+        fetchInitialData();
+    }, []);
+
+
     const handleSubmit = async () => {
+        if (!form.entry_idx || form.entry_idx === '') {
+            alert("전표를 선택해주세요!");
+            return;
+        }
+
         try {
-            const token = localStorage.getItem('token');
+            const token = sessionStorage.getItem('token');
             const res = await axios.post('http://localhost:8080/psRegister', form, {
                 headers: { Authorization: token }
             });
@@ -51,7 +83,9 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
             alert('정산 등록 실패!');
         }
     };
-
+    console.log('entryList:', entryList);
+    console.log('form.entry_idx:', form.entry_idx);
+    console.log("정산 등록 form:", form);
     return (
         <div className="entryRegist-modal">
             <div className="entryRegist-modal-box">
@@ -63,7 +97,44 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
                     <tr>
                         <th>거래처 ID</th>
                         <td>
-                            <input type="text" name="custom_idx" value={form.custom_idx} onChange={handleChange} />
+                            <Select
+                                name="custom_idx"
+                                options={customList.map(c => ({
+                                    value: c.custom_idx,
+                                    label: c.custom_name
+                                }))}
+                                value={customList.find(c => c.custom_idx == form.custom_idx) && {
+                                    value: form.custom_idx,
+                                    label: customList.find(c => c.custom_idx == form.custom_idx).custom_name
+                                }}
+                                onChange={(selected) =>
+                                    setForm(prev => ({ ...prev, custom_idx: selected?.value || '' }))
+                                }
+                                placeholder="거래처 선택"
+                                isClearable
+                            />
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>전표 연동</th>
+                        <td>
+                            <Select
+                                name="entry_idx"
+                                options={entryList.map(i => ({
+                                    value: i.entry_idx,
+                                    label: `[${i.entry_type}] 전표 #${i.entry_idx}`
+                                }))}
+                                value={entryList.find(i => i.entry_idx == form.entry_idx) && {
+                                    value: form.entry_idx,
+                                    label: `[${entryList.find(i => i.entry_idx == form.entry_idx).entry_type}] 전표 #${form.entry_idx}`
+                                }}
+                                onChange={(selected) => {
+                                    console.log("선택한 전표:", selected);
+                                    setForm(prev => ({ ...prev, entry_idx: selected?.value || '' }));
+                                }}
+                                placeholder="전표 선택"
+                                isClearable
+                            />
                         </td>
                     </tr>
                     <tr>
