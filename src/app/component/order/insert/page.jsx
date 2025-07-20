@@ -72,9 +72,9 @@ const OrderInsertPage = () => {
 
     // 거래처 리스트
     const getCustom = async (searchText='') => {
-        const {data} = await axios.get(`http://localhost:8080/custom/list?start=0&size=10&search=${searchText}`);
-        setCustom(data);
-        // console.log(data);
+        const {data} = await axios.post('http://localhost:8080/custom/list2',{search:searchText});
+        setCustom(data.list);
+        console.log(data);
     }
 
     useEffect(() => {

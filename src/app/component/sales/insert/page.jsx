@@ -240,7 +240,7 @@ const SalesInsertPage = () => {
                     if (salesValid && productValid && csvFile) {
                         // 1. sales & product 유효하고 CSV도 있음
                         if (insertSuccess && csvSuccess) {
-                            openModal({ svg: '✅', msg1: '등록 성공', msg2: '모든 등록에 성공했습니다.'
+                            openModal({ svg: '✔', msg1: '등록 성공', msg2: '모든 등록에 성공했습니다.'
                                 ,onConfirm: ()=>{location.href='/component/sales'}
                                 });
                         } else if (insertSuccess && !csvSuccess) {
@@ -253,7 +253,7 @@ const SalesInsertPage = () => {
                     } else if (salesValid && productValid && !csvFile) {
                         // 2. 주문만 등록
                         if (insertSuccess) {
-                            openModal({ svg: '✅', msg1: '등록 성공', msg2: '주문 등록에 성공했습니다.'
+                            openModal({ svg: '✔', msg1: '등록 성공', msg2: '주문 등록에 성공했습니다.'
                                 ,onConfirm: ()=>{location.href='/component/sales'}
                             });
                         } else {
@@ -262,7 +262,7 @@ const SalesInsertPage = () => {
                     } else if (!salesValid && !productValid && csvFile) {
                         // 3. CSV만 있음
                         if (csvSuccess) {
-                            openModal({ svg: '✅', msg1: 'CSV 업로드 성공', msg2: '상품 정보 등록에 성공했습니다.'
+                            openModal({ svg: '✔', msg1: 'CSV 업로드 성공', msg2: '상품 정보 등록에 성공했습니다.'
                                 ,onConfirm: ()=>{location.href='/component/sales'}
                             });
                         } else {
@@ -271,7 +271,7 @@ const SalesInsertPage = () => {
                     } else {
                         // 4. 아무것도 유효하지 않음
                         openModal({
-                            svg: '⚠️',
+                            svg: '❗',
                             msg1: '입력 없음',
                             msg2: '등록할 주문 정보나 CSV 파일이 없습니다.',
                         });
