@@ -128,6 +128,20 @@ input[type='text']:focus,input[type='password']:focus{
     outline-color: var(--gray-color);
 }
 
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type='number']:hover {
+    outline:none;
+}
+
+input[type='number']:focus {
+    outline:none;
+}
+
 .content_text {
     font-family: "Noto Sans", sans-serif;
     font-size: 15px;
@@ -1131,6 +1145,10 @@ input[type='text']:focus,input[type='password']:focus{
     background-repeat: no-repeat;
     background-position: right 5px center;
     background-size: 12px;
+}
+
+.fileBox {
+    display: none;
 }
 
 /* ------------------------------- 카테고리 관련 ------------------------------- */
@@ -2327,6 +2345,8 @@ input[type='text']:focus,input[type='password']:focus{
 
 /*-------------------------수금 / 지급 css--------------------------------*/
 
+
+
 /* 전체 컨테이너 */
 .cap-wrapper {
     padding: 24px;
@@ -2508,6 +2528,53 @@ input[type='text']:focus,input[type='password']:focus{
 .cap-fab:hover {
     background-color: #2563eb;
 }
+
+/*----------------------입금 / 지급 상세 보기 (PDF 우측 배치용)----------------------*/
+
+/* 모달 내부 구조: 좌우 분할 */
+.capDetail-modal-box {
+    display: flex;
+    gap: 24px;
+    max-height: 90vh;
+    overflow: hidden;
+    background: #fff;
+    padding: 36px 40px;
+    border-radius: 10px;
+    position: relative;
+    width: 960px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* 좌측 정보 영역 */
+.capDetail-left {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 12px;
+}
+
+/* 우측 PDF 영역 */
+.capDetail-right {
+    flex: 1;
+    border-left: 1px solid #ccc;
+    padding-left: 12px;
+}
+
+/* PDF 제목 */
+.capDetail-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 12px 0 6px;
+    color: #2d3748;
+}
+
+/* PDF iframe 미리보기 */
+.capDetail-pdf {
+    width: 100%;
+    height: 500px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
 
 
 /*-------------------------정산 현황 css--------------------------------*/
@@ -3334,146 +3401,3 @@ input[type='text']:focus,input[type='password']:focus{
     border-color: #2196f3;
 }
 
-/* =============== 차트 페이지 =============== */
-.chart-background {
-    min-height: 145vh;
-    background-color: var(--background-color);
-    overflow: hidden;
-    /*padding: 20px;*/
-}
-
-.dash-list-back{
-    width: auto;
-    min-height: 110vh;
-    overflow: hidden;
-    background-color: white;
-    padding: 10px 20px;
-    margin: 30px;
-    overflow-x: auto;
-}
-
-/* 차트 카테고리 */
-.dashboard-tab-wrapper {
-    white-space: nowrap;
-    display: flex;
-    gap: 20px;
-}
-
-.dashboard-header{
-    font-weight: bold;
-    font-size: 22px;
-    cursor: pointer;
-    padding: 4px 23px 13px 23px;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease-in-out;
-    border-bottom: 4px solid var(--background-color);
-}
-
-.dashboard-header-active {
-    border-bottom: 4px solid #1d4ed8;
-    font-weight: 600;
-}
-
-.label-small {
-    font-size: 14px;
-    font-weight: 500;
-}
-
-/* 차트 */
-.dashboard-row {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
-    align-items: flex-start;
-}
-
-.dashboard-box {
-    background-color: #fff;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    height: 450px;
-    position: relative;
-    margin-top: 32px;
-    width: 90%;
-}
-
-.dash-row {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 24px;
-    align-items: flex-start;
-    gap: 10px;
-    width: 100%;
-    padding: 20px 70px;
-}
-
-.dash-card {
-    width: 48%;
-    max-width: none;
-    height: 300px;
-    display: flex;
-    flex-direction: column;
-}
-
-.dash-box {
-    background-color: #fff;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    height: 400px;
-    min-height: 400px;
-    position: relative;
-}
-
-.dashboard-box h3,
-.dash-box h3,
-.dash-ctn-box h3,
-.order-chart-box h3 {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 5px;
-}
-
-.dash-stack-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-    margin-top: 24px;
-}
-
-.dash-ctn-box {
-    width: 90%;
-    height: 450px;
-    margin-top: 21px;
-    background: #fff;
-    padding: 16px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
-    text-align: center;
-}
-
-.order-chart-row {
-    display: flex;
-    justify-content: center;
-    gap: 40px;
-    margin-bottom: 48px;
-    margin-top: 45px;
-    flex-wrap: wrap;
-}
-
-.order-chart-card {
-    flex: 1 1 44%;
-    max-width: 43.4%;
-    min-width: 480px;
-}
-
-.order-chart-box {
-    background: #fff;
-    padding: 24px;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-    text-align: center;
-    min-height: 400px;
-}

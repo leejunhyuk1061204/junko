@@ -2,12 +2,12 @@
 
 export default function SettlementFilter({ filter, onChange, onSearch }) {
     return (
-        <div className="settlement-filter">
+        <div className="entryList-searchBar">
             <select name="status" value={filter.status} onChange={onChange}>
                 <option value="">전체 상태</option>
                 <option value="미정산">미정산</option>
+                <option value="부분정산">부분정산</option>
                 <option value="정산">정산 완료</option>
-                <option value="부분정산">부분 정산</option>
             </select>
 
             <input
@@ -21,7 +21,7 @@ export default function SettlementFilter({ filter, onChange, onSearch }) {
             <input type="date" name="startDate" value={filter.startDate} onChange={onChange} />
             <input type="date" name="endDate" value={filter.endDate} onChange={onChange} />
 
-            <button onClick={onSearch}>검색</button>
+            <button className="entryList-fabBtn blue" onClick={onSearch}>검색</button>
         </div>
     );
 }

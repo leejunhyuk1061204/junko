@@ -1,4 +1,5 @@
 'use client'
+
 import { useEffect, useState } from "react"
 import axios from "axios"
 import EntryEditModal from "@/app/component/modal/EntryEditModal"
@@ -8,7 +9,7 @@ import DeptEditModal from "@/app/component/modal/DeptEditModal"
 const EntryDetailModal = ({ open, onClose, entry }) => {
     const [files, setFiles] = useState([])
     const [selectedFile, setSelectedFile] = useState(null)
-    const [loginUserId, setLoginUserId] = useState(null)
+    const [loginUserIdx, setLoginUserIdx] = useState(null)
     const [editOpen, setEditOpen] = useState(false)
     const [deptList, setDeptList] = useState([])
     const [selectedDept, setSelectedDept] = useState(null)
@@ -17,14 +18,8 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
     const [showDeptRegist, setShowDeptRegist] = useState(false)
 
     useEffect(() => {
-        const id = sessionStorage.getItem('user_id')
-        console.log("✅ 로그인 유저 ID 확인 (useEffect):", id)
-        setLoginUserId(id)
-    }, [])
-
-    useEffect(() => {
-        const id = sessionStorage.getItem('user_id')
-        setLoginUserId(id)
+        const userIdx = sessionStorage.getItem('user_idx')
+        setLoginUserIdx(userIdx)
     }, [entry, open])
 
     useEffect(() => {
@@ -37,14 +32,19 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
     const updateStatus = async (newStatus) => {
         try {
-            const res = await axios.patch(`http://localhost:8080/accountStatusUpdate/${entry.entry_idx}/status`, {
+            const token = sessionStorage.getItem("token");
+            const user_idx = sessionStorage.getItem("user_idx");
+
+            await axios.patch(`http://localhost:8080/accountStatusUpdate/${entry.entry_idx}/status`, {
                 status: newStatus,
                 logMsg: `${newStatus} 처리됨`
             }, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                    Authorization: `Bearer ${token}`,
                 }
-            })
+
+            });
+            console.log("✅ newStatus:", newStatus)
             if (res.data.success) {
                 alert(`${newStatus} 처리 완료!`)
                 onClose()
@@ -54,10 +54,6 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
             alert("처리 중 오류 발생")
         }
     }
-    useEffect(() => {
-        console.log("✅ entry 상태 확인:", entry)
-        console.log("✅ 로그인 유저 ID 확인:", loginUserId)
-    }, [entry, loginUserId])
 
     const handleDeleteDept = async (dept_idx) => {
         if (!window.confirm("삭제할까요?")) return
@@ -70,12 +66,8 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
     return (
         <div style={modalOverlayStyle}>
             <div style={modalContentWrapperStyle}>
-                {/* 닫기 버튼 */}
-                <button className="entryList-fabBtn gray" onClick={onClose} style={{ position: 'absolute', top: 20, right: 20 }}>
-                    닫기
-                </button>
+                <button className="entryList-fabBtn gray" onClick={onClose} style={{ position: 'absolute', top: 20, right: 20 }}>닫기</button>
 
-                {/* 왼쪽: 전표 + 분개 테이블 */}
                 <div style={modalLeftPanelStyle}>
                     <h3 style={titleStyle}>전표 상세</h3>
 
@@ -99,13 +91,11 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                 <div key={file.file_idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
                                     <strong>첨부파일:</strong>
                                     <span>📎 {file.ori_filename}</span>
-                                    <button className="entryList-fabBtn blue" onClick={() => {
+                                    <button className="entryList-fabBtn blue small" onClick={() => {
                                         setSelectedFile(file)
                                         setDeptPreviewUrl(null)
-                                    }}>
-                                        미리보기
-                                    </button>
-                                    <button className="entryList-fabBtn gray" onClick={() => window.open(`http://localhost:8080/entryFileDown/${file.file_idx}`, '_blank')}>다운로드</button>
+                                    }}>미리보기</button>
+                                    <button className="entryList-fabBtn gray small" onClick={() => window.open(`http://localhost:8080/entryFileDown/${file.file_idx}`, '_blank')}>다운로드</button>
                                 </div>
                             ))
                         ) : (
@@ -113,7 +103,6 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         )}
                     </div>
 
-                    {/* 분개 테이블 */}
                     <div style={{ marginTop: '30px' }}>
                         <div className="flex justify-between items-center mb-2" style={{ marginBottom: '12px', gap: '12px' }}>
                             <h4 style={{ margin: 0 }}>분개 목록</h4>
@@ -144,9 +133,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                             } else {
                                                 alert("PDF 실패")
                                             }
-                                        }}>
-                                            미리보기
-                                        </button>
+                                        }}>미리보기</button>
                                     </td>
                                     <td>
                                         <button className="entryList-fabBtn gray small" onClick={() => { setSelectedDept(dept); setEditDeptOpen(true) }}>✏️</button>
@@ -158,9 +145,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         </table>
                     </div>
 
-
-                    {/* 버튼 */}
-                    {loginUserId && String(entry.user_id) === loginUserId && (
+                    {loginUserIdx && String(entry.user_idx) === loginUserIdx && (
                         <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "20px" }}>
                             <button className="entryList-fabBtn blue small" onClick={() => setEditOpen(true)}>✏️ 수정하기</button>
                             {entry.status === "작성중" && (
@@ -175,42 +160,28 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                 <button className="entryList-fabBtn red-del" onClick={() => updateStatus("반려")}>반려</button>
                             </>
                         )}
-                        {entry.status === "반려" && loginUserId === entry.user_id && (
+                        {entry.status === "반려" && loginUserIdx === entry.user_idx && (
                             <button className="entryList-fabBtn blue" onClick={() => updateStatus("제출")}>재제출</button>
                         )}
                     </div>
 
-                    {/* 모달 */}
-                    <EntryEditModal
-                        open={editOpen}
-                        onClose={() => setEditOpen(false)}
-                        entry={entry}
-                        onSuccess={() => { onClose(); window.location.reload(); }} />
+                    <EntryEditModal open={editOpen} onClose={() => setEditOpen(false)} entry={entry} onSuccess={() => { onClose(); window.location.reload(); }} />
                     {showDeptRegist && (
-                        <DeptRegistModal
-                            entry_idx={entry.entry_idx}
-                            onClose={() => setShowDeptRegist(false)}
-                            onSuccess={() => {
-                                axios
-                                    .get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`)
-                                    .then(res => setDeptList(res.data.data || []))
-                            }}
-                        />
+                        <DeptRegistModal entry_idx={entry.entry_idx} onClose={() => setShowDeptRegist(false)} onSuccess={() => {
+                            axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`).then(res => setDeptList(res.data.data || []))
+                        }} />
                     )}
-                    {editDeptOpen && selectedDept &&
-                        <DeptEditModal
-                            entry_idx={entry.entry_idx}
-                            dept={selectedDept}
-                            onClose={() => setEditDeptOpen(false)}
-                            onSuccess={() => { axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`)
-                                .then(res => setDeptList(res.data.data || [])) }} />}
+                    {editDeptOpen && selectedDept && (
+                        <DeptEditModal entry_idx={entry.entry_idx} dept={selectedDept} onClose={() => setEditDeptOpen(false)} onSuccess={() => {
+                            axios.get(`http://localhost:8080/accountDeptList/${entry.entry_idx}/detail`).then(res => setDeptList(res.data.data || []))
+                        }} />
+                    )}
                 </div>
 
-                {/* 오른쪽: 전표 파일/분개 PDF 미리보기 */}
                 <div style={modalRightPreviewStyle}>
                     {selectedFile && (
                         <>
-                            <h3 style={titleStyle}>미리보기</h3>
+                            <h3 style={titleStyle}>📄 전표 미리보기</h3>
                             {selectedFile.type === 'pdf' ? (
                                 <iframe src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} width="100%" height="500px" style={previewStyle} />
                             ) : (
@@ -223,9 +194,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                             <h3 style={titleStyle}>📄 분개 PDF 미리보기</h3>
                             <iframe src={deptPreviewUrl} width="100%" height="500px" style={previewStyle} />
                             <div style={{ marginTop: 10, textAlign: 'right' }}>
-                                <button className="entryList-fabBtn gray" onClick={() => setDeptPreviewUrl(null)}>
-                                    닫기
-                                </button>
+                                <button className="entryList-fabBtn gray" onClick={() => setDeptPreviewUrl(null)}>닫기</button>
                             </div>
                         </>
                     )}
@@ -237,54 +206,26 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
 export default EntryDetailModal
 
-// 🔧 스타일 정의
 const modalOverlayStyle = {
-    position: 'fixed',
-    left: 0,
-    top: 0,
-    width: '100vw',
-    height: '100vh',
-    background: 'rgba(0,0,0,0.3)',
-    zIndex: 1000,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
+    position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center'
 }
 
 const modalContentWrapperStyle = {
-    display: 'flex',
-    background: '#fff',
-    borderRadius: '10px',
-    width: '75vw',
-    height: '85vh',
-    overflow: 'hidden',
-    position: 'relative'
+    display: 'flex', background: '#fff', borderRadius: '10px', width: '75vw', height: '85vh', overflow: 'hidden', position: 'relative'
 }
 
 const modalLeftPanelStyle = {
-    flex: 1.2,
-    padding: '30px',
-    overflowY: 'auto',
-    borderRight: '1px solid #eee'
+    flex: 1.2, padding: '30px', overflowY: 'auto', borderRight: '1px solid #eee'
 }
 
 const modalRightPreviewStyle = {
-    flex: 0.8,
-    padding: '20px',
-    backgroundColor: '#f9f9f9',
-    overflowY: 'auto'
+    flex: 0.8, padding: '20px', backgroundColor: '#f9f9f9', overflowY: 'auto'
 }
 
 const titleStyle = {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    marginBottom: '16px',
-    textAlign: 'center'
+    fontSize: '18px', fontWeight: 'bold', marginBottom: '16px', textAlign: 'center'
 }
 
 const previewStyle = {
-    width: '100%',
-    maxHeight: '500px',
-    border: '1px solid #ccc',
-    borderRadius: '8px'
+    width: '100%', maxHeight: '500px', border: '1px solid #ccc', borderRadius: '8px'
 }

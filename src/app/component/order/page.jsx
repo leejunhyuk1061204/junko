@@ -246,7 +246,7 @@ const OrderListPage = () => {
                         <tr key={order.order_idx} className='cursor-pointer' onClick={()=>setDetailOrderOpen({boolean:true,idx:order.order_idx})}>
                             {/*<td><input type='checkbox'/></td>*/}
                             <td>{order.order_idx}</td>
-                            <td>{order.product_name} 외 {order.cnt-1}개 상품</td>
+                            <td>{order.product_name} {order.cnt === 1 ?'': `외 ${order.cnt-1}개 상품`}</td>
                             <td>{order.custom_name}</td>
                             <td>{order.warehouse_name}</td>
                             <td>{order.price}</td>

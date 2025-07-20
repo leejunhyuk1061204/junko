@@ -111,6 +111,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
                                 showCancel: false,
                                 onConfirm: () => {
                                     getSalesList();
+                                    handleClose();
                                 }
                             });
                         } else if(result.length > 0 && result.some(v=>v === false)){
@@ -119,6 +120,10 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
                                 msg1: '변경 실패',
                                 msg2: '주문 변경에 실패했습니다.',
                                 showCancel: false,
+                                onConfirm: () => {
+                                    getSalesList();
+                                    handleClose();
+                                }
                             });
                         }
                     }, 100);
@@ -128,6 +133,10 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
                             msg1: '오류',
                             msg2: err.response?.data?.message || err.message,
                             showCancel: false,
+                            onConfirm: () => {
+                                getSalesList();
+                                handleClose();
+                            }
                         });
                     }
 
