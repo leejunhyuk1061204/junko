@@ -13,7 +13,7 @@ import format from "date-fns/format";
 import parse from "date-fns/parse";
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from "date-fns/getDay";
-import {router} from "next/client";
+import {useRouter} from "next/navigation";
 
 const locales = {
     'ko': ko,
@@ -36,6 +36,7 @@ const MainPage = () => {
     const {openModal} = useAlertModalStore();
     const {chartData, loading, fetchMainChart} = useMainChartStore();
     const {fetchSchedules} = useScheduleStore();
+    const router = useRouter();
 
     useEffect(() => {
         const token = sessionStorage.getItem("token");
@@ -57,7 +58,7 @@ const MainPage = () => {
             });
             return;
         }
-        router.push('/schedule'); // SPA
+        location.href = "/component/schedule";
     };
 
     const [summaryData, setSummaryData] = useState(null);

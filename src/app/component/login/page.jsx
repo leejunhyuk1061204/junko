@@ -35,7 +35,6 @@ const LoginPage = () => {
     const toggleLogin = async () =>{
         try {
             const {data} = await axios.post('http://localhost:8080/login',{user_id:login.id,pw:login.pw});
-            console.log(data);
             if(data.success) {
                 sessionStorage.setItem('loginId', login.id);
                 sessionStorage.setItem('token', data.token);
@@ -63,7 +62,6 @@ const LoginPage = () => {
             ...login,
             [name]: value
         });
-        console.log(login);
     }
 
     // 찾기 form 입력
@@ -87,7 +85,6 @@ const LoginPage = () => {
 
     // 엔터
     const loginEnter = (e) => {
-        console.log(e.keyCode);
         if(e.keyCode===13){
             toggleLogin();
         }
@@ -95,9 +92,8 @@ const LoginPage = () => {
 
     return (
         <div>
-            <Header/>
-            <div className='wrap main-back padding-120 flex justify-content-center page-background'>
-                <div className='max-width-400'>
+            <div className='wrap main-back flex justify-content-center page-background'>
+                <div className='max-width-400' style={{margin: 'auto'}}>
                     <div>
                         <img src="/logo.png" alt="logo" />
                     </div>
@@ -105,9 +101,9 @@ const LoginPage = () => {
                         /*로그인 화면*/
                     <div className='flex flex-direction-col'>
                         <div><p className='text-align-left '>아이디</p></div>
-                        <div className='margin-bottom-10'><input type='text' placeholder='아이디를 입력하세요' value={login.id} name='id' onChange={e=>loginChange(e)}/></div>
+                        <div className='login-id'><input type='text' placeholder='아이디를 입력하세요' value={login.id} name='id' onChange={e=>loginChange(e)}/></div>
                         <div><p className='text-align-left '>비밀번호</p></div>
-                        <div className='margin-bottom-10'><input type='password' placeholder='비밀번호를 입력하세요' value={login.pw} name='pw' onChange={e=>loginChange(e)} onKeyUp={e=>loginEnter(e)}/></div>
+                        <div className='login-pw'><input type='password' placeholder='비밀번호를 입력하세요' value={login.pw} name='pw' onChange={e=>loginChange(e)} onKeyUp={e=>loginEnter(e)}/></div>
                         {/*<div><p className='text-align-left '>부서</p></div>*/}
                         {/*<div className='margin-y-10'>*/}
                         {/*    <select className='width-100 login-select' id='dept' onChange={e=>loginChange(e)}>*/}

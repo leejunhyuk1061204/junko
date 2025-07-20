@@ -2,29 +2,599 @@
 
 import Header from "@/app/header";
 import '../../globals.css';
-import {useChartStore} from "@/app/zustand/store";
-import {useEffect} from "react";
+import { Bar, Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip, Legend, ArcElement } from 'chart.js';
+import {useAlertModalStore, useCategoryStore, useChartStore, useDatePickerStore} from "@/app/zustand/store";
+import React, {useEffect, useRef, useState} from "react";
+import format from "date-fns/format";
+import {FaRegCalendarCheck} from "react-icons/fa6";
+import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
+import {Chart} from "chart.js/auto";
+import FilterBar from '../chart/FilterBar';
 
-const Chart = () => {
-    const {fetchChart, chartData, loading} = useChartStore();
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ArcElement);
+const tabList = [
+    '매출 분석',
+    '재고/입출고 분석',
+    '주문/반품 분석',
+    '정산/마진 분석',
+];
+const donutColors = [
+    '#7FB7E5', // 하늘
+    '#F6DA9C', // 노랑
+    '#C98DDA', // 보라
+    '#90D5CE', // 연청록
+    '#F2B183', // 살구
+    '#F4A1A1', // 핑크
+    '#A3D9A5', // 연두
+    '#9E91E7', // 연보라
+];
 
+export default function SalesChart() {
+
+    const [activeTab, setActiveTab] = useState('매출 분석');
+    const [startDate, setStartDate] = useState(new Date());
+    const [selectedParent, setSelectedParent] = useState(null);
+    const [selectedSub, setSelectedSub] = useState(null);
+
+    const {openDatePicker, closeDatePicker} = useDatePickerStore();
+    const {openModal, closeModal} = useAlertModalStore();
+    const {chartData, fetchChart, loading} = useChartStore();
+    const {parentCategories, subCategories, fetchCategories} = useCategoryStore();
+
+    const monthlySalesRef = useRef(null);
+    const parentCateRef = useRef(null);
+    const subCateRef = useRef(null);
+    const inventoryTurnoverRef = useRef(null);
+    const inOutProdRef = useRef(null);
+    const orderTrendRef = useRef(null);
+    const orderStatusRef = useRef(null);
+    const returnRateRef = useRef(null);
+
+    const filteredSubCategories = selectedParent
+        ? subCategories.filter(sub => sub.category_parent === selectedParent.category_idx)
+        : [];
+
+    // 필터 적용
     useEffect(() => {
+        fetchCategories();
         fetchChart({
-            categoryIdx: chartData.categoryIdx,
-            startDate: chartData.startDate,
-            endDate: chartData.endDate,
+            categoryIdx: null,
+            startDate: null,
+            endDate: null,
         });
     }, []);
 
-    if (loading) return <p>loading...</p>;
+    // 전년도 대비 매출 (막대)
+    useEffect(() => {
+        if (!chartData.getMonthlySalesYoY?.length) return;
+
+        monthlySalesRef.current?.destroy();
+        const labels = Array.from({ length: 12 }, (_, i) => `${(i + 1).toString().padStart(2, '0')}월`);
+        const monthMap = new Map(chartData.getMonthlySalesYoY.map(item => [item.month.slice(5), item]));
+        const thisYear = labels.map(m => monthMap.get(m.slice(0, 2))?.sales_this_year || 0);
+        const lastYear = labels.map(m => monthMap.get(m.slice(0, 2))?.sales_last_year || 0);
+        const ctx = document.getElementById("monthlySales");
+        if (!ctx) return;
+
+        monthlySalesRef.current?.destroy();
+
+        monthlySalesRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: '올해 매출',
+                        data: thisYear,
+                        backgroundColor: '#D98E04',
+                        borderRadius: 4,
+                        barThickness: 28,
+                    },
+                    {
+                        label: '작년 매출',
+                        data: lastYear,
+                        backgroundColor: '#A3A380',
+                        borderRadius: 4,
+                        barThickness: 28,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {grid: {display: false}},
+                    y: {beginAtZero: true},
+                }
+            }
+        });
+    }, [chartData.getMonthlySalesYoY]);
+
+    // 상위 카테고리별 매출 (도넛)
+    useEffect(() => {
+        const parentData = chartData.getSalesByCategory?.filter(item => !item.category_parent);
+        if (!parentData?.length) return;
+        const ctx = document.getElementById("parentCate");
+        if (!ctx) return;
+
+        parentCateRef.current?.destroy();
+
+        parentCateRef.current = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: parentData.map(d => d.category_name),
+                datasets: [{
+                    data: parentData.map(d => d.sales),
+                    backgroundColor: donutColors.slice(0, parentData.length),
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 14,
+                            padding: 12
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const value = ctx.raw.toLocaleString();
+                                const label = ctx.label || '';
+                                return `${label}: ${value}원`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }, [chartData.getSalesByCategory]);
+
+    // 하위 카테고리별 매출 (도넛)
+    useEffect(() => {
+        if (!selectedParent || !chartData.getSalesByCategory?.length) return;
+        const subData = chartData.getSalesByCategory.filter(item => item.category_parent === selectedParent.category_idx);
+        if (!subData?.length) return;
+        const ctx = document.getElementById("subCate");
+        if (!ctx) return;
+
+        subCateRef.current?.destroy();
+
+        subCateRef.current = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: subData.map(d => d.category_name),
+                datasets: [{
+                    data: subData.map(d => d.sales),
+                    backgroundColor: donutColors.slice(0, subData.length),
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 14,
+                            padding: 12
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                const value = ctx.raw.toLocaleString();
+                                const label = ctx.label || '';
+                                return `${label}: ${value}원`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }, [selectedParent, chartData.getSalesByCategory]);
+
+    // 재고 회전율 (가로 막대)
+    useEffect(() => {
+        if (activeTab !== '재고/입출고 분석') return;
+        const turnoverData = chartData.getInventoryTurnoverStats;
+        if (!turnoverData?.length) return;
+        const ctx = document.getElementById("inventoryTurnover");
+        if (!ctx) return;
+
+        inventoryTurnoverRef.current?.destroy();
+
+        const labels = turnoverData.map(item => item.product_name);
+        const currentStock = turnoverData.map(item => item.current_stock);
+        const totalSales = turnoverData.map(item => item.total_sales);
+        const turnoverRatio = turnoverData.map(item => item.turnover_ratio);
+
+        inventoryTurnoverRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {label: '현재 재고 수', data: currentStock, backgroundColor: '#74c0fc',},
+                    {label: '최근 30일 출고 수', data: totalSales, backgroundColor: '#40c057',},
+                    {label: '회전율', data: turnoverRatio, backgroundColor: '#fab005',}
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y',
+                scales: {
+                    x: {beginAtZero: true},
+                    y: {ticks: {autoSkip: false}}
+                },
+                plugins: {
+                    legend: {position: 'bottom'},
+                    tooltip: {
+                        callbacks: {
+                            label: ctx =>`${ctx.dataset.label}: ${ctx.raw}`
+                        }
+                    }
+                }
+            }
+        }, 0);
+    }, [chartData.getInventoryTurnoverStats]);
+
+    // 입출고 현황 (라인)
+    useEffect(() => {
+        if (activeTab !== '재고/입출고 분석') return;
+        const inOutData = chartData.getInOutProduct;
+        if (!inOutData?.length) return;
+        const ctx = document.getElementById("inOutProd");
+        if (!ctx) return;
+
+        inOutProdRef.current?.destroy();
+
+        const labels = inOutData.map(item => item.product_name);
+        const receiveCnt = inOutData.map(item => item.total_receive_cnt || 0);
+        const shipmentCnt = inOutData.map(item => item.total_shipment_cnt || 0);
+
+        inOutProdRef.current = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: '입고',
+                        data: receiveCnt,
+                        borderColor: '#228be6',
+                        backgroundColor: '#228be6',
+                        fill: false,
+                        tension: 0.3
+                    },
+                    {
+                        label: '출고',
+                        data: shipmentCnt,
+                        borderColor: '#fa5252',
+                        backgroundColor: '#fa5252',
+                        fill: false,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {y: {beginAtZero: true}},
+                plugins: {legend: {position: 'bottom'},}
+            }
+        }, 0);
+    }, [chartData.getInOutProduct]);
+
+    // 주문/취소 (라인)
+    useEffect(() => {
+        if (activeTab !== '주문/반품 분석') return;
+        const orderStatData = chartData.getRecentOrderStats;
+        if (!orderStatData?.length) return;
+        const ctx = document.getElementById("orderTrend");
+        if (!ctx) return;
+
+        orderTrendRef.current?.destroy();
+
+        const labels = data.map(item => item.date);
+        const orderCnt = data.map(item => item.order_cnt);
+        const cancelCnt = data.map(item => item.cancel_cnt);
+
+        orderTrendRef.current = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: '주문 수',
+                        data: orderCnt,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: '#ff6384',
+                        fill: true,
+                        tension: 0.3
+                    },
+                    {
+                        label: '취소 수',
+                        data: cancelCnt,
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderColor: '#ffa94d',
+                        fill: true,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {position: 'top'},}
+            }
+        });
+    }, [chartData.getRecentOrderStats]);
+
+    // 주문 상태 분포 (막대)
+    useEffect(() => {
+        if (activeTab !== '주문/반품 분석') return;
+        const orderStatusData = chartData.getOrderStatus;
+        if (!orderStatusData?.length) return;
+        const ctx = document.getElementById("orderStatus");
+        if (!ctx) return;
+
+        orderStatusRef.current?.destroy();
+
+        const labels = data.map(item => item.date);
+        const complete = data.map(item => item.complete || 0);
+        const shipping = data.map(item => item.shipping || 0);
+        const shipped = data.map(item => item.shipped || 0);
+        const cancelled = data.map(item => item.cancelled || 0);
+
+        orderStatusRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    { label: '결제완료', data: complete, backgroundColor: '#4dabf7' },
+                    { label: '배송중', data: shipping, backgroundColor: '#9775fa' },
+                    { label: '배송완료', data: shipped, backgroundColor: '#51cf66' },
+                    { label: '결제취소', data: cancelled, backgroundColor: '#ff6b6b' },
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {position: 'bottom'},},
+                scales: {
+                    x: {stacked: true},
+                    y: {stacked: true, beginAtZero: true},
+                },
+            }
+        });
+    }, [chartData.getOrderStatus]);
+
+    // 반품률 (막대)
+    useEffect(() => {
+        if (activeTab !== '주문/반품 분석') return;
+        const returnRateData = chartData.returnProduct;
+        if (!returnRateData?.length) return;
+        const ctx = document.getElementById("returnRate");
+        if (!ctx) return;
+
+        returnRateRef.current?.destroy();
+
+        const labels = data.map(item => item.product_name);
+        const values = data.map(item => item.return_cnt);
+
+        returnRateRef.current = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels,
+                datasets: [
+                    {
+                        label: '반품 수',
+                        data: values,
+                        backgroundColor: '#69db7c'
+                    },
+                    {
+                        type: 'line',
+                        label: '반품 추이',
+                        data: values,
+                        borderColor: '#228be6',
+                        tension: 0.3,
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {legend: {position: 'bottom'},},
+                scales: {y: {beginAtZero: true},}
+            }
+        });
+    }, [chartData.returnProduct]);
+
+    // datePicker 핸들러
+    const handleDatePicker = () => {
+        openDatePicker({
+            mode:'range',
+            modeSelect:true,
+            initialDates:[null,null],
+            onConfirm:((_,value)=>{
+                if(Array.isArray(value)){
+                    const categoryIdx = selectedSub?.id ?? selectedParent?.id ?? null;
+                    const [start,end] = value;
+                    const formattedStart = start ? format(start, 'yyyy-MM-dd') : null;
+                    const formattedEnd = end ? format(end, 'yyyy-MM-dd') : null;
+                    setStartDate(formattedStart);
+
+                    fetchChart({
+                        categoryIdx: selectedSub?.id ?? selectedParent?.id ?? null,
+                        startDate: formattedStart,
+                        endDate: formattedEnd,
+                    });
+                }
+                closeDatePicker();
+            })
+        });
+    };
+
+    if (loading) return <div style={{marginTop: '30px'}}>Loading...</div>;
 
     return (
-        <div>
+        <div className='wrap chart-background'>
             <Header />
-            <h2>Dashboard</h2>
+            <h3 className="dashboard-tab-wrapper text-align-left margin-bottom-10 margin-30">
+                {tabList.map((tab) => (
+                    <span
+                        key={tab}
+                        className={`dashboard-header ${activeTab === tab ? 'dashboard-header-active' : ''}`}
+                        onClick={() => setActiveTab(tab)}
+                    >{tab}</span>
+                ))}
+            </h3>
+            {activeTab === '매출 분석' && (
+                <div className="dash-list-back">
+                    <FilterBar
+                        selectedParent={selectedParent}
+                        setSelectedParent={setSelectedParent}
+                        selectedSub={selectedSub}
+                        setSelectedSub={setSelectedSub}
+                        handleDatePicker={handleDatePicker}
+                        parentCategories={parentCategories}
+                        filteredSubCategories={filteredSubCategories}
+                    />
+                    <div className="dashboard-row">
+                        <div className="dashboard-box">
+                            <h3>전년 대비 총 매출 현황</h3>
+                            <canvas id="monthlySales"></canvas>
+                        </div>
+                    </div>
+                    <div className="dash-row">
+                        <div className="dash-card">
+                            <div className="dash-box">
+                                <h3>카테고리별 매출 분포</h3>
+                                <canvas id="parentCate"></canvas>
+                            </div>
+                        </div>
+                        <div className="dash-card">
+                            <div className="dash-box">
+                                <h3>상품별 매출 분포</h3>
+                                <canvas id="subCate"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {activeTab === '재고/입출고 분석' && (
+                <div className="dash-list-back">
+                    <div className="flex gap_10 align-center justify-right margin-bottom-10">
+                        <FilterBar
+                            selectedParent={selectedParent}
+                            setSelectedParent={setSelectedParent}
+                            selectedSub={selectedSub}
+                            setSelectedSub={setSelectedSub}
+                            handleDatePicker={handleDatePicker}
+                            parentCategories={parentCategories}
+                            filteredSubCategories={filteredSubCategories}
+                        />
+                    </div>
+                    <div className="dash-stack-container">
+                        <div className="dash-ctn-box">
+                            <h3>재고 회전율 데이터</h3>
+                            <canvas id="inventoryTurnover"></canvas>
+                        </div>
+                        <div className="dash-ctn-box">
+                            <h3>입출고 현황</h3>
+                            <canvas id="inOutProd"></canvas>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {activeTab === '주문/반품 분석' && (
+                <div className="dash-list-back">
+                    <div className="flex gap_10 align-center justify-right margin-bottom-10">
+                        <FilterBar
+                            selectedParent={selectedParent}
+                            setSelectedParent={setSelectedParent}
+                            selectedSub={selectedSub}
+                            setSelectedSub={setSelectedSub}
+                            handleDatePicker={handleDatePicker}
+                            parentCategories={parentCategories}
+                            filteredSubCategories={filteredSubCategories}
+                        />
+                    </div>
+                    <div className="order-chart-row">
+                        <div className="order-chart-card">
+                            <div className="order-chart-box">
+                                <h3>주문 / 반품 트렌드</h3>
+                                <canvas id="orderTrend"></canvas>
+                            </div>
+                        </div>
+                        <div className="order-chart-card">
+                            <div className="order-chart-box">
+                                <h3>주문 상태 현황</h3>
+                                <canvas id="orderStatus"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="order-chart-row">
+                        <div className="order-chart-card">
+                            <div className="order-chart-box">
+                                <h3>반품률 현황</h3>
+                                <canvas id="returnRate"></canvas>
+                            </div>
+                        </div>
+                        <div className="order-chart-card">
+                            <div className="order-chart-box">
+                                <h3>누적 지연 건수</h3>
+                                {chartData.getDelayedProduct?.length > 0 ? (
+                                    <table className="custom-table">
+                                        <thead>
+                                        <tr>
+                                            <th>카테고리</th>
+                                            <th>상품명</th>
+                                            <th>결제일</th>
+                                            <th>상태</th>
+                                            <th>지연일</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {chartData.getDelayedProduct.map((item, idx) => (
+                                            <tr key={idx}>
+                                                <td>{item.category_name}</td>
+                                                <td>{item.product_name}</td>
+                                                <td>{item.payment_date}</td>
+                                                <td>{item.status}</td>
+                                                <td>{item.delay_days}일</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                ) : (
+                                    <p>지연된 상품이 없습니다.</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {activeTab === '정산/마진 분석' && (
+                <div className="dash-list-back">
+                    <div className="flex gap_10 align-center justify-right margin-bottom-10">
+                        <FilterBar
+                            selectedParent={selectedParent}
+                            setSelectedParent={setSelectedParent}
+                            selectedSub={selectedSub}
+                            setSelectedSub={setSelectedSub}
+                            handleDatePicker={handleDatePicker}
+                            parentCategories={parentCategories}
+                            filteredSubCategories={filteredSubCategories}
+                        />
+                    </div>
+
+                </div>
+            )}
 
         </div>
     );
-}
 
-export default Chart;
+}

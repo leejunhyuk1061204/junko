@@ -72,15 +72,7 @@ const mainMenus = [
     },
     {
         title: '통계',
-        submenu: [
-            { label: '매출 / 매입', href: '/' },
-            { label: '판매 순위', href: '/' },
-            { label: '고객 / 주문 / 공급사', href: '/' },
-            { label: '재고', href: '/' },
-            { label: 'KPI 달성', href: '/' },
-            { label: '맞춤형 리포트', href: '/' },
-        ],
-        href: '/',
+        href: './chart',
     },
     {
         title: '문서 / 업무 관리',
@@ -185,13 +177,15 @@ const Header = () => {
                                 {menu.title}
                             </p>
                         </Link>
-                        <div className='submenu'>
-                            {menu.submenu.map((sub, subIdx) => (
-                                <Link href={sub.href} key={subIdx}>
-                                    <p className="submenu-item">{sub.label}</p>
-                                </Link>
-                            ))}
-                        </div>
+                        {menu.submenu && menu.submenu.length > 0 && (
+                            <div className='submenu'>
+                                {menu.submenu.map((sub, subIdx) => (
+                                    <Link href={sub.href} key={subIdx}>
+                                        <p className="submenu-item">{sub.label}</p>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ))}
             </nav>
