@@ -1128,6 +1128,10 @@ input[type='text']:focus,input[type='password']:focus{
     background-size: 12px;
 }
 
+.fileBox {
+    display: none;
+}
+
 /* ------------------------------- 카테고리 관련 ------------------------------- */
 .category-container {
     display: flex;
