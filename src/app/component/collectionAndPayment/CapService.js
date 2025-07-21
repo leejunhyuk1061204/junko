@@ -20,7 +20,7 @@ export const searchCap = (dto) => {
     return axios.post(`${API}/searchCap`, dto);
 };
 
-export const searchCapPaged = (dto) => {
+export const searchCapPaged = async (dto) => {
     return axios.post(`${API}/searchCapPaged`, dto);
 };
 

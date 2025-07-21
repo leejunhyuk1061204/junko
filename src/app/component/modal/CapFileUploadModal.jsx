@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { uploadCapFile } from '../collectionAndPayment/CapService';
 import '../../globals.css';
+import axios from "axios";
 
 const CapFileUploadModal = ({ capIdx, onClose, onSuccess }) => {
     const [file, setFile] = useState(null);
@@ -14,7 +15,9 @@ const CapFileUploadModal = ({ capIdx, onClose, onSuccess }) => {
         }
 
         try {
-            await uploadCapFile(capIdx, file);
+            const formData = new FormData();
+            formData.append('file', file);
+            await axios.post(`http://localhost:8080/file/upload/collection/${capIdx}`, formData);
             alert('파일 업로드 완료!');
             onSuccess();
             onClose();

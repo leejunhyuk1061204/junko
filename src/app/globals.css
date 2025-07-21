@@ -2407,11 +2407,6 @@ input[type='number']:focus {
     color: #333;
 }
 
-.cap-btn.red {
-    background-color: #f56565;
-    color: white;
-}
-
 /* 검색 영역 */
 .cap-searchBar {
     display: flex;
@@ -2527,6 +2522,61 @@ input[type='number']:focus {
 }
 .cap-fab:hover {
     background-color: #2563eb;
+}
+
+.cap-fab-del {
+    position: fixed;
+    bottom: 30px;
+    right: 110px;
+    background-color: #E86060;
+    color: white;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.2s;
+}
+
+.cap-file-btn{
+    height: 32px;
+    padding: 0 12px;
+    width: 70px;
+    background-color: #3182f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.cap-file-del-btn {
+    cursor: pointer;
+    text-align: center;
+    width: 60px;
+    height: 32px;
+    padding: 0 12px;
+    background-color: #E86060;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.capDetail-pdf-placeholder{
+    width: 100%;
+    height: 500px;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 16px;
+    background-color: #f9f9f9;
 }
 
 /*----------------------입금 / 지급 상세 보기 (PDF 우측 배치용)----------------------*/
