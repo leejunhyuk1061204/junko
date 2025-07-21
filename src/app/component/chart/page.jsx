@@ -12,6 +12,7 @@ import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui
 import {Chart} from "chart.js/auto";
 import FilterBar from '../chart/FilterBar';
 import {useRouter} from "next/navigation";
+import axios from "axios";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend, ArcElement);
 const tabList = [
@@ -628,6 +629,56 @@ export default function SalesChart() {
         });
     };
 
+    // EXCEL download
+    const handleDownloadExcel = async () => {
+        try {
+            const token = sessionStorage.getItem('token');
+            const categoryIdx = selectedSub?.category_idx ?? selectedParent?.category_idx ?? null;
+            const params = new URLSearchParams();
+            if (categoryIdx) params.append('categoryIdx', categoryIdx);
+
+            const res = await axios.get(`http://localhost:8080/chart/excel?${params.toString()}`, {
+                responseType: "blob",
+                headers: {Authorization: token}
+            });
+
+            const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'chart_data.xlsx');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }catch(err) {
+            console.error('엑셀 꽝!!!!!', err);
+        }
+    }
+
+    // PDF download
+    const handleDownloadPdf = async () => {
+        try {
+            const token = sessionStorage.getItem('token');
+            const categoryIdx = selectedSub?.category_idx ?? selectedParent?.category_idx ?? null;
+            const params = new URLSearchParams();
+            if (categoryIdx) params.append('categoryIdx', categoryIdx);
+
+            const res = await axios.get(`http://localhost:8080/chart/pdf?${params.toString()}`, {
+                responseType: "blob",
+                headers: {Authorization: token}
+            });
+
+            const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'chart_data.pdf');
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        }catch(err) {
+            console.error('PDF FAILED!!!!!', err);
+        }
+    }
+
     if (loading) return <div style={{marginTop: '30px'}}>Loading...</div>;
 
     return (
@@ -841,7 +892,10 @@ export default function SalesChart() {
                     </div>
                 </div>
             )}
-
+            <div className="chart-download">
+                <button onClick={handleDownloadExcel}>Ecxel DOWNLOAD</button>
+                <button onClick={handleDownloadPdf}>PDF DOWNLOAD</button>
+            </div>
         </div>
     );
 
