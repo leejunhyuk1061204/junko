@@ -32,81 +32,6 @@ export const useAlertModalStore = create((set) => ({
         }),
 }));
 
-// 메인 대시보드
-export const useMainChartStore = create((set) => ({
-    categoryIdx: null,
-    startDate: null,
-    endDate: null,
-    chartData: {
-        getDaySales: [],
-        getRecentOrderStats: [],
-        getPopularProduct: [],
-        getHighReturnProduct: [],
-        getInventoryTurnoverStats: [],
-        returnProduct: [],
-        returnProductThisMonth: [],
-        getDelayedProduct: [],
-        getOrderStatus: [],
-        getProductMarginStats: [],
-        getNetProfitStats: [],
-        getInOutProduct: [],
-        getMonthlySalesYoY: [],
-        getLowStockProduct: [],
-        getSalesThisMonth: [],
-        newOrder: [],
-        getPendingShipment: [],
-        getShippedToday: [],
-        getReceiveThisMonth: [],
-        getSalesByCategory: [],
-    },
-    loading: false,
-
-    setCategoryIdx: (categoryIdx) => set({categoryIdx}),
-    setStartDate: (startDate) => set({startDate}),
-    setEndDate: (endDate) => set({endDate}),
-
-    fetchMainChart: async () => {
-        set({loading: true});
-        try {
-            const {categoryIdx, startDate, endDate} = useMainChartStore.getState();
-            const {data} = await axios.post('http://localhost:8080/list/chart', {categoryIdx, startDate, endDate});
-
-            if (data.success) {
-                set({
-                    chartData: data.chartData || {},
-                    loading: false,
-                });
-            }else {
-                console.warn('차트 응답 성공 여부 false:', data);
-                set({ loading: false });
-            }
-        } catch (err) {
-            console.error("차트 데이터 요청 실패 : ", err);
-            set({loading: false});
-        }
-    },
-}));
-
-// 메인 캘린더
-export const useScheduleStore = create((set) => ({
-    scheduleList: [],
-    fetchSchedules: async(token) => {
-        try {
-            const user_id = typeof window !== "undefined" ? sessionStorage.getItem("user_id") : "";
-            const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : "";
-
-            const {data} = await axios.post('http://localhost:8080/schedule/list', {},
-                {headers: {Authorization: token}});
-            if (data.success && data.loginYN) {
-                set({scheduleList: data.list});
-            }
-        }catch (err) {
-            console.error("일정 불러오기 실패 : ", err);
-        }
-    },
-    clearSchedules: () => set({scheduleList: []}),
-}));
-
 // 차트
 export const useChartStore = create((set) => ({
     categoryIdx: null,
@@ -143,7 +68,6 @@ export const useChartStore = create((set) => ({
     fetchChart: async (filters = {}) => {
         set({ loading: true });
         try {
-            const user_id = typeof window !== "undefined" ? sessionStorage.getItem("user_id") : "";
             const token = typeof window !== "undefined" ? sessionStorage.getItem("token") : "";
 
             const {categoryIdx, startDate, endDate} = filters;
@@ -151,7 +75,6 @@ export const useChartStore = create((set) => ({
                 categoryIdx: categoryIdx ?? null,
                 startDate: startDate ?? null,
                 endDate: endDate ?? null,
-                user_id,
             };
 
             const {data} = await axios.post('http://localhost:8080/list/chart', payload,

@@ -2865,16 +2865,17 @@ input[type='number']:focus {
     padding: 16px;
     display: flex;
     flex-direction: column;
+
 }
 
 .table-card.delayed {
     flex: 0 0 60%;
-    height: 325px;
+    height: 360px;
 }
 
 .table-card.return {
     flex: 0 0 38.5%;
-    height: 325px;
+    height: 360px;
 }
 
 .table-wrapper {
@@ -2978,6 +2979,12 @@ input[type='number']:focus {
     font-size: 12px;
     color: #999;
     padding-top: 4px;
+}
+
+.main-calendar-box .rbc-event,
+.main-calendar-box .rbc-event-content {
+    color: #f4f4f4;
+    background-color: #B4B9B0 !important;
 }
 
 .calendar-sunday {
@@ -3543,6 +3550,7 @@ input[type='number']:focus {
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     text-align: center;
     min-height: 400px;
+    max-height: 450px;
 }
 
 .dash-table {
@@ -3565,4 +3573,22 @@ input[type='number']:focus {
 .dash-table th {
     background-color: #f2f2f2;
     font-weight: bold;
+}
+
+.resetBtn {
+    width: fit-content;
+    cursor: pointer;
+    border: 1px solid #6c757d;
+    border-radius: 4px;
+    padding: 5px 8px;
+    background-color: #6b7280;
+    font-size: 13px;
+    color: #fff;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px 0;
+    color: #999;
+    font-size: 16px;
 }
