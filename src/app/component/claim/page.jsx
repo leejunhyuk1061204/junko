@@ -9,6 +9,7 @@ import ProductModal from "@/app/component/modal/ProductModal";
 import ShipmentUpdateModal from "@/app/component/modal/ShipmentUpdateModal";
 import {useAlertModalStore, useDatePickerStore} from "@/app/zustand/store";
 import axios from "axios";
+import HandleClaimModal from "@/app/component/modal/handleClaimModal";
 
 const sortOptions = [
     { id: 1, name: '최신순' , orderColumn : 'claim_date', orderDirection: 'desc' },
@@ -45,6 +46,7 @@ const ClaimPage = () => {
     const [checkboxChecked, setCheckboxChecked] = useState({});
 
     const [claimList, setClaimList] = useState([]);
+    const [handleClaimModalOpen,setHandleClaimModalOpen] = useState({bool:false,claim:null});
 
     useEffect(() => {
         getClaimList();
@@ -122,10 +124,6 @@ const ClaimPage = () => {
         setCheckboxChecked(updated);
     }
 
-    useEffect(() => {
-        console.log('checkboxChecked',checkboxChecked);
-    }, [checkboxChecked]);
-
     // datePicker 핸들러
     const handleDatePicker = () => {
         openDatePicker({
@@ -193,10 +191,10 @@ const ClaimPage = () => {
                         </div>
                     </div>
                     <div>
-                    <table className={'checkbox-table text-overflow-table'}>
+                    <table className={'text-overflow-table'}>
                         <thead>
                             <tr>
-                                <th><input type='checkbox' checked={claimList.length > 0 && claimList.every((_, i) => checkboxChecked[i]?.bool === true)} onChange={e=>allCheck(e.target.checked)}/></th>
+                                {/*<th><input type='checkbox' checked={claimList.length > 0 && claimList.every((_, i) => checkboxChecked[i]?.bool === true)} onChange={e=>allCheck(e.target.checked)}/></th>*/}
                                 <th>클레임 번호</th>
                                 <th>주문번호</th>
                                 <th>타입</th>
@@ -206,8 +204,8 @@ const ClaimPage = () => {
                         </thead>
                         <tbody>
                             {claimList?.map((claim,i)=>(
-                                <tr key={i}>
-                                    <td><input type='checkbox' checked={checkboxChecked[i]?.bool ?? false} onChange={()=>setCheckboxChecked(prev=>({...prev,[i]:{bool:!checkboxChecked[i]?.bool,idx:shipment.shipment_idx}}))}/></td>
+                                <tr key={i} className='cursor-pointer' onClick={()=>setHandleClaimModalOpen({bool:true,claim:claim})}>
+                                    {/*<td><input type='checkbox' checked={checkboxChecked[i]?.bool ?? false} onChange={()=>setCheckboxChecked(prev=>({...prev,[i]:{bool:!checkboxChecked[i]?.bool,idx:shipment.shipment_idx}}))}/></td>*/}
                                     <td>{claim.claim_idx}</td>
                                     <td>{claim.sales_idx}</td>
                                     <td>{claim.type}</td>
@@ -236,6 +234,7 @@ const ClaimPage = () => {
                 </div>
             </div>
             {/*<ProductModal open={productModalOpen.bool} onClose={()=>setProductModalOpen({bool:false,idx:0})} sales_idx={productModalOpen.idx}/>*/}
+            <HandleClaimModal open={handleClaimModalOpen.bool} onClose={()=>setHandleClaimModalOpen({bool:false,claim:null})} claim={handleClaimModalOpen.claim} getClaimList={getClaimList}/>
         </div>
     );
 };
