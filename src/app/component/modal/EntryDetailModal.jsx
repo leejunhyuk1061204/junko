@@ -40,11 +40,11 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                 logMsg: `${newStatus} 처리됨`
             }, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: token
                 }
 
             });
-            console.log("✅ newStatus:", newStatus)
+            console.log("newStatus:", newStatus)
             if (res.data.success) {
                 alert(`${newStatus} 처리 완료!`)
                 onClose()
@@ -95,7 +95,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                         setSelectedFile(file)
                                         setDeptPreviewUrl(null)
                                     }}>미리보기</button>
-                                    <button className="entryList-fabBtn gray small" onClick={() => window.open(`http://localhost:8080/entryFileDown/${file.file_idx}`, '_blank')}>다운로드</button>
+                                    <button className="entryList-fabBtn gray small" onClick={() => window.open(`http://localhost:8080/download/file/${file.file_idx}`, '_blank')}>다운로드</button>
                                 </div>
                             ))
                         ) : (
@@ -182,7 +182,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                     {selectedFile && (
                         <>
                             <h3 style={titleStyle}>📄 전표 미리보기</h3>
-                            {selectedFile.type === 'pdf' ? (
+                            {selectedFile.type === 'entry' ? (
                                 <iframe src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} width="100%" height="500px" style={previewStyle} />
                             ) : (
                                 <img src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} alt="첨부" style={previewStyle} />

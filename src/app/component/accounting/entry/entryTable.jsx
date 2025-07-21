@@ -5,12 +5,27 @@ export default function EntryTable({ entries, selectedList, setSelectedList, onC
             : [...selectedList, entry_idx])
     }
 
+    const isAllChecked = entries.length > 0 && selectedList.length === entries.length;
+
+    const handleAllCheck = (e) => {
+        if (e.target.checked) {
+            const allIds = entries.map(entry => entry.entry_idx);
+            setSelectedList(allIds);
+        } else {
+            setSelectedList([]);
+        }
+    };
+
     return (
         <table className="entryList-table">
             <thead>
             <tr>
-                <th>선택</th>
-                <th>NO</th>
+                <th>
+                    NO.<input
+                    type="checkbox"
+                    checked={isAllChecked}
+                    onChange={handleAllCheck}/>
+                </th>
                 <th>전표 번호</th>
                 <th>전표 유형</th>
                 <th>거래처명</th>
@@ -24,13 +39,15 @@ export default function EntryTable({ entries, selectedList, setSelectedList, onC
             </tr>
             </thead>
             <tbody>
-            {entries.map((entry, index) => (
+            {entries.length > 0 ? (
+                <>
+                    {entries.map((entry, index) => (
                 <tr key={entry.entry_idx} className={selectedList.includes(entry.entry_idx) ? 'selected' : ''}>
                     <td>
+                        {index + 1}
                         <input type="checkbox" checked={selectedList.includes(entry.entry_idx)}
                                onChange={() => toggleSelect(entry.entry_idx)} />
                     </td>
-                    <td>{index + 1}</td>
                     <td className="entryList-entryNo link" onClick={() => onClickEntry(entry.entry_idx)}>
                         {`JV${entry.entry_date?.replaceAll('-', '')}${String(entry.entry_idx).padStart(3, '0')}`}
                     </td>
@@ -45,6 +62,18 @@ export default function EntryTable({ entries, selectedList, setSelectedList, onC
                     <td>{entry.approved ? '○' : 'X'}</td>
                 </tr>
             ))}
+            {entries.length < 10 &&
+                Array.from({ length: 10 - entries.length }).map((_, i) => (
+                    <tr key={`empty-${i}`}>
+                        <td colSpan="11" style={{ height: '36px' }}>&nbsp;</td>
+                    </tr>
+                ))}
+            </>
+            ) : (
+            <tr>
+                <td colSpan="11">데이터가 없습니다.</td>
+            </tr>
+            )}
             </tbody>
         </table>
     )

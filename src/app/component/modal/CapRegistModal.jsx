@@ -66,7 +66,7 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
             }
 
             alert('등록 완료!');
-            onSuccess(); // ✅ 등록 후 리스트 갱신
+            onSuccess(); // 등록 후 리스트 갱신
             onClose();
         } catch (err) {
             console.error('등록 실패:', err);

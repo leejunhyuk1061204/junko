@@ -5,7 +5,7 @@ import Header from "@/app/header";
 import "./globals.css";
 import {Bar, Line} from "react-chartjs-2";
 import {Chart} from "chart.js/auto";
-import {useAlertModalStore, useMainChartStore, useScheduleStore} from "@/app/zustand/store";
+import {useAlertModalStore, useChartStore} from "@/app/zustand/store";
 import {ko} from "date-fns/locale/ko";
 import {Calendar, dateFnsLocalizer} from "react-big-calendar";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -14,6 +14,7 @@ import parse from "date-fns/parse";
 import startOfWeek from 'date-fns/startOfWeek';
 import getDay from "date-fns/getDay";
 import {useRouter} from "next/navigation";
+import axios from "axios";
 
 const locales = {
     'ko': ko,
@@ -34,34 +35,22 @@ const MainPage = () => {
     }
 
     const {openModal} = useAlertModalStore();
-    const {chartData, loading, fetchMainChart} = useMainChartStore();
-    const {fetchSchedules} = useScheduleStore();
+    const {chartData, fetchChart, loading} = useChartStore();
     const router = useRouter();
 
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         console.log("토큰있음?",token);
         if (token) {
-            fetchSchedules(token);
+            fetchChart({})
         }
-    }, []);
+    }, [fetchChart]);
 
     // 달력 클릭 시
-    const handleDateClick = () => {
-        const token = sessionStorage.getItem("token");
-        if (!token) {
-            openModal({
-                svg: '❗',
-                msg1: '해당 페이지 접근 불가',
-                msg2: '로그인 후 이용해주세요.',
-                showCancel: false,
-            });
-            return;
-        }
-        location.href = "/component/schedule";
-    };
+    const handleDateClick = () => location.href = "/component/schedule";
 
     const [summaryData, setSummaryData] = useState(null);
+    const [events, setEvents] = useState([]);
 
     const monthlySalesChartRef = useRef(null);
     const daySalesChartRef = useRef(null);
@@ -69,8 +58,52 @@ const MainPage = () => {
     const popularProductChartRef = useRef(null);
 
     useEffect(() => {
-        fetchMainChart({});
-    }, [fetchMainChart]);
+        const fetchMainSchedule = async () => {
+            try {
+                const token = sessionStorage.getItem("token");
+                if (!token) return;
+
+                const [personalRes, deptRes, workRes] = await Promise.all([
+                    axios.post('http://localhost:8080/schedule/list', {type: 'personal'}, {headers: {Authorization: token}}),
+                    axios.post('http://localhost:8080/schedule/list', {type: 'dept'}, {headers: {Authorization: token}}),
+                    axios.post('http://localhost:8080/schedule/list', {type: 'work'}, {headers: {Authorization: token}}),
+                ]);
+
+                const allEvents = [
+                    ...personalRes.data.list,
+                    ...deptRes.data.list,
+                    ...workRes.data.list,
+                ];
+
+                const mappedEvents = allEvents.map(item => {
+                    const haveTime = item.start_time && item.end_time;
+                    const workStatus = [2, 3, 5, 6].includes(item.label_idx);
+                    return {
+                        id: item.schedule_idx,
+                        title: workStatus
+                            ? `${item.user ?? item.user_name} - ${item.label_name}`
+                            : item.title,
+                        start: new Date(
+                            haveTime
+                                ? `${item.start_date}T${item.start_time}`
+                                : `${item.start_date}T00:00:00`,
+                        ),
+                        end: new Date(
+                            haveTime
+                                ? `${item.end_date}T${item.end_time}`
+                                : `${item.end_date}T23:59:59`
+                        ),
+                        allDay: !haveTime,
+                        resource: item
+                    };
+                });
+                setEvents(mappedEvents);
+            } catch (err) {
+                console.error("메인캘린터 불러오기 실패:", err);
+            }
+        };
+        fetchMainSchedule();
+    }, []);
 
     useEffect(() => {
         if (!chartData || !chartData.getSalesThisMonth || !Array.isArray(chartData.getSalesThisMonth)) return;
@@ -94,19 +127,16 @@ const MainPage = () => {
         // 전년 대비 월별 매출
         const monthlySalesChart = (rawData) => {
             const ctx = document.getElementById("monthlySalesChart");
-            const labels = Array.from({length: 12}, (_, i) => {
-                const month = (i+1).toString().padStart(2, "0");
-                return `${month}`;
-            });
-            const dataMap = new Map(rawData.map(item => [item.month, item]));
-            const thisYear = labels.map(month => dataMap.get(month)?.sales_this_year?? 0);
-            const lastYear = labels.map(month => dataMap.get(month)?.sales_last_year?? 0);
+            const labels = Array.from({ length: 12 }, (_, i) => `${(i + 1).toString().padStart(2, '0')}월`);
+            const monthMap = new Map(chartData.getMonthlySalesYoY.map(item => [item.month.slice(5), item]));
+            const thisYear = labels.map(m => monthMap.get(m.slice(0, 2))?.sales_this_year || 0);
+            const lastYear = labels.map(m => monthMap.get(m.slice(0, 2))?.sales_last_year || 0);
 
             if (ctx && !monthlySalesChartRef.current) {
                 monthlySalesChartRef.current = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: labels,
+                        labels,
                         datasets: [
                             {
                                 type: 'bar',
@@ -133,10 +163,8 @@ const MainPage = () => {
                                 beginAtZero: true,
                                 grid: {display: false},
                                 ticks: {
-                                    maxRotation: 45,
-                                    minRotation: 20,
-                                    autoSkip: false,
-                                    callback: function(value) {return value.length > 8 ? value.slice(0, 8) + '…' : value;}}
+                                    maxRotation: 20,
+                                    minRotation: 20,}
                             },
                             y: {beginAtZero: true,}
                         }
@@ -335,6 +363,7 @@ const MainPage = () => {
                                 views={['month']}
                                 onSelectSlot={handleDateClick}
                                 selectable
+                                events={events}
                                 style={{height: 400}}
                                 components={{toolbar: CustomToolbar,}}
                             />
@@ -412,7 +441,6 @@ const MainPage = () => {
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

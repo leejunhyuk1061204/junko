@@ -2417,11 +2417,6 @@ input[type='number']:focus {
     color: #333;
 }
 
-.cap-btn.red {
-    background-color: #f56565;
-    color: white;
-}
-
 /* 검색 영역 */
 .cap-searchBar {
     display: flex;
@@ -2537,6 +2532,61 @@ input[type='number']:focus {
 }
 .cap-fab:hover {
     background-color: #2563eb;
+}
+
+.cap-fab-del {
+    position: fixed;
+    bottom: 30px;
+    right: 110px;
+    background-color: #E86060;
+    color: white;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 1000;
+    transition: background-color 0.2s;
+}
+
+.cap-file-btn{
+    height: 32px;
+    padding: 0 12px;
+    width: 70px;
+    background-color: #3182f6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.cap-file-del-btn {
+    cursor: pointer;
+    text-align: center;
+    width: 60px;
+    height: 32px;
+    padding: 0 12px;
+    background-color: #E86060;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.capDetail-pdf-placeholder{
+    width: 100%;
+    height: 500px;
+    border: 2px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 16px;
+    background-color: #f9f9f9;
 }
 
 /*----------------------입금 / 지급 상세 보기 (PDF 우측 배치용)----------------------*/
@@ -2875,16 +2925,17 @@ input[type='number']:focus {
     padding: 16px;
     display: flex;
     flex-direction: column;
+
 }
 
 .table-card.delayed {
     flex: 0 0 60%;
-    height: 325px;
+    height: 360px;
 }
 
 .table-card.return {
     flex: 0 0 38.5%;
-    height: 325px;
+    height: 360px;
 }
 
 .table-wrapper {
@@ -2988,6 +3039,12 @@ input[type='number']:focus {
     font-size: 12px;
     color: #999;
     padding-top: 4px;
+}
+
+.main-calendar-box .rbc-event,
+.main-calendar-box .rbc-event-content {
+    color: #f4f4f4;
+    background-color: #B4B9B0 !important;
 }
 
 .calendar-sunday {
@@ -3425,7 +3482,7 @@ input[type='number']:focus {
     overflow: hidden;
     background-color: white;
     padding: 10px 20px;
-    margin: 30px;
+    margin: 16px;
     overflow-x: auto;
 }
 
@@ -3553,6 +3610,7 @@ input[type='number']:focus {
     box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     text-align: center;
     min-height: 400px;
+    max-height: 450px;
 }
 
 .dash-table {
@@ -3575,4 +3633,46 @@ input[type='number']:focus {
 .dash-table th {
     background-color: #f2f2f2;
     font-weight: bold;
+}
+
+.resetBtn {
+    width: fit-content;
+    cursor: pointer;
+    border: 1px solid #6c757d;
+    border-radius: 4px;
+    padding: 5px 8px;
+    background-color: #6b7280;
+    font-size: 13px;
+    color: #fff;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px 0;
+    color: #999;
+    font-size: 16px;
+}
+
+.chart-download {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 16px;
+}
+
+.chart-download button {
+    width: fit-content;
+    cursor: pointer;
+    border: 1px solid #6c757d;
+    border-radius: 4px;
+    padding: 5px 8px;
+    background-color: #6b7280;
+    font-size: 12px;
+    color: #fff;
+}
+
+.chart-download button:hover {
+    background-color: #5A5F6B;
 }

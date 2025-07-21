@@ -1,7 +1,8 @@
 'use client';
-import React, { useState } from 'react';
-import { TbSearch } from 'react-icons/tb';
+import React, {useState} from 'react';
+import {TbSearch} from 'react-icons/tb';
 import '../../globals.css';
+import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 
 const CapSearchBar = ({ onSearch }) => {
     const [form, setForm] = useState({
@@ -15,9 +16,27 @@ const CapSearchBar = ({ onSearch }) => {
         sortOrder: 'desc',
     });
 
+    const typeOptions = [
+        { id: '', name: '전체 유형' },
+        { id: '수금', name: '수금' },
+        { id: '지급', name: '지급' }
+    ];
+
+    const sortByOptions = [
+        { id: 'date', name: '일자' },
+        { id: 'amount', name: '금액' }
+    ];
+
+    const sortOrderOptions = [
+        { id: 'desc', name: '내림차순' },
+        { id: 'asc', name: '오름차순' }
+    ];
+
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
+        const updated = { ...form, [name]: value };
+        setForm(updated);
+        onSearch(updated);
     };
 
     const handleSubmit = (e) => {
@@ -42,11 +61,31 @@ const CapSearchBar = ({ onSearch }) => {
 
     return (
         <form className="entryList-searchBar" onSubmit={handleSubmit}>
-            <select name="type" value={form.type} onChange={handleChange}>
-                <option value="">전체 유형</option>
-                <option value="수금">수금</option>
-                <option value="지급">지급</option>
-            </select>
+            <Listbox
+                value={form.type}
+                onChange={(value) => {
+                    const updated = { ...form, type: value };
+                    setForm(updated);
+                    onSearch(updated);
+                }}
+            >
+                <div className="custom-select-wrapper">
+                    <ListboxButton className="custom-select-btn">
+                        {typeOptions.find(opt => opt.id === form.type)?.name || '전체 유형'}
+                    </ListboxButton>
+                    <ListboxOptions className="custom-select-options">
+                        {typeOptions.map(option => (
+                            <ListboxOption
+                                key={option.id}
+                                value={option.id}
+                                className="custom-select-option-item"
+                            >
+                                {option.name}
+                            </ListboxOption>
+                        ))}
+                    </ListboxOptions>
+                </div>
+            </Listbox>
 
             <input
                 type="text"
@@ -85,15 +124,58 @@ const CapSearchBar = ({ onSearch }) => {
                 onChange={handleChange}
             />
 
-            <select name="sortBy" value={form.sortBy} onChange={handleChange}>
-                <option value="date">일자</option>
-                <option value="amount">금액</option>
-            </select>
 
-            <select name="sortOrder" value={form.sortOrder} onChange={handleChange}>
-                <option value="desc">내림차순</option>
-                <option value="asc">오름차순</option>
-            </select>
+            <Listbox
+                value={form.sortBy}
+                onChange={(value) => {
+                    const updated = { ...form, sortBy: value };
+                    setForm(updated);
+                    onSearch(updated);
+                }}
+            >
+                <div className="custom-select-wrapper">
+                    <ListboxButton className="custom-select-btn">
+                        {sortByOptions.find(opt => opt.id === form.sortBy)?.name}
+                    </ListboxButton>
+                    <ListboxOptions className="custom-select-options">
+                        {sortByOptions.map(option => (
+                            <ListboxOption
+                                key={option.id}
+                                value={option.id}
+                                className="custom-select-option-item"
+                            >
+                                {option.name}
+                            </ListboxOption>
+                        ))}
+                    </ListboxOptions>
+                </div>
+            </Listbox>
+
+            <Listbox
+                value={form.sortOrder}
+                onChange={(value) => {
+                    const updated = { ...form, sortOrder: value };
+                    setForm(updated);
+                    onSearch(updated);
+                }}
+            >
+                <div className="custom-select-wrapper">
+                    <ListboxButton className="custom-select-btn">
+                        {sortOrderOptions.find(opt => opt.id === form.sortOrder)?.name}
+                    </ListboxButton>
+                    <ListboxOptions className="custom-select-options">
+                        {sortOrderOptions.map(option => (
+                            <ListboxOption
+                                key={option.id}
+                                value={option.id}
+                                className="custom-select-option-item"
+                            >
+                                {option.name}
+                            </ListboxOption>
+                        ))}
+                    </ListboxOptions>
+                </div>
+            </Listbox>
 
             <button type="submit" className="entryList-fabBtn blue" title="검색">
                 <TbSearch size={16} />

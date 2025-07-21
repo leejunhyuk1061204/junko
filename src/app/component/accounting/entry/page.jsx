@@ -46,11 +46,11 @@ export default function Page() {
         }
     }
 
-    const handleSearch = async () => {
+    const handleSearch = async (customFilter = filter) => {
         try {
             setIsSearching(true)
             const res = await axios.post('http://localhost:8080/accountListSearch', {
-                ...filter,
+                ...customFilter,
                 page: 1,
                 limit: limit
             })
@@ -87,9 +87,17 @@ export default function Page() {
 
         if (!window.confirm(`총 ${selectedList.length}건 삭제할까요?`)) return
 
+        const token = sessionStorage.getItem('token')
+
         try {
             for (const idx of selectedList) {
-                await axios.delete(`http://localhost:8080/accountDelete/${idx}`)
+                await axios.put(
+                    `http://localhost:8080/accountDelete/${idx}`,{},{
+                        headers: {
+                            Authorization: token
+                        }
+                    }
+                )
             }
             alert('삭제 완료!')
             setSelectedList([])
