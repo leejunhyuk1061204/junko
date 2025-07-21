@@ -1,6 +1,6 @@
 'use client'
 
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 import Header from "@/app/header";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions,} from "@headlessui/react";
@@ -181,6 +181,15 @@ export default function TemplatePage() {
         router.push("./template/insert");
     };
 
+    const handleReset = () => {
+        setSort(sortOptions[0].id);
+        setSelectedSort(sortOptions[0]);
+        setSelectedCategory(categoryOptions[0]);
+        setCategory("");
+        setSearch("");
+        fetchList(currentPage);
+    };
+
     return (
         <div className="productPage wrap page-background">
             <Header />
@@ -236,15 +245,15 @@ export default function TemplatePage() {
                     onChange={(e) => setSearch(e.target.value)}
                     className="product-input-search"
                 />
-
                 <button className="product-search-btn" onClick={handleSearch}><TbSearch className="product-search-icon"/></button>
+                <button type="button" className="temp-reset-btn" onClick={handleReset}>초기화</button>
             </div>
 
             {/* 리스트 영역 */}
                 <table className="template-table margin-bottom-20">
                     <thead>
                     <tr>
-                        <th>
+                        <th style={{ overflow: "visible", width: "35px", }}>
                             <input
                                 type="checkbox"
                                 checked={isAllChecked}

@@ -257,6 +257,10 @@ input[type='number']:focus {
     justify-content: center;
 }
 
+.justify-content-flex-end {
+    justify-content: flex-end;
+}
+
 .justify-content-between{
     justify-content: space-between;
 }
@@ -271,6 +275,10 @@ input[type='number']:focus {
 
 .justify-left {
     justify-content: flex-start;
+}
+
+.items-center {
+    align-items: center;
 }
 
 .box-sizing {
@@ -822,6 +830,24 @@ input[type='number']:focus {
     width: auto;
     height: 20px;
     color: white;
+}
+
+.temp-reset-btn {
+    height: 32px;
+    padding: 0 12px;
+    background-color: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap; /*줄바꿈 X*/
+    flex-shrink: 0; /*줄어들지 않게*/
+    min-width: fit-content; /*내용 크기에 핏하게*/
+}
+
+.temp-reset-btn:hover {
+    background-color: #4A4F58;
 }
 
 .product-modal-select{
@@ -1448,6 +1474,10 @@ input[type='number']:focus {
     background-color: #f4f4f4;
     font-weight: bold;
 }
+
+/*.template-table th:first-child {
+    overflow: visible; !* 체크박스 hidden 방지 *!
+}*/
 
 .template-btn-small {
     padding: 4px 8px;
@@ -2985,10 +3015,6 @@ input[type='number']:focus {
     transition: color 0.2s ease;
 }
 
-.custom-toolbar button:hover {
-    color: #1976d2;
-}
-
 .custom-label {
     font-size: 16px;
     font-weight: 600;
@@ -3636,6 +3662,10 @@ input[type='number']:focus {
     color: #fff;
 }
 
+.resetBtn:hover {
+    background-color: #5A5F6B;
+}
+
 .empty-message {
     text-align: center;
     padding: 40px 0;
@@ -3665,4 +3695,104 @@ input[type='number']:focus {
 
 .chart-download button:hover {
     background-color: #5A5F6B;
+}
+
+
+/* =============== 문서 =============== */
+/* 문서 리스트 */
+.doc-select-container{
+    position: relative;
+    width: fit-content;
+    cursor: pointer;
+    height: 32px;
+}
+
+.doc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: white;
+    border: 1px solid #ccc;
+}
+
+.doc-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.doc-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    height: 3em;
+    text-align: center;
+    text-overflow: ellipsis;
+    border: 1px solid #ddd;
+    padding: 10px;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.doc-table td:last-child {
+    white-space: nowrap;    /* 버튼 줄바꿈 방지 */
+    min-width: 120px;       /* 두 버튼이 최소 들어갈 수 있는 너비 확보 */
+}
+
+.doc-insert-btn {
+    height: 32px;
+    padding: 0 12px;
+    background-color: #1c64f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    white-space: nowrap; /*줄바꿈 X*/
+    flex-shrink: 0; /*줄어들지 않게*/
+    min-width: fit-content; /*내용 크기에 핏하게*/
+}
+
+.doc-insert-btn:hover {
+    background-color: #1752cc;
+}
+
+.doc-insert-icon {
+    color: white;
+    margin-right: 4px;
+    vertical-align: middle;
+}
+
+.status-label {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+    text-align: center;
+    font-weight: bold;
+}
+
+/*미확인*/
+.status-unread {
+    background-color: #F0F0F0;
+    color: #555555;
+}
+/*결재중*/
+.status-approving {
+    background-color: #FFF4E5;
+    color: #AD6800;
+}
+/*승인완료*/
+.status-approved {
+    background-color: #E6F4EA;
+    color: #237804;
+}
+/*반려*/
+.status-rejected {
+    background-color: #FAEAEA;
+    color: #A8071A;
 }
