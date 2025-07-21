@@ -464,6 +464,16 @@ input[type='number']:focus {
     border:none !important;
 }
 
+.border-none-important:hover {
+    border:none !important;
+    outline:none !important;
+}
+
+.border-none-important:focus {
+    border:none !important;
+    outline:none !important;
+}
+
 .max-h-60 {
     max-height: 15rem;
 }

@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
 
-const ProductModal = ({open,onClose,receive_idx,sales_idx}) => {
+const ProductModal = ({open,onClose,receive_idx,sales_idx,claim_idx}) => {
 
     const [productList,setProductList] = useState([]);
 
@@ -16,6 +16,11 @@ const ProductModal = ({open,onClose,receive_idx,sales_idx}) => {
         getSalesProductList();
     }, [sales_idx]);
 
+    useEffect(() => {
+        if(claim_idx === 0 || typeof claim_idx === 'undefined') return;
+        getReturnProductList();
+    }, [claim_idx]);
+
     // 입고상품 리스트
     const getReceiveProductList = async() => {
         if(receive_idx === 0 || typeof receive_idx === 'undefined') return;
@@ -28,6 +33,14 @@ const ProductModal = ({open,onClose,receive_idx,sales_idx}) => {
     const getSalesProductList = async() => {
         if(sales_idx === 0 || typeof sales_idx === 'undefined') return;
         const {data} = await axios.post('http://localhost:8080/salesProduct/list',{sales_idx:sales_idx})
+        console.log(data);
+        setProductList(data.list);
+    }
+
+    // 반품상품 리스트
+    const getReturnProductList = async() => {
+        if(claim_idx === 0 || typeof claim_idx === 'undefined') return;
+        const {data} = await axios.get(`http://localhost:8080/returnReceiveProduct/list/${claim_idx}`);
         console.log(data);
         setProductList(data.list);
     }
@@ -114,6 +127,14 @@ const ProductModal = ({open,onClose,receive_idx,sales_idx}) => {
                                        <th>{product.product_name || ''}</th>
                                        <th>{product.combined_name ? product.combined_name : '없음'}</th>
                                        <th>{product.product_cnt}</th>
+                                   </tr>
+                               ))}
+                               {claim_idx !== 0 && typeof claim_idx !== 'undefined' && productList?.map((product) => (
+                                   <tr key={product.return_product_idx}>
+                                       <th>{product.product_idx || ''}</th>
+                                       <th>{product.product_name || ''}</th>
+                                       <th>{product.combined_name ? product.combined_name : '없음'}</th>
+                                       <th>{product.return_cnt}</th>
                                    </tr>
                                ))}
                                </tbody>
