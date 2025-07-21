@@ -40,11 +40,11 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                 logMsg: `${newStatus} 처리됨`
             }, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: token
                 }
 
             });
-            console.log("✅ newStatus:", newStatus)
+            console.log("newStatus:", newStatus)
             if (res.data.success) {
                 alert(`${newStatus} 처리 완료!`)
                 onClose()

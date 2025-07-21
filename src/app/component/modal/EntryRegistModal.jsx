@@ -102,12 +102,34 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
 
             const res = await axios.post("http://localhost:8080/accountRegist", data, {
                 headers: {
-                    Authorization: `Bearer ${token}`,
+                    Authorization: token,
                     user_idx: user_idx
                 }
             });
 
             if (res.data.success) {
+                if (res.data.success && res.data.entry_idx && file) {
+                    const uploadData = new FormData();
+                    uploadData.append("file", file);
+
+                    const uploadRes = await axios.post(
+                        `http://localhost:8080/file/upload/account/${res.data.entry_idx}`,
+                        uploadData,
+                        {
+                            headers: {
+                                Authorization: token,
+                                user_idx: user_idx,
+                                "Content-Type": "multipart/form-data",
+                            },
+                        }
+                    );
+
+                    if (!uploadRes.data.success) {
+                        alert("파일 업로드 실패");
+                        return;
+                    }
+                }
+
                 alert("전표 등록 완료!");
                 onSuccess();
                 onClose();
@@ -118,6 +140,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
             alert("등록 중 오류 발생");
             console.error(e);
         }
+
     }
 
         if (!open) return null

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getCapDetail, getCapLog, generatePdf } from '../collectionAndPayment/CapService';
 import '../../globals.css';
+import axios from "axios";
 
 const CapDetailModal = ({ capIdx, onClose }) => {
     const [detail, setDetail] = useState(null);
@@ -27,10 +28,20 @@ const CapDetailModal = ({ capIdx, onClose }) => {
 
     const generatePdfPreview = async () => {
         try {
-            const res = await generatePdf(capIdx, 15);
-            const filename = res.data.new_filename || res.data.filename;
-            const webPath = `/files/${filename}`;
-            setPdfUrl(webPath);
+            const res = await axios.get(`http://localhost:8080/file/latest/pdf`, {
+                params: {
+                    type: 'collection',
+                    idx: capIdx
+                }
+            });
+            const filename = res.data?.file?.new_filename;
+            if (!filename){
+                setPdfUrl(null);
+                return;
+            }
+
+            const previewUrl = `http://localhost:8080/pdf/preview/${filename}`;
+            setPdfUrl(previewUrl);
         } catch (e) {
             console.error('PDF 미리보기 실패:', e);
             setPdfUrl(null);
@@ -61,25 +72,12 @@ const CapDetailModal = ({ capIdx, onClose }) => {
                         </tbody>
                     </table>
 
-                    <h4 style={{ marginTop: '20px' }}>🔁 변경 이력</h4>
-                    {logs.length > 0 ? (
-                        <ul>
-                            {logs.map((log) => (
-                                <li key={log.log_Idx}>
-                                    <strong>{log.actionType}</strong> ({log.regDate})
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>이력이 없습니다.</p>
-                    )}
-
                     <button className="entryList-fabBtn gray" onClick={onClose}>닫기</button>
                 </div>
 
                 {/* 우측 */}
                 <div className="capDetail-right">
-                    <h3 className="capDetail-title">📄 PDF 미리보기</h3>
+                    <h3 className="capDetail-title">PDF 미리보기</h3>
                     {loading ? (
                         <p>PDF 생성 중...</p>
                     ) : pdfUrl ? (
@@ -89,7 +87,7 @@ const CapDetailModal = ({ capIdx, onClose }) => {
                             title="PDF 미리보기"
                         />
                     ) : (
-                        <p>PDF 없음 또는 생성 실패</p>
+                        <p className="capDetail-pdf-placeholder">PDF 없음 또는 생성 실패</p>
                     )}
                 </div>
             </div>
