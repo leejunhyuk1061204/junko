@@ -73,76 +73,123 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
         data.append("amount", form.amount);
         data.append("entry_date", form.entry_date);
 
-        try {
-            if (form.custom_name) {
-                const res = await axios.get("http://localhost:8080/custom/findByName", {
-                    params: { name: form.custom_name.trim() }
-                });
-                if (res.data.custom_idx !== undefined) {
-                    data.append("custom_idx", res.data.custom_idx);
-                } else {
-                    alert("유효하지 않은 거래처명입니다!");
-                    return;
-                }
+
+        if (form.custom_name) {
+            const res = await axios.get("http://localhost:8080/custom/findByName", {
+                params: {name: form.custom_name.trim()}
+            });
+            if (res.data.custom_idx !== undefined) {
+                data.append("custom_idx", res.data.custom_idx);
+            } else {
+                alert("유효하지 않은 거래처명입니다!");
+                return;
             }
+        }
 
-            if (form.customer_name) {
-                const res = await axios.get("http://localhost:8080/sales/findByName", {
-                    params: { name: form.customer_name.trim() }
-                });
-                if (res.data.sales_idx !== undefined) {
-                    data.append("sales_idx", res.data.sales_idx);
-                } else {
-                    alert("유효하지 않은 고객명입니다!");
-                    return;
-                }
+        if (form.customer_name) {
+            const res = await axios.get("http://localhost:8080/sales/findByName", {
+                params: {name: form.customer_name.trim()}
+            });
+            if (res.data.sales_idx !== undefined) {
+                data.append("sales_idx", res.data.sales_idx);
+            } else {
+                alert("유효하지 않은 고객명입니다!");
+                return;
             }
+        }
 
-            if (file) data.append("file", file);
+        if (file) data.append("file", file);
 
-            const res = await axios.post("http://localhost:8080/accountRegist", data, {
-                headers: {
-                    Authorization: token,
-                    user_idx: user_idx
+        const res = await axios.post("http://localhost:8080/accountRegist", data, {
+            headers: {
+                Authorization: token,
+                user_idx: user_idx
+            }
+        });
+
+        if (!res.data.success || !res.data.entry_idx) {
+            alert("전표 등록 실패");
+            return;
+        }
+
+        if (res.data.success) {
+            const voucher_idx = res.data.entry_idx; // 전표 번호
+
+            const documentInsertRes = await axios.post("http://localhost:8080/document/insert", {
+                template_idx: 10,
+                user_idx: user_idx,
+                variables: {
+                    entry_idx: voucher_idx,
+                    account_idx: 0,
+                    entry_type: form.entry_type,
+                    amount: form.amount,
+                    entry_date: form.entry_date,
+                    custom_idx: customIdx || 0,
+                    sales_idx: customerIdx || 0,
+                    status: "작성중",
+                    user_idx: user_idx,
+                    del_yn: 0
                 }
             });
 
-            if (res.data.success) {
-                if (res.data.success && res.data.entry_idx && file) {
-                    const uploadData = new FormData();
-                    uploadData.append("file", file);
+            if (documentInsertRes.data.success) {
+                const document_idx = documentInsertRes.data.document_idx;
 
-                    const uploadRes = await axios.post(
-                        `http://localhost:8080/file/upload/account/${res.data.entry_idx}`,
-                        uploadData,
-                        {
-                            headers: {
-                                Authorization: token,
-                                user_idx: user_idx,
-                                "Content-Type": "multipart/form-data",
-                            },
-                        }
-                    );
+                const pdfRes = await axios.post("http://localhost:8080/document/pdf", {
+                    document_idx: document_idx
+                });
 
-                    if (!uploadRes.data.success) {
-                        alert("파일 업로드 실패");
-                        return;
+                console.log("entry_type:", form.entry_type);
+                console.log("amount:", form.amount);
+                console.log("entry_date:", form.entry_date);
+                console.log("custom_name:", form.custom_name);
+                console.log("customer_name:", form.customer_name);
+                console.log("file:", file);
+
+                if (!pdfRes.data.success) {
+                    alert("PDF 생성 실패");
+                    return;
+                }
+            } else {
+                alert("문서 생성 실패");
+                return;
+            }
+
+            // 파일 업로드 (기존 로직 유지)
+            if (res.data.success && voucher_idx && file) {
+                const uploadData = new FormData();
+                uploadData.append("file", file);
+
+                const uploadRes = await axios.post(
+                    `http://localhost:8080/file/upload/account/${voucher_idx}`,
+                    uploadData,
+                    {
+                        headers: {
+                            Authorization: token,
+                            user_idx: user_idx,
+                            "Content-Type": "multipart/form-data",
+                        },
                     }
+                );
+
+                for (let pair of data.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
                 }
 
-                alert("전표 등록 완료!");
-                onSuccess();
-                onClose();
-            } else {
-                alert("등록 실패 또는 로그인 필요");
+                if (!uploadRes.data.success) {
+                    alert("파일 업로드 실패");
+                    return;
+                }
             }
-        } catch (e) {
-            alert("등록 중 오류 발생");
-            console.error(e);
+
+            alert("전표 등록 및 문서 생성 완료!");
+            onSuccess();
+            onClose();
+
+        } else {
+            alert("등록 실패 또는 로그인 필요");
         }
-
     }
-
         if (!open) return null
 
         return (
