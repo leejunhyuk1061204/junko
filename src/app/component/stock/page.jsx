@@ -6,6 +6,7 @@ import {IoIosArrowDown, IoIosArrowUp} from "react-icons/io";
 import Pagination from "react-js-pagination";
 import StockAdjustModal from "@/app/component/modal/StockAdjustModal";
 import {useAlertModalStore} from "@/app/zustand/store";
+import StockHistoryModal from "@/app/component/modal/StockHistoryModal";
 
 const StockPage = () => {
 
@@ -20,6 +21,7 @@ const StockPage = () => {
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [stockAdjustModalOpen, setStockAdjustModalOpen] = useState({bool:false});
+    const [stockHistoryModalOpen, setStockHistoryModalOpen] = useState({bool:false});
 
     useEffect(() => {
         getWarehouseList();
@@ -148,6 +150,43 @@ const StockPage = () => {
         }
     }
 
+    // 재고 히스토리
+    const stockHistory = () =>{
+        if(Object.values(checkboxChecked)?.length === 0){
+            openModal({
+                svg: '❗',
+                msg1: '조정 실패',
+                msg2: '상품을 선택해주세요',
+                showCancel: false,
+            })
+            return;
+        }
+        const filteredList = Object.values(checkboxChecked)?.filter(f=>f.bool === true);
+
+        if(filteredList.length === 0){
+            openModal({
+                svg: '❗',
+                msg1: '조정 실패',
+                msg2: '상품을 선택해주세요',
+                showCancel: false,
+            })
+            return;
+        }
+
+        if(filteredList.length > 1){
+            openModal({
+                svg: '❗',
+                msg1: '조정 실패',
+                msg2: '하나의 상품만 선택해주세요',
+                showCancel: false,
+            })
+            return;
+        }
+        if(filteredList.length === 1){
+            setStockHistoryModalOpen({bool:true,stock:filteredList[0].stock});
+        }
+    }
+
     return (
         <div>
             <div className='productPage wrap page-background'>
@@ -257,17 +296,19 @@ const StockPage = () => {
                                         onChange={(page) => setPage(page)}  // set만!
                                     />
                                 </div>
-                                {group.includes('option') && group.includes('manufacture') && group.includes('expiration') && group.includes('warehouse') && group.includes('zone') &&
                                 <div className='flex justify-right width-fit'>
-                                    <button className='btn cursor-pointer width-fit white-space-nowrap' onClick={stockAdjust}>재고 조정</button>
+                                    <button className='btn cursor-pointer width-fit white-space-nowrap' onClick={stockHistory}>재고 내역</button>
+                                    {group.includes('option') && group.includes('manufacture') && group.includes('expiration') && group.includes('warehouse') && group.includes('zone') &&
+                                        <button className='btn cursor-pointer width-fit white-space-nowrap' onClick={stockAdjust}>재고 조정</button>
+                                    }
                                 </div>
-                                }
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
             <StockAdjustModal open={stockAdjustModalOpen.bool} onClose={()=>setStockAdjustModalOpen({bool:false})} stock={stockAdjustModalOpen.stock} getStockSumList={getStockSumList}/>
+            <StockHistoryModal open={stockHistoryModalOpen.bool} onClose={()=>setStockHistoryModalOpen({bool:false})} stock={stockHistoryModalOpen.stock}/>
         </div>
     );
 };
