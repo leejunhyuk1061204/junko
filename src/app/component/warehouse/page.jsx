@@ -698,8 +698,6 @@ const Warehouse = ({warehouse,zoneList,getWarehouseList,getZoneList,onSelect}) =
                         onClick={(e)=>{e.stopPropagation();setShowZone(!showZone)}}
                     />
                 )}
-
-
             </div>
             {showZone && zoneList.filter(f=>f.warehouse_idx === warehouse.warehouse_idx).length > 0 && zoneList.filter(f=>f.warehouse_idx === warehouse.warehouse_idx).map(zone=>{
                 return (
