@@ -120,15 +120,14 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
                 user_idx: user_idx,
                 variables: {
                     entry_idx: voucher_idx,
-                    account_idx: 0,
+                    entry_code: `JV${form.entry_date.replaceAll('-', '')}${voucher_idx}`,
                     entry_type: form.entry_type,
-                    amount: form.amount,
+                    custom_name: form.custom_name.trim(),
+                    sales_name: form.customer_name.trim(),
+                    amount: Number(form.amount).toLocaleString(),  // "123,400,000"
                     entry_date: form.entry_date,
-                    custom_idx: customIdx || 0,
-                    sales_idx: customerIdx || 0,
                     status: "작성중",
-                    user_idx: user_idx,
-                    del_yn: 0
+                    user_name: sessionStorage.getItem("user_name") || "미지정"
                 }
             });
 
@@ -138,13 +137,6 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
                 const pdfRes = await axios.post("http://localhost:8080/document/pdf", {
                     document_idx: document_idx
                 });
-
-                console.log("entry_type:", form.entry_type);
-                console.log("amount:", form.amount);
-                console.log("entry_date:", form.entry_date);
-                console.log("custom_name:", form.custom_name);
-                console.log("customer_name:", form.customer_name);
-                console.log("file:", file);
 
                 if (!pdfRes.data.success) {
                     alert("PDF 생성 실패");
@@ -229,7 +221,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
                             <th>고객명</th>
                             <td><input type="text" name="customer_name" value={form.customer_name} onChange={handleChange} /></td>
                         </tr>
-                        <tr>
+                        <tr style={{ display: 'none' }}>
                             <th>첨부파일</th>
                             <td><input type="file" onChange={(e) => setFile(e.target.files[0])} /></td>
                         </tr>
