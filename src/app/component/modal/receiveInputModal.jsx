@@ -74,7 +74,7 @@ const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
                         })
                     } else {
                         openModal({
-                            svg: '❗',
+                            svg: '✔',
                             msg1: '변경 성공',
                             msg2: '진행 상태 변경에 성공했습니다',
                             showCancel: false,

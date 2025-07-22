@@ -1,8 +1,11 @@
 'use client'
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
+import {useAlertModalStore} from "@/app/zustand/store";
 
-const ReturnHandleModal = ({open,onClose,return_receive}) => {
+const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
+
+    const {openModal, closeModal} = useAlertModalStore();
 
     const [user, setUser] = useState([]);
     const [selectedUser, setSelectedUser] = useState({});
@@ -12,11 +15,32 @@ const ReturnHandleModal = ({open,onClose,return_receive}) => {
 
     const [zoneList, setZoneList] = useState([]);
     const [zoneFocused, setZoneFocused] = useState({});
-    const [zoneSearch1,setZoneSearch1] = useState('');
+    const [zoneSearch1,setZoneSearch1] = useState([]);
     const [zoneSearch2,setZoneSearch2] = useState('');
 
     const [returnProductList,setReturnProductList] = useState([]);
     const [handleForm,setHandleForm] = useState([]);
+    const [selectedRow, setSelectedRow] = useState(0);
+
+    // 모달이 닫힐 때 상태 초기화
+    const handleClose = () => {
+        setUser([]);
+        setSelectedUser({});
+        setUserSearch('');
+        setUserName('');
+        setUserFocused(false);
+
+        setZoneList([]);
+        setZoneFocused({});
+        setZoneSearch1([]);
+        setZoneSearch2('');
+
+        setReturnProductList([]);
+        setHandleForm([]);
+        setSelectedRow(0);
+
+        onClose();
+    };
 
     useEffect(() => {
         if(return_receive === null) return;
@@ -30,6 +54,7 @@ const ReturnHandleModal = ({open,onClose,return_receive}) => {
         if (!returnProductList || returnProductList.length === 0) return;
         const initialForm = returnProductList.map(p => ({
             product_idx: p.product_idx,
+            product_option_idx:typeof p.product_option_idx === 'undefined'? 0 : p.product_option_idx,
             resell_cnt: 0,
             disposal_cnt: 0,
             disposal_reason: '',
@@ -43,7 +68,12 @@ const ReturnHandleModal = ({open,onClose,return_receive}) => {
                 zone_name:'',
             }))
         )
+        setZoneSearch1(Array(returnProductList.length).fill(''));
     }, [returnProductList]);
+
+    useEffect(() => {
+        console.log('zoneList',zoneList);
+    }, [zoneList]);
 
     // zone 리스트 가져오기
     const getZoneList = async (searchText='') => {
@@ -54,12 +84,12 @@ const ReturnHandleModal = ({open,onClose,return_receive}) => {
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            setZoneSearch2(zoneSearch1);
+            setZoneSearch2(zoneSearch1[selectedRow]);
             // // console.log('유저 검색');
         }, 300);
 
         return () => clearTimeout(timer);
-    }, [zoneSearch1]);
+    }, [zoneSearch1[selectedRow]]);
 
     useEffect(() => {
         getZoneList(zoneSearch2);
@@ -104,10 +134,58 @@ const ReturnHandleModal = ({open,onClose,return_receive}) => {
         });
     }
 
-    // 모달이 닫힐 때 상태 초기화
-    const handleClose = () => {
-        onClose();
-    };
+    // returnHandle 등록
+    const returnHandleInsert = () => {
+        console.log(handleForm);
+        openModal({
+            svg: '❓',
+            msg1: '변경 확인',
+            msg2: '상태를 변경하시겠습니까?',
+            showCancel: true,
+            onConfirm: () => {
+                closeModal();
+                setTimeout(async()=>{
+                    try {
+                        const {data} = await axios.post('http://localhost:8080/returnReceive/update',{
+                            return_receive_idx:return_receive.return_receive_idx,
+                            status:"반품완료",
+                            user_idx:selectedUser,
+                            handle:handleForm
+                        })
+                        console.log(data);
+                        if (!data.success) {
+                            openModal({
+                                svg: '❗',
+                                msg1: '변경 실패',
+                                msg2: '진행 상태 변경에 실패했습니다',
+                                showCancel: false,
+                            })
+                        } else {
+                            openModal({
+                                svg: '✔',
+                                msg1: '변경 성공',
+                                msg2: '진행 상태 변경에 성공했습니다',
+                                showCancel: false,
+                                onConfirm: () => {
+                                    closeModal();
+                                    getReturnList();
+                                    handleClose();
+                                }
+                            })
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        openModal({
+                            svg: '❗',
+                            msg1: '오류 발생',
+                            msg2: '서버 요청 중 문제가 발생했습니다',
+                            showCancel: false,
+                        })
+                    }
+                },100);
+            }
+        })
+    }
 
     if (!open) return null;
 
@@ -223,31 +301,40 @@ const ReturnHandleModal = ({open,onClose,return_receive}) => {
                                                     <td>{typeof product.product_option_idx === 'undefined' ? '없음':product.combined_name}</td>
                                                     <td><input type='number' className='width-100' value={handleForm[i]?.disposal_cnt||''} onChange={(e)=>changeHandleForm(i,'disposal_cnt',e.target.value)}/></td>
                                                     <td><input type='text' className='border-none-important' value={handleForm[i]?.disposal_reason||''} onChange={(e)=>changeHandleForm(i,'disposal_reason',e.target.value)}/></td>
-                                                    <td><input type='number' className='width-100' value={handleForm[i]?.return_cnt||''} onChange={(e)=>changeHandleForm(i,'return_cnt',e.target.value)}/></td>
+                                                    <td><input type='number' className='width-100' value={handleForm[i]?.resell_cnt||''} onChange={(e)=>changeHandleForm(i,'resell_cnt',e.target.value)}/></td>
                                                     <td>
-                                                        {handleForm[i]?.return_cnt === 0 ? '없음':
+                                                        {handleForm[i]?.resell_cnt === 0 ? '없음':
                                                         <div className="listBox-container">
                                                             <input
                                                                 type="text"
                                                                 className="width-100 border rounded"
                                                                 placeholder="보관 장소"
-                                                                value={zoneSearch1}
+                                                                value={zoneSearch1[i]||''}
                                                                 onFocus={() => {
+                                                                        setSelectedRow(i);
                                                                         setZoneFocused(prev => ({...prev, [i]: true}));
-                                                                        setZoneSearch1('');
+                                                                        setZoneSearch1(prev=>{
+                                                                            const copy = [...prev];
+                                                                            copy[i] = '';
+                                                                            return copy;
+                                                                        });
                                                                 }}
                                                                 onBlur={() => setTimeout(() => setZoneFocused(prev=>({...prev,[i]:false})), 120)}
-                                                                disabled={handleForm[i]?.return_cnt === 0}
+                                                                disabled={handleForm[i]?.resell_cnt === 0}
                                                             />
                                                             {zoneFocused[i] ? (<>
-                                                                {zoneList?.length > 0 && handleForm[i]?.return_cnt > 0 && (
+                                                                {zoneList?.length > 0 && handleForm[i]?.resell_cnt > 0 && (
                                                                     <ul className="listBox-option">
                                                                         {zoneList?.map((z) => (
                                                                             <li
                                                                                 key={z.zone_idx}
                                                                                 className="listBox-option-item margin-0"
                                                                                 onClick={() => {
-                                                                                        setZoneSearch1(z.zone_name);
+                                                                                        setZoneSearch1(prev=>{
+                                                                                            const copy = [...prev];
+                                                                                            copy[i] = z.zone_name;
+                                                                                            return copy;
+                                                                                        });
                                                                                         changeHandleForm(i,'zone_idx',z.zone_idx);
                                                                                 }}
                                                                             >
@@ -263,13 +350,14 @@ const ReturnHandleModal = ({open,onClose,return_receive}) => {
                                                         </div>
                                                         }
                                                     </td>
-                                                    <td>{handleForm[i]?.return_cnt === 0 ? '없음':<input className='width-100' type='date' value={handleForm[i]?.manufacture||''} onChange={(e)=>changeHandleForm(i,'manufacture',e.target.value)} disabled={handleForm[i]?.return_cnt === 0}/>}</td>
-                                                    <td>{handleForm[i]?.return_cnt === 0 ? '없음':<input className='width-100' type='date' value={handleForm[i]?.expiration||''} onChange={(e)=>changeHandleForm(i,'expiration',e.target.value)} disabled={handleForm[i]?.return_cnt === 0}/>}</td>
+                                                    <td>{handleForm[i]?.resell_cnt === 0 ? '없음':<input className='width-100' type='date' value={handleForm[i]?.manufacture||''} onChange={(e)=>changeHandleForm(i,'manufacture',e.target.value)} disabled={handleForm[i]?.resell_cnt === 0}/>}</td>
+                                                    <td>{handleForm[i]?.resell_cnt === 0 ? '없음':<input className='width-100' type='date' value={handleForm[i]?.expiration||''} onChange={(e)=>changeHandleForm(i,'expiration',e.target.value)} disabled={handleForm[i]?.resell_cnt === 0}/>}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </table>
                                 </div>
+                                <div className='flex justify-content-center'><button className='btn width-fit' onClick={returnHandleInsert}>등록</button></div>
                             </div>
                         </>
                     </div>

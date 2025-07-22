@@ -29,9 +29,7 @@ const statusFilterList = [
 
 const ReturnPage = () => {
 
-    const {openModal, closeModal} = useAlertModalStore();
     const {openDatePicker, closeDatePicker} = useDatePickerStore();
-    const [receiveList, setReceiveList] = useState([]);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [selectedSort, setSelectedSort] = useState({ id: 1, name: '최신순' , orderColumn : 'receive_date', orderDirection: 'desc' });
@@ -234,7 +232,7 @@ const ReturnPage = () => {
                 </div>
             </div>
             <ProductModal open={productModalOpen.bool} onClose={()=>setProductModalOpen({bool:false,idx:0})} claim_idx={productModalOpen.idx}/>
-            <ReturnHandleModal open={returnHandleModalOpen.bool} onClose={()=>setReturnHandleModalOpen({bool:false,return:null})} return_receive={returnHandleModalOpen.return}/>
+            <ReturnHandleModal open={returnHandleModalOpen.bool} onClose={()=>setReturnHandleModalOpen({bool:false,return:null})} return_receive={returnHandleModalOpen.return} getReturnList={getReturnList}/>
         </div>
     );
 };

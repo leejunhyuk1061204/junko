@@ -2053,6 +2053,7 @@ input[type='number']:focus {
     text-overflow: ellipsis;
 }
 
+.show-dropdown,
 .text-overflow-table tbody td.show-dropdown {
     overflow: visible;
 }
@@ -3805,4 +3806,29 @@ input[type='number']:focus {
 .status-rejected {
     background-color: #FAEAEA;
     color: #A8071A;
+}
+
+.warehouse-div {
+    font-size:20px;
+    font-weight: bold;
+}
+
+.zone-div {
+    font-size:17px;
+    font-weight: normal;
+    width: 50%;
+    border-radius: var(--border-radius);
+    cursor: grab;
+    padding: 15px 30px;
+    transition: all 0.2s ease-in-out;
+}
+.zone-div:hover {
+    background-color: var(--background-color);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dragging-zone {
+    opacity: 0.4;
+    transition: opacity 0.2s;
 }
