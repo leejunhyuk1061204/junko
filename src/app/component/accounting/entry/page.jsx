@@ -148,7 +148,7 @@ export default function Page() {
                                 onChange={(page) => setPage(page)}
                             />
                         </div>
-                        <div className="flex justify-start gap-2 mt-4">
+                        <div className="flex">
                             <button className="entryList-fabBtn blue" onClick={() => setShowRegistModal(true)}>
                                 전표 등록
                             </button>
