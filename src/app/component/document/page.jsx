@@ -8,12 +8,14 @@ import {TbPlus, TbSearch} from "react-icons/tb";
 import Pagination from "react-js-pagination";
 import {useRouter} from "next/navigation";
 import axios from "axios";
-import {FaPlus} from "react-icons/fa6";
-import {useAlertModalStore} from "@/app/zustand/store";
+import {FaPlus, FaRegCalendarCheck} from "react-icons/fa6";
+import {useAlertModalStore, useDatePickerStore} from "@/app/zustand/store";
+import format from "date-fns/format";
 
 export default function DocumentManagePage() {
     const router = useRouter();
     const {openModal, closeModal} = useAlertModalStore();
+    const {openDatePicker,closeDatePicker} = useDatePickerStore();
 
     const sortOptions = [
         { id: "create_date DESC", name: "최신순" },
@@ -41,8 +43,11 @@ export default function DocumentManagePage() {
     const [loading, setLoading] = useState(true);
     const statusOptions = ['전체', '미확인', '결재중', '승인완료', '반려'];
     const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(10);
     const [totalPage, setTotalPage] = useState(1);
+    const [totalCnt, setTotalCnt] = useState(0);
     const [search, setSearch] = useState("");
+    const [selectedDate, setSelectedDate] = useState({start_date: null, end_date: null});
 
     useEffect(() => {
         const stored = sessionStorage.getItem("user_idx");
@@ -53,9 +58,9 @@ export default function DocumentManagePage() {
 
     useEffect(() => {
         if (userIdx !== null) fetchDocuments(1);
-    }, [statusFilter, userIdx]);
+    }, [statusFilter, userIdx, search]);
 
-    const fetchDocuments = async (page = currentPage) => {
+    const fetchDocuments = async (page = currentPage, customDate = selectedDate) => {
         setLoading(true);
         try {
             const {data} = await axios.get('http://localhost:8080/document/list', {
@@ -63,15 +68,17 @@ export default function DocumentManagePage() {
                     user_idx: userIdx,
                     status: statusFilter === '전체' ? '' : statusFilter,
                     keyword: search,
+                    start_date: customDate.start_date || '',
+                    end_date: customDate.end_date || '',
                     order: 'created_date',
                     sort: 'desc',
                     page,
-                    limit: 10,
+                    limit: limit,
                 }
             });
             setDocuments(data.list || []);
-            setCurrentPage(data.currentPage);
-            setTotalPage(data.totalPage);
+            setTotalCnt(data.totalCnt || 0);
+            setCurrentPage(data.currentPage || 1);
             setLoading(false);
         }catch(err) {
             console.error("문서 리스트 실패: ", err);
@@ -110,8 +117,33 @@ export default function DocumentManagePage() {
         setSort(sortOptions[0].id);
         setSelectedSort(sortOptions[0]);
         setStatusFilter('전체');
+        setSelectedDate({ start_date: null, end_date: null });
+        setCurrentPage(1);
+        setSearch("");
         fetchDocuments(currentPage);
     }
+
+    const handleDatePicker = () => {
+        openDatePicker({
+            mode:'range',
+            modeSelect:true,
+            initialDates:[null,null],
+            onConfirm:((_,value) => {
+                if (Array.isArray(value)) {
+                    const [start, end] = value;
+
+                    const newDates = {
+                        start_date: start ? format(start, 'yyyy-MM-dd') : '',
+                        end_date: end ? format(end, 'yyyy-MM-dd') : '',
+                    };
+                    setSelectedDate(newDates);
+                    setCurrentPage(1);
+                    fetchDocuments(1, newDates);
+                }
+                closeDatePicker();
+            })
+        });
+    };
 
     // 미리보기
     const handlePreview = async (doc) => {
@@ -203,6 +235,11 @@ export default function DocumentManagePage() {
                         </Listbox>
                     </div>
 
+                    <div className="doc-select-container">
+                        <button className="product-search-btn" onClick={handleDatePicker}>
+                            <FaRegCalendarCheck className="date-icon"/></button>
+                    </div>
+
                     <input
                         style={{ width: "800px" }}
                         type="text"
@@ -214,7 +251,7 @@ export default function DocumentManagePage() {
                     />
                     <button className="product-search-btn" onClick={handleSearch}><TbSearch className="product-search-icon"/></button>
                     <button type="button" className="temp-reset-btn" onClick={handleReset}>초기화</button>
-                    <button className="doc-insert-btn" onClick={() => router.push("/component/document/insert")}><FaPlus className="doc-insert-icon"/>새 문서 작성</button>
+                    <button className="doc-insert-btn" onClick={() => router.push("/component/document/insert/tempList")}><FaPlus className="doc-insert-icon"/>새 문서 작성</button>
                 </div>
 
                 <div>
@@ -230,13 +267,9 @@ export default function DocumentManagePage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {loading ? (
+                            {documents.length === 0 ? (
                                 <tr>
-                                    <td colSpan="7" className="text-align-center">불러오는 중...</td>
-                                </tr>
-                            ) : documents.length === 0 ? (
-                                <tr>
-                                    <td colSpan="7" className="text-align-center">검색 결과가 없습니다.</td>
+                                    <td colSpan="6" className="text-align-center">검색 결과가 없습니다.</td>
                                 </tr>
                             ) : (
                                 documents.map((doc) => (
@@ -256,13 +289,20 @@ export default function DocumentManagePage() {
                                     </tr>
                                 ))
                             )}
+                            {/*{documents.length < 10 &&
+                                Array.from({ length: 10 - documents.length }).map((_, i) => (
+                                    <tr key={`empty-${i}`}>
+                                        <td colSpan={6} style={{ height: '43px' }}>&nbsp;</td>
+                                    </tr>
+                                ))
+                            }*/}
                         </tbody>
                     </table>
                     <div className="product-pagination flex justify-content-center gap_5 margin-bottom-10">
                         <Pagination
                             activePage={currentPage}
-                            itemsCountPerPage={10}
-                            totalItemsCount={totalPage * 10}
+                            itemsCountPerPage={limit}
+                            totalItemsCount={totalCnt}
                             pageRangeDisplayed={5}
                             onChange={handlePageChange}
                         />
