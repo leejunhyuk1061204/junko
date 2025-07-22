@@ -89,7 +89,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         {files.length ? (
                             files.map(file => (
                                 <div key={file.file_idx} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                                    <strong>첨부파일:</strong>
+                                    <strong>회계전표 문서:</strong>
                                     <span>📎 {file.ori_filename}</span>
                                     <button className="entryList-fabBtn blue small" onClick={() => {
                                         setSelectedFile(file)
@@ -99,7 +99,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                 </div>
                             ))
                         ) : (
-                            <div><strong>첨부파일:</strong> 없음</div>
+                            <div><strong>회계전표 문서:</strong> 없음</div>
                         )}
                     </div>
 
@@ -111,7 +111,14 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
                         <table className="entryDetail-table">
                             <thead>
-                            <tr><th>번호</th><th>계정과목</th><th>차/대변</th><th>금액</th><th>파일</th><th>PDF</th><th>수정/삭제</th></tr>
+                            <tr>
+                                <th style={{ width: '50px' }}>번호</th>
+                                <th style={{ width: '90px' }}>계정과목</th>
+                                <th style={{ width: '70px' }}>차/대변</th>
+                                <th style={{ width: '120px' }}>금액</th>
+                                <th style={{ width: '90px' }}>PDF</th>
+                                <th style={{ width: '160px' }}>수정/삭제</th>
+                            </tr>
                             </thead>
                             <tbody>
                             {deptList.map(dept => (
@@ -120,7 +127,6 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                     <td>{dept.as_name}</td>
                                     <td>{dept.type}</td>
                                     <td>{dept.amount.toLocaleString()}원</td>
-                                    <td>{dept.file_idx ? <a href={`http://localhost:8080/deptfileDown/${dept.file_idx}`} target="_blank">다운</a> : '-'}</td>
                                     <td>
                                         <button className="entryList-fabBtn gray small" onClick={async () => {
                                             const res = await axios.post("http://localhost:8080/accountDeptPdf", {
@@ -128,7 +134,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                                 template_idx: 14
                                             })
                                             if (res.data.success) {
-                                                setDeptPreviewUrl(`http://localhost:8080/entryFileDown/${res.data.file_idx}?preview=true`)
+                                                setDeptPreviewUrl(`http://localhost:8080/deptfileDown/${res.data.file_idx}?preview=true`)
                                                 setSelectedFile(null)
                                             } else {
                                                 alert("PDF 실패")
@@ -136,8 +142,10 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                         }}>미리보기</button>
                                     </td>
                                     <td>
-                                        <button className="entryList-fabBtn gray small" onClick={() => { setSelectedDept(dept); setEditDeptOpen(true) }}>✏️</button>
-                                        <button className="entryList-fabBtn red-del small" onClick={() => handleDeleteDept(dept.dept_idx)}>🗑</button>
+                                        <div className="flex align-items-center">
+                                            <button className="entryList-fabBtn gray small" onClick={() => { setSelectedDept(dept); setEditDeptOpen(true) }}>수정</button>
+                                            <button className="entryList-fabBtn red-del small" onClick={() => handleDeleteDept(dept.dept_idx)}>삭제</button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -147,7 +155,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
                     {loginUserIdx && String(entry.user_idx) === loginUserIdx && (
                         <div style={{ display: "flex", justifyContent: "center", gap: "12px", marginTop: "20px" }}>
-                            <button className="entryList-fabBtn blue small" onClick={() => setEditOpen(true)}>✏️ 수정하기</button>
+                            <button className="entryList-fabBtn blue small" onClick={() => setEditOpen(true)}>수정하기</button>
                             {entry.status === "작성중" && (
                                 <button className="entryList-fabBtn blue small" onClick={() => updateStatus("제출")}>제출</button>
                             )}
@@ -181,17 +189,20 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                 <div style={modalRightPreviewStyle}>
                     {selectedFile && (
                         <>
-                            <h3 style={titleStyle}>📄 전표 미리보기</h3>
+                            <h3 style={titleStyle}>전표 미리보기</h3>
                             {selectedFile.type === 'entry' ? (
                                 <iframe src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} width="100%" height="500px" style={previewStyle} />
                             ) : (
                                 <img src={`http://localhost:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} alt="첨부" style={previewStyle} />
                             )}
+                            <div style={{ marginTop: 10, textAlign: 'right' }}>
+                                <button className="entryList-fabBtn gray" onClick={() => setSelectedFile(null)}>닫기</button>
+                            </div>
                         </>
                     )}
                     {deptPreviewUrl && (
                         <>
-                            <h3 style={titleStyle}>📄 분개 PDF 미리보기</h3>
+                            <h3 style={titleStyle}>분개 PDF 미리보기</h3>
                             <iframe src={deptPreviewUrl} width="100%" height="500px" style={previewStyle} />
                             <div style={{ marginTop: 10, textAlign: 'right' }}>
                                 <button className="entryList-fabBtn gray" onClick={() => setDeptPreviewUrl(null)}>닫기</button>

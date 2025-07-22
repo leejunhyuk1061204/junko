@@ -1827,6 +1827,7 @@ input[type='number']:focus {
     border-radius: 50%;
     font-size: 14px;
     margin: 0;
+    cursor: pointer;
 }
 
 .react-datepicker__day-name {
@@ -3777,6 +3778,13 @@ input[type='number']:focus {
     vertical-align: middle;
 }
 
+.date-icon {
+    width: 17px;
+    height: 17px;
+    color: white;
+}
+
+/*결재 상태 표시*/
 .status-label {
     padding: 4px 8px;
     border-radius: 6px;
@@ -3784,7 +3792,6 @@ input[type='number']:focus {
     font-weight: 500;
     display: inline-block;
     text-align: center;
-    font-weight: bold;
 }
 
 /*미확인*/

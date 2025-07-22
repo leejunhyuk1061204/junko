@@ -68,7 +68,7 @@ export default function SettlementList() {
 
     const handleDelete = async () => {
         if (!selectedData) return alert("삭제할 항목 선택 필요");
-        const token = sessionStorage.getItem("accessToken");
+        const token = sessionStorage.getItem("token");
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
         try {
