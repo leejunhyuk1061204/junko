@@ -11,6 +11,9 @@ export default function VoucherInsertPage() {
         entry_date: '',
         amount: '',
         custom_idx: '',
+        custom_name: '',
+        custom_owner: '',
+        user_name: '',
     })
     const [templateIdx, setTemplateIdx] = useState(null)
     const [templateList, setTemplateList] = useState([])
@@ -48,22 +51,56 @@ export default function VoucherInsertPage() {
         if (!templateIdx) return alert('템플릿을 선택하세요')
 
         try {
+            // 1. 전표 저장
             const res = await axios.post('http://localhost:8080/voucher/insert', {
                 ...formData,
+                entry_date: formData.entry_date
+                    ? new Date(formData.entry_date).toISOString().slice(0, 10)
+                    : '',
                 template_idx: templateIdx,
             })
 
-            if (res.data.success) {
+            if (res.data.success && res.data.entry_idx) {
+                const entry_idx = res.data.entry_idx
+
+                const variables = res.data.variables
+
+                const docRes = await axios.post('http://localhost:8080/document/insert', {
+                    idx: entry_idx,
+                    type: 'voucher',
+                    user_idx: formData.user_idx,
+                    template_idx: templateIdx,
+                    variables,
+                })
+
+                if (docRes.data.success && docRes.data.document_idx) {
+                    const document_idx = docRes.data.document_idx
+
+                    // 3. PDF 생성
+                    const pdfRes = await axios.post('http://localhost:8080/document/pdf', {
+                        document_idx,
+                    })
+
+                    if (!pdfRes.data.success) {
+                        console.warn('PDF 생성 실패:', pdfRes.data.message || '')
+                        alert('PDF 파일 생성 실패')
+                    }
+                } else {
+                    console.warn('문서 생성 실패:', docRes.data.message || '')
+                    alert('문서 생성 실패')
+                }
+
                 alert('저장 완료')
                 window.location.href = './'
             } else {
-                alert('저장 실패')
+                alert('전표 저장 실패')
             }
         } catch (err) {
-            console.error(err)
+            console.error('저장 중 오류:', err)
             alert('저장 중 오류 발생')
         }
     }
+
 
     return (
         <div className="wrap page-background">
