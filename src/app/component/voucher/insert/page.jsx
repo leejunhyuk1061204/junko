@@ -90,6 +90,51 @@ export default function VoucherInsertPage() {
                     alert('문서 생성 실패')
                 }
 
+                // 4. 분개 문서 생성
+
+                const entryDetailTemplateIdx = 14
+
+                const entryDetailVariableRes = await axios.post('http://localhost:8080/entry-detail/preview', {
+                    template_idx: entryDetailTemplateIdx,
+                    variables: {
+                        entry_idx: entry_idx,
+                        entry_type: formData.entry_type,
+                        amount: formData.amount,
+                        user_idx: formData.user_idx,
+                        custom_idx: formData.custom_idx,
+                    }
+                })
+
+                if (!entryDetailVariableRes.data.success) {
+                    alert('분개용 변수 생성 실패')
+                    return
+                }
+
+                const entryDetailDocRes = await axios.post('http://localhost:8080/document/insert', {
+                    idx: entry_idx,
+                    type: 'entry_detail',
+                    user_idx: formData.user_idx,
+                    template_idx: entryDetailTemplateIdx,
+                    variables: entryDetailVariableRes.data.variables,
+                })
+
+                if (entryDetailDocRes.data.success && entryDetailDocRes.data.document_idx) {
+                    const entryDetailDocumentIdx = entryDetailDocRes.data.document_idx
+
+                    // 5. 분개 PDF 생성
+                    const entryDetailPdfRes = await axios.post('http://localhost:8080/document/pdf', {
+                        document_idx: entryDetailDocumentIdx,
+                    })
+
+                    if (!entryDetailPdfRes.data.success) {
+                        console.warn('분개 PDF 생성 실패:', entryDetailPdfRes.data.message || '')
+                        alert('분개 PDF 파일 생성 실패')
+                    }
+                } else {
+                    console.warn('분개 문서 생성 실패:', entryDetailDocRes.data.message || '')
+                    alert('분개 문서 생성 실패')
+                }
+
                 alert('저장 완료')
                 window.location.href = './'
             } else {

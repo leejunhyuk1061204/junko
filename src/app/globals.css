@@ -2675,7 +2675,15 @@ input[type='number']:focus {
     border-radius: 4px;
 }
 
-
+.template-readonly {
+    height: 36px;
+    line-height: 36px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f4f4f4;
+    font-size: 14px;
+}
 
 /*-------------------------정산 현황 css--------------------------------*/
 .settlement-wrapper {
