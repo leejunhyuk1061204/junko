@@ -10,6 +10,7 @@ export default function VoucherDetailPage() {
     const { entry_idx } = useParams()
     const [voucher, setVoucher] = useState(null)
     const [previewHtml, setPreviewHtml] = useState('')
+    const [previewMode, setPreviewMode] = useState('voucher')
 
     useEffect(() => {
         if (!entry_idx) return
@@ -25,36 +26,51 @@ export default function VoucherDetailPage() {
     }, [entry_idx])
 
     useEffect(() => {
-        if (voucher?.document_idx) {
-            axios.post('http://localhost:8080/voucher/preview', {
-                template_idx: 10,
-                variables: {
-                    entry_idx: voucher.entry_idx,
-                    entry_type: voucher.entry_type,
-                    entry_date: voucher.entry_date ? String(voucher.entry_date).slice(0, 10) : '',
-                    amount: voucher.amount,
-                    user_idx: voucher.user_idx,
-                    custom_idx: voucher.custom_idx,
-                }
-            }).then((res) => {
-                if (res.data.success) {
-                    setPreviewHtml(res.data.preview)
-                } else {
-                    console.warn("미리보기 실패")
-                }
-            }).catch(console.error)
-        }
-    }, [voucher])
+        if (!voucher) return
 
+        const loadPreview = async () => {
+            const baseData = {
+                entry_idx: voucher.entry_idx,
+                entry_type: voucher.entry_type,
+                entry_date: voucher.entry_date?.slice(0, 10) || '',
+                amount: voucher.amount,
+                user_idx: voucher.user_idx,
+                custom_idx: voucher.custom_idx,
+            }
+
+            const url = previewMode === 'voucher'
+                ? 'http://localhost:8080/voucher/preview'
+                : 'http://localhost:8080/entry-detail/preview'
+
+            const template_idx = previewMode === 'voucher' ? 10 : 14
+
+            try {
+                const res = await axios.post(url, {
+                    template_idx,
+                    variables: { ...baseData },
+                })
+                if (res.data.success) setPreviewHtml(res.data.preview)
+            } catch (e) {
+                console.error(e)
+            }
+        }
+
+        loadPreview()
+    }, [voucher, previewMode])
 
     const handleDocumentCreate = async () => {
         const confirmCreate = window.confirm('문서를 생성하시겠습니까?')
         if (!confirmCreate) return
 
         try {
-            // 1. 백엔드에 변수 요청 (voucherToVariables 이용)
-            const variableRes = await axios.post('http://localhost:8080/voucher/preview', {
-                template_idx: 1,
+            const isVoucher = previewMode === 'voucher'
+            const url = isVoucher
+                ? 'http://localhost:8080/voucher/preview'
+                : 'http://localhost:8080/entry-detail/preview'
+            const template_idx = isVoucher ? 10 : 14
+
+            const variableRes = await axios.post(url, {
+                template_idx,
                 variables: {
                     entry_idx: voucher.entry_idx,
                     entry_type: voucher.entry_type,
@@ -72,26 +88,22 @@ export default function VoucherDetailPage() {
 
             const variables = variableRes.data.variables
 
-            // 2. 문서 생성
             const res = await axios.post('http://localhost:8080/document/insert', {
                 idx: voucher.entry_idx,
-                type: 'voucher',
+                type: isVoucher ? 'voucher' : 'entry_detail',
                 user_idx: voucher.user_idx,
-                template_idx: 1,
+                template_idx,
                 variables,
             })
 
             if (res.data.success && res.data.document_idx) {
-                // 3. PDF 생성
                 const pdfRes = await axios.post('http://localhost:8080/document/pdf', {
-                    document_idx: res.data.document_idx
+                    document_idx: res.data.document_idx,
                 })
 
                 if (pdfRes.data.success) {
-                    // 4. 전표 정보 다시 불러오기 (새로고침 없이 반영)
                     const detailRes = await axios.get(`http://localhost:8080/voucher/detail/${voucher.entry_idx}`)
                     if (detailRes.data.success) setVoucher(detailRes.data.data)
-
                     alert('문서 생성 완료!')
                 } else {
                     alert('PDF 생성 실패')
@@ -104,8 +116,21 @@ export default function VoucherDetailPage() {
             alert('문서 생성 중 오류 발생')
         }
     }
-
     if (!voucher) return <div>로딩 중...</div>
+
+    const getDownloadLink = () => {
+        if (!voucher) return '#'
+
+        if (previewMode === 'voucher') {
+            return voucher.document_idx
+                ? `http://localhost:8080/download/pdf/${voucher.document_idx}`
+                : '#'
+        } else {
+            return voucher.entry_detail_document_idx
+                ? `http://localhost:8080/download/pdf/${voucher.entry_detail_document_idx}`
+                : '#'
+        }
+    }
 
     return (
         <div className="productPage wrap page-background">
@@ -155,6 +180,21 @@ export default function VoucherDetailPage() {
                     </table>
                     </div>
 
+                    <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                        <button
+                            className={`template-btn-submit ${previewMode === 'voucher' ? 'active' : ''}`}
+                            onClick={() => setPreviewMode('voucher')}
+                        >
+                            전표 미리보기
+                        </button>
+                        <button
+                            className={`template-btn-submit ${previewMode === 'entry_detail' ? 'active' : ''}`}
+                            onClick={() => setPreviewMode('entry_detail')}
+                        >
+                            분개 미리보기
+                        </button>
+                    </div>
+
                     <div className="text-align-left" style={{ marginTop: '40px' }}>
                     <Link href="./" className="template-btn-back">목록</Link>
                     </div>
@@ -162,31 +202,36 @@ export default function VoucherDetailPage() {
 
                 {/* 오른쪽: 문서 미리보기 */}
                 <div className="template-form-right">
-                    <h3 className="text-align-left margin-bottom-10" style={{ marginBottom: '40px' , marginTop: '10px' }}>
+                    <h3 className="text-align-left margin-bottom-10" style={{ marginBottom: '40px', marginTop: '10px' }}>
                         <span className="product-header">문서 미리보기</span>
                     </h3>
 
-                    {voucher.document_idx ? (
+                    {previewHtml ? (
                         <>
                             <iframe
                                 srcDoc={previewHtml}
                                 className="template-preview-frame"
                                 title="문서 미리보기"
                             />
-                            <div style={{ marginTop: '30px'}}>
-                            <a
-                                href={`http://localhost:8080/download/pdf/${voucher.document_idx}`}
-                                className="template-btn-submit margin-top-10"
-                                target="_blank"
-                            >
-                                PDF 다운로드
-                            </a>
+                            <div style={{ marginTop: '30px' }}>
+                                {(previewMode === 'voucher' && voucher.document_idx) ||
+                                (previewMode === 'entry_detail' && voucher.entry_detail_document_idx) ? (
+                                    <a
+                                        href={getDownloadLink()}
+                                        className="template-btn-submit margin-top-10"
+                                        target="_blank"
+                                    >
+                                        PDF 다운로드
+                                    </a>
+                                ) : (
+                                    <button onClick={handleDocumentCreate} className="template-btn-submit">
+                                        문서 생성
+                                    </button>
+                                )}
                             </div>
                         </>
                     ) : (
-                        <button onClick={handleDocumentCreate} className="template-btn-submit">
-                            문서 생성
-                        </button>
+                        <div>문서 미리보기를 불러오는 중입니다...</div>
                     )}
                 </div>
             </div>
