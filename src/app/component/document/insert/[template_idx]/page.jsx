@@ -13,14 +13,22 @@ export default function DocumentInsertPage() {
     const params = useParams();
     const template_idx = params.template_idx;
 
-    const [type, setType] = useState("");
+    const [appoverIds, setAppoverIds] = useState([]);
+    const [templateHtml, setTemplateHtml] = useState("");
+    const [title, setTitle] = useState("");
+    const [date, setDate] = useState(""); // yyyy-MM-dd
+    const [step, setStep] = useState("1단계");
+    const [type, setType] = useState(""); // 고정 or 선택
     const [idx, setIdx] = useState(0);
     const [variables, setVariables] = useState({
         user_name: "",
         resign_date: "",
     });
-    const [appoverIds, setAppoverIds] = useState([]);
-    const [templateHtml, setTemplateHtml] = useState("");
+    const [approverIds, setApproverIds] = useState([]);
+    const [approverNames, setApproverNames] = useState(""); // UI 표시용
+    const [searchName, setSearchName] = useState("");
+    const [attachment, setAttachment] = useState(null); // 파일 객체
+
 
     // 템플릿 변수 추출
     const extractVariableKeys = (html) => {
@@ -58,7 +66,7 @@ export default function DocumentInsertPage() {
     }
 
     const handleSearch = () => {
-        // 결재라인 추후 구현
+        // 결재라인 검색
     }
 
     const handleKeyPress = (e) => {
@@ -126,28 +134,30 @@ export default function DocumentInsertPage() {
                             <div className="form-row">
                                 <div className="form-group" style={{ flex: 1 }}>
                                     <label>일자</label>
-                                    <input type="date" />
+                                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)}/>
                                 </div>
 
                                 <div className="form-group" style={{ flex: 1 }}>
                                     <label>결재 단계</label>
-                                    <select>
-                                        <option>1단계</option>
-                                        <option>2단계</option>
+                                    <select value={step} onChange={(e) => setStep(e.target.value)}>
+                                        <option value="1단계">1단계</option>
+                                        <option value="2단계">2단계</option>
+                                        <option value="3단계">3단계</option>
                                     </select>
-                                </div>
-
-                                <div className="form-group" style={{ flex: 2 }}>
-                                    <label>제목</label>
-                                    <input type="text" placeholder="제목을 입력하세요." />
                                 </div>
                             </div>
 
                             <div className="form-group">
                                 <label>결재선 지정</label>
                                 <div className="approver-box">
-                                    <input type="text" value="김유정, 김정희" readOnly />
-                                    <input type="text" placeholder="이름 검색" />
+                                    <input type="text" value="" readOnly />
+                                    <input
+                                        type="text"
+                                        placeholder="이름 검색"
+                                        value={searchName}
+                                        onChange={(e) => setSearchName(e.target.value)}
+                                        onKeyDown={handleKeyPress}
+                                    />
                                     <button className="product-search-btn" onClick={handleSearch}>
                                         <TbSearch className="product-search-icon"/></button>
                                 </div>
@@ -197,5 +207,5 @@ export default function DocumentInsertPage() {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
