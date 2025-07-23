@@ -7,9 +7,9 @@ import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui
 import {useAlertModalStore} from "@/app/zustand/store";
 import {FaExclamation} from "react-icons/fa6";
 
-const sendReceiveList = [
-    {idx:1, name:'보낸 메세지'},
-    {idx:2, name:'받은 메세지'},
+const msgOptionList = [
+    {idx:1, name:'받은 메세지'},
+    {idx:2, name:'보낸 메세지'},
 ]
 
 const importantFilterList = [
@@ -34,11 +34,13 @@ const MsgModal = ({open,onClose,type,msg}) => {
     const {openModal} = useAlertModalStore();
     const [tray, setTray] = useState(false);
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
+    const [receiveTotal, setReceiveTotal] = useState(0);
+    const [sendTotal, setSendTotal] = useState(0);
     const [receiveMsgList, setReceiveMsgList] = useState([]);
     const [sendMsgList, setSendMsgList] = useState([]);
     const [importantYN, setImportantYN] = useState({idx:1, name:'전체'},);
     const [readYN, setReadYN] = useState({idx:1, name:'전체'},);
+    const [msgOption, setMsgOption] = useState({idx:1, name:'받은 메세지'},);
     const [position, setPosition] = useState({x:0,y:0});
     const [msgType, setMsgType] = useState(type);
     const [selectedMsg, setSelectedMsg] = useState(null);
@@ -60,17 +62,25 @@ const MsgModal = ({open,onClose,type,msg}) => {
         onClose();
     };
 
-    // 스테이터스 필터
+    // 쪽지 보낼 때 필터 변경
     const handleImportantChange = (important) => {
         setSelectedImportant(important);
     }
 
+    // 필터 변경
     const handleReadYNChange = (readYN) => {
         setReadYN(readYN);
+        setPage(1);
     }
 
     const handleImportantYNChange = (importantYN) => {
         setImportantYN(importantYN);
+        setPage(1);
+    }
+
+    const handleMsgOptionChange = (msgOption) => {
+        setMsgOption(msgOption);
+        setPage(1);
     }
 
     // user 리스트
@@ -96,6 +106,7 @@ const MsgModal = ({open,onClose,type,msg}) => {
     useEffect(() => {
         if(typeof type === "undefined")return;
         getReceiveMsgList();
+        getSendMsgList();
     },[type,page,readYN,importantYN])
 
     useEffect(() => {
@@ -108,7 +119,7 @@ const MsgModal = ({open,onClose,type,msg}) => {
 
     useEffect(() => {
         if(selectedMsg === null || typeof selectedMsg === "undefined") return;
-        if(!selectedMsg.read_yn){
+        if(msgOption.idx===1 && !selectedMsg.read_yn){
             readMsg();
         }
     },[selectedMsg])
@@ -119,18 +130,31 @@ const MsgModal = ({open,onClose,type,msg}) => {
         console.log(data);
     }
 
-    // 메세지 리스트
+    // 받는 메세지 리스트
     const getReceiveMsgList = async() =>{
         const {data} = await axios.post('http://localhost:8080/msg/list',{
             type:'receive',
             page:page,
             user_idx: sessionStorage.getItem('user_idx'),
-            important_yn: importantYN.name === '중요'? 1 : importantYN.name === '일반' ? 0 : '',
-            read_yn:readYN.name === '읽음' ? 1 : readYN.name === '미확인' ? 0 : '',
+            important_yn: importantYN.name === '중요'? 1 : importantYN.name === '일반' ? 0 : null,
+            read_yn:readYN.name === '읽음' ? 1 : readYN.name === '미확인' ? 0 : null,
         });
-        console.log(data);
-        setTotal(data.total*5);
+        console.log('receive',data);
+        setReceiveTotal(data.total*5);
         setReceiveMsgList(data.list);
+    }
+
+    // 보낸 메세지 리스트
+    const getSendMsgList = async() =>{
+        const {data} = await axios.post('http://localhost:8080/msg/list',{
+            type:'send',
+            page:page,
+            user_idx: sessionStorage.getItem('user_idx'),
+            important_yn: importantYN.name === '중요'? 1 : importantYN.name === '일반' ? 0 : null,
+        });
+        console.log('send',data);
+        setSendTotal(data.total*5);
+        setSendMsgList(data.list);
     }
 
     // drag
@@ -259,12 +283,12 @@ const MsgModal = ({open,onClose,type,msg}) => {
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                         {msgType==='list'&&
                         <>
-                            <div className='flex justify-content-between'>
-                                <div className="select-container" style={{marginRight:0}}>
-                                    <Listbox value={selectedImportant} onChange={handleImportantChange}>
-                                        <ListboxButton className="select-btn" style={{marginRight:0,minWidth:'40px'}}>{selectedImportant.name}</ListboxButton>
+                            <div className='flex justify-content-between' style={{padding:'0 30px'}}>
+                                <div className="select-container width-fit" style={{marginRight:0}}>
+                                    <Listbox value={msgOption} onChange={handleMsgOptionChange}>
+                                        <ListboxButton className="select-btn white-space-nowrap" style={{marginRight:0,minWidth:'40px'}}>{msgOption.name}</ListboxButton>
                                         <ListboxOptions className="select-option">
-                                            {importantFilterList.map(option => (
+                                            {msgOptionList.map(option => (
                                                 <ListboxOption key={option.idx} value={option} className="select-option-item">
                                                     {option.name}
                                                 </ListboxOption>
@@ -272,19 +296,21 @@ const MsgModal = ({open,onClose,type,msg}) => {
                                         </ListboxOptions>
                                     </Listbox>
                                 </div>
-                                <div className='flex'>
-                                    <div className="select-container" style={{marginRight:0}}>
-                                        <Listbox value={readYN} onChange={handleReadYNChange}>
-                                            <ListboxButton className="select-btn" style={{marginRight:0,minWidth:'40px'}}>{readYN.name}</ListboxButton>
-                                            <ListboxOptions className="select-option">
-                                                {readFilterList.map(option => (
-                                                    <ListboxOption key={option.idx} value={option} className="select-option-item">
-                                                        {option.name}
-                                                    </ListboxOption>
-                                                ))}
-                                            </ListboxOptions>
-                                        </Listbox>
-                                    </div>
+                                <div className='flex width-fit gap_10'>
+                                    {msgOption.idx === 1 &&
+                                        <div className="select-container" style={{marginRight:0}}>
+                                            <Listbox value={readYN} onChange={handleReadYNChange}>
+                                                <ListboxButton className="select-btn" style={{marginRight:0,minWidth:'40px'}}>{readYN.name}</ListboxButton>
+                                                <ListboxOptions className="select-option">
+                                                    {readFilterList.map(option => (
+                                                        <ListboxOption key={option.idx} value={option} className="select-option-item">
+                                                            {option.name}
+                                                        </ListboxOption>
+                                                    ))}
+                                                </ListboxOptions>
+                                            </Listbox>
+                                        </div>
+                                    }
                                     <div className="select-container" style={{marginRight:0}}>
                                         <Listbox value={importantYN} onChange={handleImportantYNChange}>
                                             <ListboxButton className="select-btn" style={{marginRight:0,minWidth:'40px'}}>{importantYN.name}</ListboxButton>
@@ -300,17 +326,44 @@ const MsgModal = ({open,onClose,type,msg}) => {
                                 </div>
                             </div>
                             <div className='flex flex-direction-col' style={{padding:'0 30px'}}>
-                                <table className='checkbox-table'>
-                                    <thead>
+                                {msgOption.idx === 1 &&
+                                    <table className='checkbox-table'>
+                                        <thead>
+                                            <tr style={{fontWeight:'bold',fontSize:'18px'}}>
+                                                <td>중요</td>
+                                                <td>제목</td>
+                                                <td>보낸 사람</td>
+                                                <td>수신 확인</td>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {receiveMsgList.map((msg, i) => (
+                                                <tr
+                                                    key={i}
+                                                    className='cursor-pointer'
+                                                    style={{padding:'5px 10px'}}
+                                                    onClick={()=>{setMsgType('detail');setSelectedMsg(msg);}}
+                                                >
+                                                    <td style={{color:'lightcoral'}}>{msg.important_yn?<FaExclamation />:''}</td>
+                                                    <td>{msg.msg_title}</td>
+                                                    <td>{msg.sender_name}</td>
+                                                    <td>{msg.read_yn?'읽음':'미확인'}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                }
+                                {msgOption.idx === 2 &&
+                                    <table className='checkbox-table'>
+                                        <thead>
                                         <tr style={{fontWeight:'bold',fontSize:'18px'}}>
                                             <td>중요</td>
                                             <td>제목</td>
-                                            <td>보낸 사람</td>
-                                            <td>수신</td>
+                                            <td>받는 사람</td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        {receiveMsgList.map((msg, i) => (
+                                        </thead>
+                                        <tbody>
+                                        {sendMsgList.map((msg, i) => (
                                             <tr
                                                 key={i}
                                                 className='cursor-pointer'
@@ -319,31 +372,12 @@ const MsgModal = ({open,onClose,type,msg}) => {
                                             >
                                                 <td style={{color:'lightcoral'}}>{msg.important_yn?<FaExclamation />:''}</td>
                                                 <td>{msg.msg_title}</td>
-                                                <td>{msg.sender_name}</td>
-                                                <td>{msg.read_yn?'읽음':'미확인'}</td>
+                                                <td>{msg.receiver_name}</td>
                                             </tr>
                                         ))}
-                                    </tbody>
-                                </table>
-                                {/*<div className='flex' style={{padding:'5px 10px',fontWeight:'600'}}>*/}
-                                {/*    <div>제목</div>*/}
-                                {/*    <div>보낸 사람</div>*/}
-                                {/*    <div>수신</div>*/}
-                                {/*    <div>중요</div>*/}
-                                {/*</div>*/}
-                                {/*{receiveMsgList.map((msg, i) => (*/}
-                                {/*    <div*/}
-                                {/*        key={i}*/}
-                                {/*        className='flex cursor-pointer'*/}
-                                {/*        style={{padding:'5px 10px'}}*/}
-                                {/*        onClick={()=>{setMsgType('detail');setSelectedMsg(msg);}}*/}
-                                {/*    >*/}
-                                {/*        <div>{msg.msg_title}</div>*/}
-                                {/*        <div>{msg.sender_name}</div>*/}
-                                {/*        <div>{msg.read_yn?'읽음':'미확인'}</div>*/}
-                                {/*        <div>{msg.important_yn?'중요':''}</div>*/}
-                                {/*    </div>*/}
-                                {/*))}*/}
+                                        </tbody>
+                                    </table>
+                                }
                             </div>
                             {/* 페이지네이션 */}
                             <div className="product-pagination flex justify-content-between gap_5 margin-bottom-10">
@@ -351,7 +385,7 @@ const MsgModal = ({open,onClose,type,msg}) => {
                                     <Pagination
                                         activePage={page}
                                         itemsCountPerPage={5}
-                                        totalItemsCount={total}
+                                        totalItemsCount={msgOption.idx===1?receiveTotal:sendTotal}
                                         pageRangeDisplayed={5}
                                         onChange={(page) => setPage(page)}  // set만!
                                     />
@@ -437,9 +471,10 @@ const MsgModal = ({open,onClose,type,msg}) => {
                                     </div>
                                 </div>
                                 <div className='flex width-100 margin-bottom-20' style={{padding:'0 30px'}}>
-                                    <div className='flex flex-25 align-center justify-content-center'></div>
-                                    <div className='flex justify-content-between'>
+                                    <div className='flex flex-25 align-center justify-content-center'>
                                         <button className='btn width-fit' onClick={()=>setMsgType('list')}>뒤로가기</button>
+                                    </div>
+                                    <div className='flex justify-right'>
                                         <button className='btn width-fit' onClick={sendMsg}>보내기</button>
                                     </div>
                                 </div>
@@ -447,10 +482,18 @@ const MsgModal = ({open,onClose,type,msg}) => {
                         }
                         {msgType==='detail' && selectedMsg !== null &&
                             <div className='flex flex-direction-col gap_20'>
-                                <div className='flex width-auto' style={{padding:'0 30px'}}>
-                                    <div className='flex flex-25 align-center justify-content-center'>보낸 사람</div>
-                                    <div>{selectedMsg?.sender_name || ''}</div>
-                                </div>
+                                {msgOption.idx === 1 &&
+                                    <div className='flex width-auto' style={{padding:'0 30px'}}>
+                                        <div className='flex flex-25 align-center justify-content-center'>보낸 사람</div>
+                                        <div>{selectedMsg?.sender_name || ''}</div>
+                                    </div>
+                                }
+                                {msgOption.idx === 2 &&
+                                    <div className='flex width-auto' style={{padding:'0 30px'}}>
+                                        <div className='flex flex-25 align-center justify-content-center'>받는 사람</div>
+                                        <div>{selectedMsg?.receiver_name || ''}</div>
+                                    </div>
+                                }
                                 <div className='flex width-auto' style={{padding:'0 30px'}}>
                                     <div className='flex flex-25 align-center justify-content-center'>제목</div>
                                     <div>{selectedMsg?.msg_title || ''}</div>
@@ -462,7 +505,7 @@ const MsgModal = ({open,onClose,type,msg}) => {
                                 <div className='flex width-100 margin-bottom-20' style={{padding:'0 30px'}}>
                                     <div className='flex justify-content-between'>
                                         <button className='btn width-fit' onClick={()=>setMsgType('list')}>뒤로가기</button>
-                                        <button className='btn width-fit' onClick={()=>{setMsgType('insert');setSelectedUser(selectedMsg.sender_idx);setUserSearch(selectedMsg.sender_name);console.log(selectedMsg);setSelectedImportant({idx:1, name:'일반'})}}>답장</button>
+                                        {msgOption.idx === 1 && <button className='btn width-fit' onClick={()=>{setMsgType('insert');setSelectedUser(selectedMsg.sender_idx);setUserSearch(selectedMsg.sender_name);console.log(selectedMsg);setSelectedImportant({idx:1, name:'일반'})}}>답장</button>}
                                     </div>
                                 </div>
                             </div>

@@ -1,12 +1,13 @@
 'use client'
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import './globals.css';
-import {IoMailOutline, IoSettingsOutline} from "react-icons/io5";
+import {IoMailOutline, IoMailUnreadOutline, IoSettingsOutline} from "react-icons/io5";
 import {BsPersonCircle} from "react-icons/bs";
 import Link from "next/link";
 import axios from "axios";
 import MsgModal from "@/app/component/modal/MsgModal";
+import {CSSTransition} from "react-transition-group";
 
 const mainMenus = [
     {
@@ -64,7 +65,7 @@ const mainMenus = [
     {
         title: '정산 / 회계관리',
         submenu: [
-            { label: '정산 현황', href: '/component/purchaseSettlement' },
+            { label: '정산 현황', href: '/component/entryStatus' },
             { label: '거래처 / 공급사별 정산', href: '/' },
             { label: '세금 계산서 / 증빙 관리', href: '/component/taxInvoice' },
             { label: '입금 / 지급 관리', href: '/component/receiptPayment' },
@@ -97,9 +98,10 @@ const Header = () => {
     const [date_time, setDate_Time] = useState('');
     const [showMsg, setShowMsg] = useState(false);
     const [page, setPage] = useState(1);
-    const [total, setTotal] = useState(0);
     const [msgList, setMsgList] = useState([]);
     const [msgModalOpen, setMsgModalOpen] = useState({bool:false});
+    const [msgCnt, setMsgCnt] = useState(0);
+    const [showNotification, setShowNotification] = useState(false);
 
     useEffect(() => {
         // 클라이언트에서만 sessionStorage 접근 가능
@@ -114,7 +116,7 @@ const Header = () => {
         getMsgReceiveList();
     }, [token]);
 
-    // msg 리스트 가져오기
+    // 안읽은 msg 리스트 가져오기
     const getMsgReceiveList = async () => {
         const {data} = await axios.post('http://localhost:8080/msg/list',{
             type:'receive',
@@ -124,9 +126,26 @@ const Header = () => {
         });
         console.log(data);
         setMsgList(data.list);
-        setTotal(data.total);
+        setMsgCnt(data.list.length);
     }
 
+    // 1분마다 메세지 검색
+    useEffect(() => {
+        const interval = setInterval(() => {
+            getMsgReceiveList();
+        },1000*60);
+
+        return () => clearInterval(interval);
+    },[])
+
+    useEffect(() => {
+        if(msgCnt > 0){
+            setShowNotification(true);
+            setTimeout(()=>{
+                setShowNotification(false);
+            },1000*3)
+        }
+    },[msgCnt])
 
     const curDate =() =>{
         const today = new Date();
@@ -152,6 +171,7 @@ const Header = () => {
         setDate_Time(`${formatDate} (${formatDay}) ${formatTime}`);
     }
 
+    // 시간 갱신 타이머
     const startTimer = () => {
         setInterval(curDate, 1000*60);
     }
@@ -166,11 +186,6 @@ const Header = () => {
         window.location.href = '/';
     };
 
-
-    useEffect(()=>{
-        console.log(showMsg);
-    },[showMsg])
-
     return (
         <div className="header wrap main-back">
             <div className="flex justify-content-between " >
@@ -181,7 +196,7 @@ const Header = () => {
                     <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_15 margin-right-4 position-relative">
                         <div className="header-date-text">{date_time}</div>
                         <div className='cursor-pointer'><img src='/run.png' alt='run' width={24}/></div>
-                        <div className='cursor-pointer'><IoMailOutline onClick={()=>setShowMsg(!showMsg)}/></div>
+                        <div className='cursor-pointer'>{msgCnt>0 ? <IoMailUnreadOutline onClick={()=>setShowMsg(!showMsg)}/> : <IoMailOutline onClick={()=>setShowMsg(!showMsg)}/>}</div>
                         {showMsg ? (<>
                             {msgList?.length > 0 && (
                                 <ul className="listBox-option" style={{width:'50%',top:'90%',left:'70px'}}>
@@ -243,8 +258,27 @@ const Header = () => {
                     </div>
                 ))}
             </nav>
+            <Notification show={showNotification} msgCnt={msgCnt}/>
             <MsgModal open={msgModalOpen.bool} onClose={()=>setMsgModalOpen({bool:false})} type={msgModalOpen.type} msg={msgModalOpen.msg}/>
         </div>
+    );
+};
+
+const Notification = ({ show, msgCnt }) => {
+    const notificationRef = useRef(null);
+
+    return (
+        <CSSTransition
+            in={show}
+            timeout={500}
+            classNames="notification"
+            unmountOnExit
+            nodeRef={notificationRef}
+        >
+            <div className="notification" ref={notificationRef} style={{fontSize:'17px'}}>
+                <p style={{marginTop:'10px'}}>{msgCnt} 개의 읽지 않은 메시지가 있습니다.</p>
+            </div>
+        </CSSTransition>
     );
 };
 
