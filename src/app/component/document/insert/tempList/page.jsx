@@ -59,19 +59,19 @@ export default function selectTemplate() {
     };
 
     const fetchList = async (page = currentPage) => {
-        const token = sessionStorage.getItem("token");
-        if (!token) {
+        const user_id = sessionStorage.getItem("user_id");
+        if (!user_id) {
             openModal({
                 svg: '❗',
                 msg1: '해당 페이지 접근 불가',
                 msg2: '로그인 후 이용해주세요.',
                 showCancel: false,
+                onConfirm: () => router.push('/component/login'),
             });
         }
 
         try {
             const res = await axios.get("http://localhost:8080/template/list", {
-                headers: { Authorization: token },
                 params: {
                     category,
                     search,
@@ -173,7 +173,7 @@ export default function selectTemplate() {
             <Header />
             <div className="template-list-back">
                 <h1 className="text-align-left margin-bottom-10 font-bold margin-left-20" style={{ fontSize: "24px" }}>
-                    기안서 양식 리스트
+                    기안서 양식
                 </h1>
 
                 <div className="margin-bottom-10 flex gap_10 align-center justify-content-center">
@@ -245,7 +245,7 @@ export default function selectTemplate() {
                                     </button>
                                     <button
                                         className="template-btn-small"
-                                        onClick={() => router.push(`/document/insert/${item.template_idx}`)}
+                                        onClick={() => router.push(`./${item.template_idx}`)}
                                     >
                                         사용
                                     </button>

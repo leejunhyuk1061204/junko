@@ -172,11 +172,11 @@ const Header = () => {
             <nav className='navigation_bar flex'>
                 {mainMenus.map((menu, idx) => (
                     <div className='menu-item margin-y-10 flex' key={idx}>
-                        <Link href={menu.href}>
+                        {/*<Link href={menu.href}>*/}
                             <p className='menu-title'>
                                 {menu.title}
                             </p>
-                        </Link>
+                        {/*</Link>*/}
                         {menu.submenu && menu.submenu.length > 0 && (
                             <div className='submenu'>
                                 {menu.submenu.map((sub, subIdx) => (
