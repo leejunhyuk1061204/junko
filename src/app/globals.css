@@ -3847,3 +3847,99 @@ input[type='number']:focus {
     opacity: 0.4;
     transition: opacity 0.2s;
 }
+
+
+/* =============== 기안서 작성 =============== */
+.approval-box-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 20px;
+    background-color: #fff;
+    margin-bottom: 30px;
+}
+
+.approval-box-inner {
+    display: flex;
+    gap: 30px;
+}
+
+.approval-left,
+.approval-right {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+}
+
+.vertical-divider {
+    width: 1px;
+    background-color: #ddd;
+    margin: 4px 0;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end; /*라벨 높이 안 밀리게*/
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-group input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 50%;
+}
+
+.form-group select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    font-size: 14px;
+    width: 20%;
+}
+
+.approver-box,
+.search-field {
+    display: flex;
+    gap: 6px;
+}
+
+.search-btn {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    background: #eee;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.doc-link {
+    margin-top: 6px;
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.attach-btn {
+    margin-top: 6px;
+    padding: 6px 18px;
+    font-size: 18px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.variable-input {
+    width: 40%;
+}
