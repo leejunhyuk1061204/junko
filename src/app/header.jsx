@@ -5,6 +5,8 @@ import './globals.css';
 import {IoMailOutline, IoSettingsOutline} from "react-icons/io5";
 import {BsPersonCircle} from "react-icons/bs";
 import Link from "next/link";
+import axios from "axios";
+import MsgModal from "@/app/component/modal/MsgModal";
 
 const mainMenus = [
     {
@@ -65,7 +67,7 @@ const mainMenus = [
             { label: '정산 현황', href: '/component/purchaseSettlement' },
             { label: '거래처 / 공급사별 정산', href: '/' },
             { label: '세금 계산서 / 증빙 관리', href: '/component/taxInvoice' },
-            { label: '입금 / 지급 관리', href: '/component/collectionAndPayment' },
+            { label: '입금 / 지급 관리', href: '/component/receiptPayment' },
             { label: '회계 전표 관리', href: '/component/voucher' },
         ],
         href: '/',
@@ -93,6 +95,11 @@ const Header = () => {
 
     const [token, setToken] = useState(null);
     const [date_time, setDate_Time] = useState('');
+    const [showMsg, setShowMsg] = useState(false);
+    const [page, setPage] = useState(1);
+    const [total, setTotal] = useState(0);
+    const [msgList, setMsgList] = useState([]);
+    const [msgModalOpen, setMsgModalOpen] = useState({bool:false});
 
     useEffect(() => {
         // 클라이언트에서만 sessionStorage 접근 가능
@@ -101,6 +108,24 @@ const Header = () => {
         }
         curDate();
     }, []);
+
+    useEffect(() => {
+        if(token === null || typeof token === 'undefined') return;
+        getMsgReceiveList();
+    }, [token]);
+
+    // msg 리스트 가져오기
+    const getMsgReceiveList = async () => {
+        const {data} = await axios.post('http://localhost:8080/msg/list',{
+            type:'receive',
+            user_idx:sessionStorage.getItem('user_idx') || 0,
+            page:page,
+            read_yn:false,
+        });
+        console.log(data);
+        setMsgList(data.list);
+        setTotal(data.total);
+    }
 
 
     const curDate =() =>{
@@ -142,6 +167,10 @@ const Header = () => {
     };
 
 
+    useEffect(()=>{
+        console.log(showMsg);
+    },[showMsg])
+
     return (
         <div className="header wrap main-back">
             <div className="flex justify-content-between " >
@@ -149,10 +178,35 @@ const Header = () => {
                     <img src='/logo.png' alt ='Logo' width={160} className="header-logo box-sizing" onClick={()=>{window.location.href='/'}}/>
                 </div>
                 {token ? (
-                    <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_15 margin-right-4">
+                    <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_15 margin-right-4 position-relative">
                         <div className="header-date-text">{date_time}</div>
                         <div className='cursor-pointer'><img src='/run.png' alt='run' width={24}/></div>
-                        <div className='cursor-pointer'><IoMailOutline/></div>
+                        <div className='cursor-pointer'><IoMailOutline onClick={()=>setShowMsg(!showMsg)}/></div>
+                        {showMsg ? (<>
+                            {msgList?.length > 0 && (
+                                <ul className="listBox-option" style={{width:'50%',top:'90%',left:'70px'}}>
+                                    {msgList?.map((msg,i) => (
+                                        <li
+                                            key={i}
+                                            className="listBox-option-item margin-0 flex justify-content-between"
+                                            style={{top:'90%',left:'70px', fontWeight:'normal'}}
+                                            onClick={()=>{setMsgModalOpen({bool:true,type:'detail',msg:msg});setShowMsg(!showMsg)}}
+                                        >
+                                            <span className='margin-left-5'>{msg.msg_title}</span>
+                                            <span className='margin-right-5'>{msg.sender_name}</span>
+                                        </li>
+                                    ))}
+                                    <li className="listBox-option-item margin-0" style={{top:'90%',left:'70px'}} onClick={()=>{setMsgModalOpen({bool:true,type:'list'});setShowMsg(!showMsg)}}>열기</li>
+                                </ul>
+                            )}
+                            {msgList?.length === 0 && (
+                                <ul className="listBox-option" style={{width:'50%',top:'90%',left:'70px'}}>
+                                    <li className="listBox-option-item margin-0" style={{top:'90%',left:'70px', fontWeight:'normal'}}>미확인 쪽지가 없습니다</li>
+                                    <li className="listBox-option-item margin-0" style={{top:'90%',left:'70px'}}>열기</li>
+                                </ul>
+                            )}
+
+                        </>):('')}
                         <div className='cursor-pointer'><BsPersonCircle/></div>
                         <div className='cursor-pointer'><IoSettingsOutline/></div>
                         <div className='header-login-text'>환영합니다  {sessionStorage.getItem('user_name')} 님</div>
@@ -189,6 +243,7 @@ const Header = () => {
                     </div>
                 ))}
             </nav>
+            <MsgModal open={msgModalOpen.bool} onClose={()=>setMsgModalOpen({bool:false})} type={msgModalOpen.type} msg={msgModalOpen.msg}/>
         </div>
     );
 };

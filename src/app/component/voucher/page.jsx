@@ -7,6 +7,7 @@ import Header from "@/app/header";
 import Pagination from "react-js-pagination";
 import {TbSearch} from "react-icons/tb";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
+import {useRouter} from "next/navigation";
 
 export default function VoucherListPage() {
     const [list, setList] = useState([])
@@ -19,6 +20,7 @@ export default function VoucherListPage() {
     const [checkedList, setCheckedList] = useState([])
     const isAllChecked = list.length > 0 && checkedList.length === list.length
     const [previewUUID, setPreviewUUID] = useState(null)
+    const router = useRouter()
     const [filters, setFilters] = useState({
         status: '',
         custom_name: '',
@@ -130,6 +132,24 @@ export default function VoucherListPage() {
         }
     }
 
+    const handleStatusChange = async (entry_idx, newStatus) => {
+        try {
+            const res = await axios.put(`http://localhost:8080/voucher/status/update/${entry_idx}`, {
+                status: newStatus,
+            });
+
+            if (res.data.success) {
+                alert(`상태가 '${newStatus}'(으)로 변경되었습니다.`);
+                window.location.href = window.location.href
+            } else {
+                alert('상태 변경 실패');
+            }
+        } catch (err) {
+            console.error(err);
+            alert('상태 변경 중 오류 발생');
+        }
+    };
+
     return (
         <>
             <div className="productPage wrap page-background">
@@ -222,6 +242,7 @@ export default function VoucherListPage() {
                             <th>작성자</th>
                             <th>상태</th>
                             <th>승인</th>
+                            <th>수정</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -241,15 +262,31 @@ export default function VoucherListPage() {
                                 <td>{Number(item.amount).toLocaleString()}원</td>
                                 <td>{item.entry_date}</td>
                                 <td>{item.user_name}</td>
-                                <td>{item.status}</td>
+                                <td>
+                                    <select
+                                        value={item.status}
+                                        onChange={(e) => handleStatusChange(item.entry_idx, e.target.value)}
+                                        disabled={item.status !== '작성중'}
+                                        className="template-input"
+                                        style={{ height: '30px', padding: '0 12px', width: '150px', justifyContent: 'center'}}
+                                    >
+                                        <option value="작성중">작성중</option>
+                                        <option value="확정">확정</option>
+                                    </select>
+                                </td>
                                 <td>{item.approved ? '○' : 'X'}</td>
+                                <td>
+                                    <Link href={`./voucher/update/${item.entry_idx}`}>
+                                        <button className="product-btn-small">수정</button>
+                                    </Link>
+                                </td>
                             </tr>
                         ))}
                         {/* 빈 줄 채우기 */}
                         {list.length < size &&
                             Array.from({ length: size - list.length }).map((_, i) => (
                                 <tr key={`empty-${i}`}>
-                                    <td colSpan={10} style={{ height: '45px' }}>&nbsp;</td>
+                                    <td colSpan={11} style={{ height: '46.5px' }}>&nbsp;</td>
                                 </tr>
                             ))
                         }
