@@ -14,35 +14,46 @@ export default function ReceiptPaymentDetailPage() {
     const [previewHtml, setPreviewHtml] = useState('');
     const [loading, setLoading] = useState(true);
 
-    const searchParams = useSearchParams();
-    const type = searchParams.get('type') || '수금';
+    const [documentIdx, setDocumentIdx] = useState(null);
+    const [fileName, setFileName] = useState('');
 
+    // 문서 및 파일 조회
     useEffect(() => {
         if (!rp_idx) return;
 
-        const tryFetch = async () => {
+        const fetchDetail = async () => {
             try {
-                let res = await axios.get(`http://localhost:8080/receipt/detail/${rp_idx}`);
-                if (!res.data.success) {
-                    res = await axios.get(`http://localhost:8080/payment/detail/${rp_idx}`);
-                }
+                const res = await axios.get(`http://localhost:8080/receiptPayment/detail/${rp_idx}`);
+                if (res.data.success && res.data.data) {
+                    const dto = res.data.data;
+                    setData(dto);
 
-                if (res.data.success) {
-                    setData(res.data.data);
-                    setVariables(res.data.variables);
+                    if (res.data.document) {
+                        setDocumentIdx(res.data.document.document_idx);
+                        setPreviewHtml(res.data.document.content || '');
+                    }
+
+                    if (res.data.file) {
+                        setFileName(res.data.file.file_name);
+                    }
+
+                    if (res.data.variables) {
+                        setVariables(res.data.variables);
+                    }
                 } else {
-                    alert('데이터를 불러올 수 없습니다.');
-                    router.push('/receiptPayment');
+                    alert('데이터 조회 실패');
+                    router.back();
                 }
             } catch (err) {
-                alert('에러 발생');
-                router.push('/receiptPayment');
+                console.warn('상세조회 실패:', err);
+                alert('조회 중 오류 발생');
+                router.back();
             } finally {
                 setLoading(false);
             }
         };
 
-        tryFetch();
+        fetchDetail();
     }, [rp_idx]);
 
     const handleDelete = async () => {
@@ -62,26 +73,9 @@ export default function ReceiptPaymentDetailPage() {
         }
     };
 
-    const handlePreview = async () => {
-        try {
-            const res = await axios.post('http://localhost:8080/document/preview', {
-                template_idx: data.type === '수금' ? 15 : 15,
-                variables: variables,
-            });
-            if (res.data.success) {
-                setPreviewHtml(res.data.preview);
-            } else {
-                alert('미리보기 실패');
-            }
-        } catch (err) {
-            console.error(err);
-            alert('미리보기 오류');
-        }
-    };
-
     const handleDownload = () => {
-        if (!data.document_idx) return alert('첨부된 문서가 없습니다');
-        window.open(`http://localhost:8080/download/pdf/${data.document_idx}`, '_blank');
+        if (!documentIdx) return alert('PDF 문서가 없습니다');
+        window.open(`http://localhost:8080/download/pdf/${documentIdx}`, '_blank');
     };
 
     if (loading) return <div className="wrap">로딩 중...</div>;
@@ -132,7 +126,6 @@ export default function ReceiptPaymentDetailPage() {
                     </div>
 
                     <div className="margin-top-20 flex justify-right gap_10" style={{ textAlign: 'right', marginTop: '10px' }}>
-                        <button className="template-btn-back" onClick={handlePreview}>문서 미리보기</button>
                         <button className="template-btn-submit" onClick={handleDownload}>PDF 다운로드</button>
                     </div>
 

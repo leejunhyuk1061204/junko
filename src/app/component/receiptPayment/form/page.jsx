@@ -137,6 +137,7 @@ export default function ReceiptPaymentFormPage() {
                 }
 
                 alert(`${type} ${mode === 'insert' ? '등록' : '수정'} 완료`);
+                console.log('res.data:', res.data)
                 window.location.href = './';
             } else {
                 alert('처리 실패');
