@@ -259,7 +259,7 @@ const Header = () => {
                 ))}
             </nav>
             <Notification show={showNotification} msgCnt={msgCnt}/>
-            <MsgModal open={msgModalOpen.bool} onClose={()=>setMsgModalOpen({bool:false})} type={msgModalOpen.type} msg={msgModalOpen.msg}/>
+            <MsgModal open={msgModalOpen.bool} onClose={()=>setMsgModalOpen({bool:false})} type={msgModalOpen.type} msg={msgModalOpen.msg} getUnreadMsg={getMsgReceiveList}/>
         </div>
     );
 };
