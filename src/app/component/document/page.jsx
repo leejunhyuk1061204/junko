@@ -16,6 +16,7 @@ export default function DocumentManagePage() {
     const router = useRouter();
     const {openModal, closeModal} = useAlertModalStore();
     const {openDatePicker,closeDatePicker} = useDatePickerStore();
+    const [selectedTab, setSelectedTab] = useState("상신함");
 
     const sortOptions = [
         { id: "create_date DESC", name: "최신순" },
@@ -23,7 +24,6 @@ export default function DocumentManagePage() {
         { id: "template_name ASC", name: "문서명 오름차순" },
         { id: "template_name DESC", name: "문서명 내림차순" },
     ];
-
     const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
     const [sort, setSort] = useState(sortOptions[0].id);
 
@@ -66,7 +66,7 @@ export default function DocumentManagePage() {
 
     useEffect(() => {
         if (userIdx !== null) fetchDocuments(1);
-    }, [statusFilter, userIdx, search]);
+    }, [statusFilter, userIdx, search, selectedTab]);
 
     const fetchDocuments = async (page = currentPage, customDate = selectedDate) => {
         setLoading(true);
@@ -82,6 +82,7 @@ export default function DocumentManagePage() {
                     sort: 'desc',
                     page,
                     limit: limit,
+                    tab: selectedTab,
                 }
             });
             setDocuments(data.list || []);
@@ -128,7 +129,7 @@ export default function DocumentManagePage() {
         setSelectedDate({ start_date: null, end_date: null });
         setCurrentPage(1);
         setSearch("");
-        fetchDocuments(currentPage);
+        fetchDocuments(1);
     }
 
     const handleDatePicker = () => {
@@ -205,6 +206,16 @@ export default function DocumentManagePage() {
                 <h1 className="text-align-left margin-bottom-10 font-bold margin-left-20" style={{ fontSize: "24px" }}>
                     문서 관리
                 </h1>
+                <div className="tab-buttons" style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
+                    <button
+                        className={selectedTab === "상신함" ? "tab-btn-active" : "tab-btn"}
+                        onClick={() => setSelectedTab("상신함")}
+                    >상신함</button>
+                    <button
+                        className={selectedTab === "수신함" ? "tab-btn-active" : "tab-btn"}
+                        onClick={() => setSelectedTab("수신함")}
+                    >수신함</button>
+                </div>
                 {/* 필터 영역 */}
                 <div className="margin-bottom-10 flex gap_10 align-center justify-content-center">
                     <div className="doc-select-container">
@@ -227,7 +238,7 @@ export default function DocumentManagePage() {
                     <div className="doc-select-container">
                         <Listbox value={statusFilter} onChange={handleStatusChange}>
                             <ListboxButton className="select-btn">
-                                {statusFilter || "결제 상태"}
+                                {statusFilter || "결재 상태"}
                             </ListboxButton>
                             <ListboxOptions className="select-option">
                                 {statusOptions.map((status) => (
@@ -271,7 +282,7 @@ export default function DocumentManagePage() {
                                 <th style={{ width: "10%" }}>상태</th>
                                 <th style={{ width: "15%" }}>작성일</th>
                                 <th style={{ width: "15%" }}>결재자</th>
-                                <th style={{ width: "13%" }}>미리보기</th>
+                                <th style={{ width: "13%" }}>상세</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -291,7 +302,7 @@ export default function DocumentManagePage() {
                                         <td>{doc.approver_name || '-'}</td>
                                         <td>
                                             <button className="template-btn-small" onClick={() => handlePreview(doc)}>
-                                                미리보기
+                                                문서 보기
                                             </button>
                                         </td>
                                     </tr>

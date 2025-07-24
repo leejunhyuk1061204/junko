@@ -74,8 +74,11 @@ const mainMenus = [
         href: '/',
     },
     {
-        title: '통계',
-        href: '/component/chart',
+        title: '대시보드',
+        submenu: [
+            { label: '통계 분석', href: '/component/chart' },
+        ],
+        href: '/',
     },
     {
         title: '문서 / 업무 관리',

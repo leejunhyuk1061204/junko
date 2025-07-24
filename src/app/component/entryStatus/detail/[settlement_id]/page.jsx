@@ -30,8 +30,8 @@ export default function EntryStatusDetailPage() {
     }, [settlement_id])
 
     useEffect(() => {
-        if (!data) return
-        previewDocument()
+        if (!data) return;
+        previewDocument();
     }, [data])
 
     const previewDocument = async () => {
