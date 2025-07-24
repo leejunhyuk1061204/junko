@@ -6,6 +6,7 @@ import Header from '@/app/header'
 import Pagination from 'react-js-pagination'
 import {TbSearch} from 'react-icons/tb'
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from '@headlessui/react'
+import axios from "axios";
 
 export default function InvoiceListPage() {
     const [list, setList] = useState([])
@@ -36,8 +37,8 @@ export default function InvoiceListPage() {
             keyword: filters.keyword,
             startDate: filters.startDate,
             endDate: filters.endDate,
-            sort,
-            order
+            sort: 'i.invoice_idx',
+            order: 'DESC'
         }
 
         const res = await fetch(`http://localhost:8080/invoice/list?${new URLSearchParams(params)}`)
@@ -72,6 +73,27 @@ export default function InvoiceListPage() {
             setOrder('desc')
         }
         setPage(1)
+    }
+
+    const handleStatusChange = async (invoice_idx, newStatus) => {
+        try {
+            const res = await axios.put(`http://localhost:8080/invoice/status/${invoice_idx}`, {
+                status: newStatus
+            })
+
+            if (res.data.success) {
+                setList(prev =>
+                    prev.map(item =>
+                        item.invoice_idx === invoice_idx ? { ...item, status: newStatus } : item
+                    )
+                )
+            } else {
+                alert('상태 변경 실패')
+            }
+        } catch (err) {
+            console.error(err)
+            alert('에러 발생')
+        }
     }
 
     return (
@@ -144,21 +166,38 @@ export default function InvoiceListPage() {
                         <tr key={item.invoice_idx}>
                             <td>{item.invoice_idx}</td>
                             <td>{item.entry_idx}</td>
-                            <td>{item.custom_name}</td>
+                            <td>
+                                <a href={`./invoiceTax/detail/${item.invoice_idx}`} className="product-clickable">
+                                    {item.custom_name}
+                                </a>
+                            </td>
                             <td>{Number(item.total_amount).toLocaleString()}원</td>
-                            <td>{item.status}</td>
+                            <td>
+                                <select
+                                    value={item.status}
+                                    onChange={e => handleStatusChange(item.invoice_idx, e.target.value)}
+                                    className="invoice-status-select"
+                                >
+                                    <option value="작성중">작성중</option>
+                                    <option value="발행완료">발행완료</option>
+                                    <option value="취소">취소</option>
+                                </select>
+                            </td>
                             <td>{item.issued_by}</td>
                             <td>{item.reg_date}</td>
                             <td>
-                                <Link href={`./invoiceTax/detail/${item.invoice_idx}`}>
-                                    <button className="product-btn-small">보기</button>
-                                </Link>
-                                <Link href={`./invoiceTax/form/${item.invoice_idx}`}>
-                                    <button className="product-btn-small">수정</button>
+                                <Link href={`./invoiceTax/update/${item.invoice_idx}`}>
+                                    <button className="template-btn">수정</button>
                                 </Link>
                             </td>
                         </tr>
                     ))}
+                    {list.length < size &&
+                        Array.from({ length: size - list.length }).map((_, i) => (
+                            <tr key={`empty-${i}`}>
+                                <td colSpan={11} style={{ height: '45px' }}>&nbsp;</td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
 

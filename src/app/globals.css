@@ -1751,6 +1751,25 @@ input[type='number']:focus {
     color: #007bff;
 }
 
+.approver-tag-container {
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.approver-tag {
+    background-color: #e9f0ff;
+    border: 1px solid #bcd;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 14px;
+    justify-content: center;
+}
+
+body.invoice-detail-body-reset {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 /* ------------------------------- 로그인 관련 ------------------------------- */
 
 .login-select {
