@@ -18,7 +18,11 @@ export default function EntryStatusDetailPage() {
         axios.get(`http://localhost:8080/settlement/detail/${settlement_id}`)
             .then(res => {
                 if (res.data.success) {
-                    setData(res.data.data)
+                    const merged = {
+                        ...res.data.data,
+                        file: res.data.file || null,
+                    }
+                    setData(merged)
                 } else {
                     alert('정산 정보를 불러올 수 없습니다.')
                 }
@@ -47,12 +51,12 @@ export default function EntryStatusDetailPage() {
                     user_name: data.user_name || '',
                     user_idx: data.user_idx,
                     custom_idx: data.custom_idx,
+                    custom_name: data.custom_name || '',
                 }
             })
 
             if (res.data.success) {
                 setPreviewHtml(res.data.preview)
-                setDocExists(!!data.document_idx)
             }
         } catch (e) {
             console.error(e)
@@ -75,6 +79,7 @@ export default function EntryStatusDetailPage() {
                     status: data.status,
                     user_name: data.user_name || '',
                     custom_idx: data.custom_idx,
+                    custom_name: data.custom_name || '',
                 }
             })
 
@@ -89,6 +94,7 @@ export default function EntryStatusDetailPage() {
                 user_idx: data.user_idx,
                 user_name: data.user_name,
                 template_idx: 12,
+                custom_name: data.custom_name || '',
                 variables: variableRes.data.variables,
             })
 
@@ -97,6 +103,19 @@ export default function EntryStatusDetailPage() {
                 await axios.post('http://localhost:8080/document/pdf', {
                     document_idx: res.data.document_idx,
                 })
+
+                setTimeout(async () => {
+                    const detailRes = await axios.get(`http://localhost:8080/settlement/detail/${data.settlement_id}`)
+                    if (detailRes.data.success) {
+                        const merged = {
+                            ...detailRes.data.data,
+                            file: detailRes.data.file || null,
+                        }
+                        setData(merged)
+                        setDocExists(!!detailRes.data.file)
+                    }
+                }, 1000) // 1초 후 재조회
+
                 alert('문서 생성 완료!')
                 setDocExists(true)
             } else {
@@ -155,7 +174,7 @@ export default function EntryStatusDetailPage() {
                                 title="문서 미리보기"
                             />
                             <div style={{ marginTop: '30px' }}>
-                                {docExists ? (
+                                {docExists && data.file ? (
                                     <a
                                         href={`http://localhost:8080/download/pdf/${data.document_idx}`}
                                         className="template-btn-submit margin-top-10"

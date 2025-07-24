@@ -29,7 +29,7 @@ const selectedImportantList = [
     {idx:2, name:'중요'},
 ]
 
-const MsgModal = ({open,onClose,type,msg}) => {
+const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
 
     const {openModal} = useAlertModalStore();
     const [tray, setTray] = useState(false);
@@ -59,6 +59,26 @@ const MsgModal = ({open,onClose,type,msg}) => {
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
+        setTray(false);
+        setPage(1);
+        setReceiveTotal(0);
+        setSendTotal(0);
+        setReceiveMsgList([]);
+        setSendMsgList([]);
+        setImportantYN({idx:1, name:'전체'},);
+        setReadYN({idx:1, name:'전체'},)
+        setMsgOption({idx:1, name:'받은 메세지'},)
+        setPosition({x:0,y:0});
+        selectedMsg(null);
+        setMsgForm({});
+        setSelectedImportant({idx:1, name:'일반'});
+        setUser([]);
+        setUserSearch('');
+        setUserName('');
+        setUserFocused(false);
+        setSelectedUser(0);
+
+        getUnreadMsg();
         onClose();
     };
 
