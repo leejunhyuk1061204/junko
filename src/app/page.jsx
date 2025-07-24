@@ -108,6 +108,7 @@ const MainPage = () => {
     useEffect(() => {
         if (!chartData || !chartData.getSalesThisMonth || !Array.isArray(chartData.getSalesThisMonth)) return;
 
+        const timer = setTimeout(()=>{
         // 요약 정보
         setSummaryData({
             totalSales: chartData?.getSalesThisMonth?.[0]?.total_sales?? 0,
@@ -299,13 +300,18 @@ const MainPage = () => {
             }
         }
 
-        // 차트 그리기
-        monthlySalesChart(chartData.getMonthlySalesYoY);
-        daySalesChart(chartData.getDaySales);
-        inOutChart(chartData.getInOutProduct);
-        popularProductChart(chartData.getPopularProduct);
+
+            // 차트 그리기
+            monthlySalesChart(chartData.getMonthlySalesYoY);
+            daySalesChart(chartData.getDaySales);
+            inOutChart(chartData.getInOutProduct);
+            popularProductChart(chartData.getPopularProduct);
+            console.log("useEffect 실행");
+        },100);
+
 
         return () => {
+            clearTimeout(timer);
             // 재렌더 시 기존 차트 제거
             if (monthlySalesChartRef.current) monthlySalesChartRef.current.destroy();
             if (daySalesChartRef.current) daySalesChartRef.current.destroy();

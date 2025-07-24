@@ -353,6 +353,10 @@ input[type='number']:focus {
     margin-right: 4%;
 }
 
+.margin-right-5 {
+    margin-right: 5px;
+}
+
 .margin-right-10 {
     margin-right: 10px;
 }
@@ -367,6 +371,14 @@ input[type='number']:focus {
 
 .position-absolute {
     position: absolute;
+}
+
+.top-100 {
+    top: 100%;
+}
+
+.left-0 {
+    left: 0;
 }
 
 .text-align-left {
@@ -2053,7 +2065,8 @@ input[type='number']:focus {
     color: var(--red-color);
 }
 
-.checkbox-table thead th:first-child{
+.checkbox-table thead th:first-child,
+.checkbox-table thead td:first-child{
     width:60px;
 }
 
@@ -2675,7 +2688,15 @@ input[type='number']:focus {
     border-radius: 4px;
 }
 
-
+.template-readonly {
+    height: 36px;
+    line-height: 36px;
+    padding: 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f4f4f4;
+    font-size: 14px;
+}
 
 /*-------------------------정산 현황 css--------------------------------*/
 .settlement-wrapper {
@@ -3846,4 +3867,340 @@ input[type='number']:focus {
 .dragging-zone {
     opacity: 0.4;
     transition: opacity 0.2s;
+}
+
+.tray-off {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    background-color: #fefefe;
+    border: none;
+    font-size: 3rem;
+    cursor: pointer;
+    margin-left: 10px;
+    height: 25px;
+    padding: 0 6px;
+}
+
+.tray-on {
+    padding: 0 6px;
+    height: 25px;
+    margin: 10px;
+    font-size: 3rem;
+    border: none;
+    background-color: #fefefe;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tray-on-width {
+    width:50px;
+    background: rgba(0,0,0,0) !important;
+}
+
+.tray-off-width {
+    background-color: #fff;
+    width: 600px;
+    min-width: 320px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* =============== 기안서 작성 =============== */
+.approval-box-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 24px;
+    background-color: #fff;
+    margin-bottom: 14px;
+}
+
+.approval-box-inner {
+    display: flex;
+    gap: 0;
+}
+
+.approval-left {
+    flex: 1.2;
+    padding-right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.approval-right {
+    flex: 0.8;
+    padding-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.vertical-divider {
+    width: 1px;
+    background-color: #ddd;
+    margin: 4px 0;
+}
+
+.form-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end; /*라벨 높이 안 밀리게*/
+}
+
+.form-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    height: 36px;
+}
+
+.form-group label {
+    font-size: 14px;
+    margin-bottom: 6px;
+    font-weight: 700;
+    width: 100px;
+    font-size: 16px;
+}
+
+.form-group input {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    width: 50%;
+}
+
+.form-group select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 13px;
+    font-size: 14px;
+    width: 30%;
+}
+
+.approver-box {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    align-items: center;
+}
+
+.approver-box input[type="text"],
+.search-field {
+    display: flex;
+    gap: 6px;
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.doc-link {
+    margin-top: 6px;
+    color: #1d4ed8;
+    text-decoration: underline;
+}
+
+.attach-btn {
+    margin-top: 6px;
+    padding: 6px 18px;
+    font-size: 18px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.input-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.variable-row {
+    display: flex;
+    align-items: center;
+}
+
+.variable-row label {
+    width: 160px;
+    font-weight: 500;
+    margin-right: 10px;
+}
+
+.variable-row input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.approver-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.form-group .approver-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.form-group .approver-group .form-label {
+    width: 80px;
+    text-align: right;
+    align-self: center;
+    font-weight: 500;
+}
+
+.approver-field-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    position: relative;
+}
+
+.approver-search-row {
+    display: flex;
+    gap: 6px;
+    width: 60%;
+}
+
+.approver-search-row input {
+    flex: 0.7;
+    min-width: 100px;
+    padding: 6px 10px;
+    font-size: 14px;
+}
+
+.readonly-approver {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    max-width: 350px;
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    color: #444;
+    white-space: nowrap;
+    gap: 4px;
+    min-height: 30px;
+    align-items: center;
+}
+
+.readonly-approver .placeholder {
+    color: #aaa;
+}
+
+.approver-tag {
+    flex-shrink: 0; /* 한 줄 유지 */
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    padding: 4px 2px;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2px;
+    width: 80px;
+}
+
+.approver-tag:last-child {
+    margin-right: 0;
+}
+
+.approver-tag button {
+    margin-left: 4px;
+    background: none;
+    border: none;
+    color: #888;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.approver-tag button:hover {
+    color: #cd5c5c;
+}
+
+.approver-search-btn {
+    flex-shrink: 0;
+    height: 32px;
+    padding: 0 12px;
+    background-color: #1c64f2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 결재선 리스트 검색 */
+.search-dropdown {
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 150px;
+    overflow-y: auto;
+    margin-top: 4px;
+    list-style: none;
+    z-index: 10;
+    position: absolute;
+    width: 200px;
+    padding: 6px 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+}
+
+.search-dropdown li {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.search-dropdown li:hover {
+    background-color: #f0f0f0;
+}
+
+.variable-input {
+    width: 40%;
+}
+
+.notification {
+    position: fixed;
+    bottom: -100px;
+    right: 20px;
+    background-color: #ffeeee;
+    color: #721c24;
+    padding: 10px 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(100%);
+    transition:transform 3.5s;
+    transition-delay: 1.5s;
+    pointer-events: none;
+    z-index: 500;
+    width: 300px;
+    height: 300px;
+}
+
+.notification-enter {
+    transform: translateY(100%);
+}
+
+.notification-enter-active {
+    transform: translateY(0);
+    transition: transform 1s;
+}
+
+.notification-exit {
+    transform: translateY(0);
+}
+
+.notification-exit-active {
+    transform: translateY(100%);
+    transition: transform 1s ;
 }

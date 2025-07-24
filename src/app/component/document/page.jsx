@@ -50,10 +50,18 @@ export default function DocumentManagePage() {
     const [selectedDate, setSelectedDate] = useState({start_date: null, end_date: null});
 
     useEffect(() => {
-        const stored = sessionStorage.getItem("user_idx");
-        if (stored) {
-            setUserIdx(parseInt(stored, 10));
+        const user_idx = sessionStorage.getItem("user_idx");
+        if (!user_idx) {
+            openModal({
+                svg: '❗',
+                msg1: '해당 페이지 접근 불가',
+                msg2: '로그인 후 이용해주세요.',
+                showCancel: false,
+                onConfirm: () => router.push('./login'),
+            });
+            return;
         }
+        setUserIdx(parseInt(sessionStorage.getItem("user_idx"), 10));
     }, []);
 
     useEffect(() => {
@@ -154,8 +162,8 @@ export default function DocumentManagePage() {
 
         try {
             const {data} = await axios.post('http://localhost:8080/document/preview',{
-                template_idx: template_idx,
-                variables: variables || {} // undefined 방지
+                template_idx: doc.template_idx,
+                variables: doc.variables || {} // undefined 방지
             });
 
             const html = data.preview;
@@ -259,10 +267,10 @@ export default function DocumentManagePage() {
                         <thead>
                             <tr>
                                 <th style={{ width: "13%" }}>문서 번호</th>
-                                <th style={{ width: "30%" }}>제목</th>
+                                <th style={{ width: "20%" }}>구분</th>
                                 <th style={{ width: "10%" }}>상태</th>
-                                <th style={{ width: "15%" }}>생성일</th>
-                                <th style={{ width: "12%" }}>결재자</th>
+                                <th style={{ width: "15%" }}>작성일</th>
+                                <th style={{ width: "15%" }}>결재자</th>
                                 <th style={{ width: "13%" }}>미리보기</th>
                             </tr>
                         </thead>
@@ -275,7 +283,7 @@ export default function DocumentManagePage() {
                                 documents.map((doc) => (
                                     <tr key={doc.document_idx}>
                                         <td>{doc.document_idx}</td>
-                                        <td>{doc.title || '-'}</td>
+                                        <td>{doc.template_name || '-'}</td>
                                         <td>
                                             <span className={statusLabel(doc.status)}>{doc.status}</span>
                                         </td>
