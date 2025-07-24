@@ -371,7 +371,7 @@ export default function DocumentInsertPage() {
                                                             setSearchMsg(`${maxStep}명까지만 선택 가능합니다.`)
                                                         }
                                                 }}>
-                                                    {person.user_name} ({person.job_name})
+                                                    {person.user_name} {person.job_name}
                                                 </li>
                                             ))}
                                         </ul>

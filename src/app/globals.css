@@ -3948,7 +3948,7 @@ input[type='number']:focus {
     background-color: #FFF4E5;
     color: #AD6800;
 }
-/*승인완료*/
+/*승인*/
 .status-approved {
     background-color: #E6F4EA;
     color: #237804;
@@ -4338,16 +4338,67 @@ input[type='number']:focus {
 }
 
 .tab-btn {
-    padding: 6px 12px;
-    background: #f1f1f1;
-    border: none;
+    padding: 6px 8px;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
+    font-weight: 550;
     color: #555;
+    border-bottom: 3px solid transparent;
 }
 
 .tab-btn-active {
-    background: #333;
-    color: #fff;
+    color: #444;
+    font-weight: 550;
+    border-bottom: 3px solid #1d4ed8;
+}
+
+
+/* =============== 문서 상세보기 =============== */
+.doc-modal-content h2 {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    text-align: center;
+    justify-content: center;
+}
+
+.doc-modal-content ul.info {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px 0;
+}
+
+.doc-modal-content li {
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.doc-modal-content p {
+    margin-bottom: 20px;
+    font-size: 16px;
+
+}
+
+.doc-modal-content table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.doc-modal-content th,
+.doc-modal-content td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.document-preview {
+    justify-content: center;
+    min-height: 50px;
+    margin: 20px 0;
+}
+
+.doc-manage {
+    width: 135px;
 }

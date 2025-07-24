@@ -11,6 +11,7 @@ import axios from "axios";
 import {FaPlus, FaRegCalendarCheck} from "react-icons/fa6";
 import {useAlertModalStore, useDatePickerStore} from "@/app/zustand/store";
 import format from "date-fns/format";
+import DocumentDetailModal from "@/app/component/document/detail/page";
 
 export default function DocumentManagePage() {
     const router = useRouter();
@@ -31,7 +32,7 @@ export default function DocumentManagePage() {
         switch(status) {
             case "미확인": return "status-label status-unread";
             case "결재중": return "status-label status-approving";
-            case "승인완료": return "status-label status-approved";
+            case "승인": return "status-label status-approved";
             case "반려": return "status-label status-rejected";
             default: return "status-label";
         }
@@ -41,16 +42,20 @@ export default function DocumentManagePage() {
     const [documents, setDocuments] = useState([]);
     const [userIdx, setUserIdx] = useState(null);
     const [loading, setLoading] = useState(true);
-    const statusOptions = ['전체', '미확인', '결재중', '승인완료', '반려'];
+    const statusOptions = ['전체', '미확인', '결재중', '승인', '반려'];
     const [currentPage, setCurrentPage] = useState(1);
     const [limit, setLimit] = useState(10);
-    const [totalPage, setTotalPage] = useState(1);
     const [totalCnt, setTotalCnt] = useState(0);
     const [search, setSearch] = useState("");
     const [selectedDate, setSelectedDate] = useState({start_date: null, end_date: null});
+    const [detailHtml, setDetailHtml] = useState(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+    const [selectedDoc, setSelectedDoc] = useState(null);
+    const [comment, setComment] = useState("");
+
+    const user_idx = typeof window !== "undefined" ? parseInt(sessionStorage.getItem("user_idx"), 10) : "";
 
     useEffect(() => {
-        const user_idx = sessionStorage.getItem("user_idx");
         if (!user_idx) {
             openModal({
                 svg: '❗',
@@ -65,7 +70,7 @@ export default function DocumentManagePage() {
     }, []);
 
     useEffect(() => {
-        if (userIdx !== null) fetchDocuments(1);
+        if (user_idx !== null) fetchDocuments(1);
     }, [statusFilter, userIdx, search, selectedTab]);
 
     const fetchDocuments = async (page = currentPage, customDate = selectedDate) => {
@@ -73,7 +78,7 @@ export default function DocumentManagePage() {
         try {
             const {data} = await axios.get('http://localhost:8080/document/list', {
                 params: {
-                    user_idx: userIdx,
+                    user_idx: user_idx,
                     status: statusFilter === '전체' ? '' : statusFilter,
                     keyword: search,
                     start_date: customDate.start_date || '',
@@ -154,48 +159,82 @@ export default function DocumentManagePage() {
         });
     };
 
-    // 미리보기
-    const handlePreview = async (doc) => {
-        console.log({
-            template_idx: doc.template_idx,
-            variables: doc.variables,
-        });
-
+    // 상세보기
+    const handleView = async (doc) => {
         try {
-            const {data} = await axios.post('http://localhost:8080/document/preview',{
+            const {data} = await axios.post('http://localhost:8080/document/preview', {
                 template_idx: doc.template_idx,
-                variables: doc.variables || {} // undefined 방지
+                variables: doc.variables || {}
             });
 
-            const html = data.preview;
-
-            if (!html) {
+            if (!data.preview) {
                 openModal({
                     svg: '❗',
-                    msg1: '페이지 오류',
-                    msg2: '미리오기를 불러올 수 없습니다.',
+                    msg1: '문서 호출 실패',
+                    msg2: '문서 내용을 불러올 수 없습니다.',
                     showCancel: false,
                 });
                 return;
             }
+            setDetailHtml(data.preview);
+            setSelectedDoc(doc);
+            setShowDetailModal(true);
 
-            const width = 800;
-            const height = 600;
-            const left = window.screenX + (window.outerWidth - width) / 2;
-            const top = window.screenY + (window.outerHeight - height) / 2;
+        } catch (err) {
+            console.error("상세보기 오류", err);
+        }
+    };
 
-            const win = window.open(
-                "", // 빈창
-                "_blank", // 새 창
-                `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=yes`
-            );
+    // 승인
+    const handleApprove = async (docIdx) => {
 
-            win.document.open();
-            win.document.write(html);
-            win.document.close();
+        try {
+            await axios.post('http://localhost:8080/document/approve', {
+                document_idx: docIdx,
+                user_idx: user_idx,
+                status: '승인완료'
+            });
+            openModal({
+                svg: '✔',
+                msg1: '처리 완료',
+                msg2: '승인되었습니다.',
+                showCancel: false,
+            });
+            setShowDetailModal(false);
+            fetchDocuments(); // 리스트 새로고침
+        } catch (err) {
+            console.error("승인 실패..", err);
+        }
+    };
 
-        }catch (err) {
-            console.error("미리보기 실패!!!!!!", err);
+    // 반려
+    const handleReject = async (docIdx, comment) => {
+        if (!comment || !comment.trim()) {
+            openModal({
+                svg: '❗',
+                msg1: '처리 실패',
+                msg2: '반려 사유를 입력하세요.',
+                showCancel: false,
+            });
+            return;
+        }
+        try {
+            await axios.post('http://localhost:8080/document/reject', {
+                document_idx: docIdx,
+                user_idx: user_idx,
+                comment: comment,
+                status: '반려'
+            });
+            openModal({
+                svg: '✔',
+                msg1: '처리 완료',
+                msg2: '반려 처리되었습니다.',
+                showCancel: false,
+            });
+            setShowDetailModal(false);
+            fetchDocuments();
+        } catch (err) {
+            console.error("반려 돌아가..", err);
         }
     };
 
@@ -203,19 +242,22 @@ export default function DocumentManagePage() {
         <div className="productPage wrap page-background">
             <Header />
             <div className="template-list-back justify-content-between items-center">
-                <h1 className="text-align-left margin-bottom-10 font-bold margin-left-20" style={{ fontSize: "24px" }}>
-                    문서 관리
-                </h1>
-                <div className="tab-buttons" style={{ display: "flex", gap: "10px", marginBottom: "16px" }}>
-                    <button
-                        className={selectedTab === "상신함" ? "tab-btn-active" : "tab-btn"}
-                        onClick={() => setSelectedTab("상신함")}
-                    >상신함</button>
-                    <button
-                        className={selectedTab === "수신함" ? "tab-btn-active" : "tab-btn"}
-                        onClick={() => setSelectedTab("수신함")}
-                    >수신함</button>
+                <div className="flex">
+                    <h1 className="text-align-left margin-bottom-10 font-bold margin-left-20 doc-manage" style={{ fontSize: "24px" }}>
+                        문서 관리
+                    </h1>
+                    <div className="tab-buttons" style={{display: "flex", gap: "4px", marginBottom: "4px"}}>
+                        <button
+                            className={selectedTab === "상신함" ? "tab-btn-active" : "tab-btn"}
+                            onClick={() => setSelectedTab("상신함")}
+                        >상신함</button>
+                        <button
+                            className={selectedTab === "수신함" ? "tab-btn-active" : "tab-btn"}
+                            onClick={() => setSelectedTab("수신함")}
+                        >수신함</button>
+                    </div>
                 </div>
+
                 {/* 필터 영역 */}
                 <div className="margin-bottom-10 flex gap_10 align-center justify-content-center">
                     <div className="doc-select-container">
@@ -277,12 +319,12 @@ export default function DocumentManagePage() {
                     <table className="doc-table margin-bottom-20">
                         <thead>
                             <tr>
-                                <th style={{ width: "13%" }}>문서 번호</th>
-                                <th style={{ width: "20%" }}>구분</th>
-                                <th style={{ width: "10%" }}>상태</th>
-                                <th style={{ width: "15%" }}>작성일</th>
-                                <th style={{ width: "15%" }}>결재자</th>
-                                <th style={{ width: "13%" }}>상세</th>
+                                <th style={{ width: "6%" }}>문서 번호</th>
+                                <th style={{ width: "13%" }}>구분</th>
+                                <th style={{ width: "8%" }}>상태</th>
+                                <th style={{ width: "8%" }}>작성일</th>
+                                <th style={{ width: "17%" }}>결재자</th>
+                                <th style={{ width: "8%" }}>상세</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -301,7 +343,7 @@ export default function DocumentManagePage() {
                                         <td>{doc.created_date}</td>
                                         <td>{doc.approver_name || '-'}</td>
                                         <td>
-                                            <button className="template-btn-small" onClick={() => handlePreview(doc)}>
+                                            <button className="template-btn-small" onClick={() => handleView(doc)}>
                                                 문서 보기
                                             </button>
                                         </td>
@@ -327,6 +369,17 @@ export default function DocumentManagePage() {
                         />
                     </div>
                 </div>
+                {showDetailModal && (
+                    <DocumentDetailModal
+                        html={detailHtml}
+                        doc={selectedDoc}
+                        user_idx={userIdx}
+                        value={comment}
+                        onApprove={handleApprove}
+                        onReject={handleReject}
+                        onClose={() => setShowDetailModal(false)}
+                    />
+                )}
             </div>
         </div>
     );
