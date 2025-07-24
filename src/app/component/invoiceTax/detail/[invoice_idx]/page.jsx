@@ -10,6 +10,18 @@ export default function InvoiceDetailPage() {
     const params = useParams()
     const [data, setData] = useState(null)
     const [previewHtml, setPreviewHtml] = useState('')
+    const [userList, setUserList] = useState([])
+
+    useEffect(() => {
+        document.body.classList.add('invoice-detail-body-reset')
+        return () => document.body.classList.remove('invoice-detail-body-reset')
+    }, [])
+
+    useEffect(() => {
+        axios.post('http://localhost:8080/users/list', {})
+            .then(res => setUserList(res.data?.list || []))
+            .catch(err => console.error('유저 리스트 불러오기 실패:', err))
+    }, [])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -53,7 +65,7 @@ export default function InvoiceDetailPage() {
     if (!data) return <div className="wrap page-background"><Header/><p>로딩 중...</p></div>
 
     return (
-        <div className="wrap page-background">
+        <div className="wrap page-background" >
             <Header/>
             <div className="template-form-container">
                 {/* 왼쪽: 계산서 상세 정보 */}
@@ -99,6 +111,27 @@ export default function InvoiceDetailPage() {
                         <tr><td>총금액</td><td>{(data.total_amount * 1.1).toLocaleString()}원</td></tr>
                         <tr><td>작성일</td><td>{data.reg_date}</td></tr>
                         <tr><td>작성자</td><td>{data.issued_by}</td></tr>
+                        <tr>
+                            <td>결재자</td>
+                            <td>
+                                <div className="approver-tag-container">
+                                    {Array.isArray(data.approver_ids) && data.approver_ids.length > 0 ? (
+                                        data.approver_ids
+                                            .map(id => Number(id))
+                                            .map(id => {
+                                                const user = userList.find(u => u.user_idx === id)
+                                                return user ? (
+                                                    <span key={id} className="approver-tag">
+                                                        {user.user_name}
+                                                    </span>
+                                                ) : null
+                                            })
+                                    ) : (
+                                        '없음'
+                                    )}
+                                </div>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
 
