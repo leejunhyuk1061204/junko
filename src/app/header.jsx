@@ -67,7 +67,7 @@ const mainMenus = [
         submenu: [
             { label: '정산 현황', href: '/component/entryStatus' },
             { label: '거래처 / 공급사별 정산', href: '/' },
-            { label: '세금 계산서 / 증빙 관리', href: '/component/taxInvoice' },
+            { label: '세금 계산서 / 증빙 관리', href: '/component/invoiceTax' },
             { label: '입금 / 지급 관리', href: '/component/receiptPayment' },
             { label: '회계 전표 관리', href: '/component/voucher' },
         ],
