@@ -5,10 +5,11 @@ import React, {useEffect, useRef, useState} from "react";
 import {TbSearch} from "react-icons/tb";
 import {useParams, useRouter} from "next/navigation";
 import axios from "axios";
-import {useAlertModalStore} from "@/app/zustand/store";
+import {useAlertModalStore, useDatePickerStore} from "@/app/zustand/store";
 
 export default function DocumentInsertPage() {
     const {openModal, closeModal} = useAlertModalStore();
+    const {openDatePicker, closeDatePicker} = useDatePickerStore();
     const router = useRouter();
     const params = useParams();
     const template_idx = params.template_idx;
@@ -16,7 +17,6 @@ export default function DocumentInsertPage() {
     const [approvalStep, setApprovalStep] = useState("1단계");
     const [approverIds, setApproverIds] = useState([]);
     const [templateHtml, setTemplateHtml] = useState("");
-    const [date, setDate] = useState(""); // yyyy-MM-dd
     const [type, setType] = useState(""); // 고정 or 선택
     const [idx, setIdx] = useState(0);
     const [variables, setVariables] = useState({
@@ -28,6 +28,11 @@ export default function DocumentInsertPage() {
     const [searchResults, setSearchResults] = useState([]);
     const [highlightIndex, setHighlightIndex] = useState(-1);
     const [templateName, setTemplateName] = useState("");
+    const [selectedDate, setSelectedDate] = useState({
+        selectedDate: null,
+        startDate: null,
+        endDate: null,
+    });
 
     const dropdownRef = useRef(null);
     const dateRef = useRef(null);
@@ -221,14 +226,42 @@ export default function DocumentInsertPage() {
         setVariables((prev) => {
             const updated = { ...prev };
             Object.keys(updated).forEach((key) => {
-                if (key.endsWith("date")) updated[key] = date;
+                if (key.endsWith("date")) {
+                    if (selectedDate.selectDate) {
+                        updated[key] = selectedDate.selectDate;
+                    } else if (selectedDate.startDate && selectedDate.endDate) {
+                        updated[key] = `${selectedDate.startDate} ~ ${selectedDate.endDate}`;
+                    }
+                }
                 if (key === "user_name") {
                     updated[key] = typeof window !== "undefined" ? sessionStorage.getItem("user_name") || "" : "";
                 }
             });
             return updated;
         });
-    }, [date]);
+    }, [selectedDate]);
+
+    const handleDatePicker = () => {
+        openDatePicker({
+            mode:'single',
+            modeSelect:true,
+            initialDates:[null,null],
+            onConfirm:((_,value)=>{
+                if(Array.isArray(value)){
+                    const [start,end] = value;
+                    setSelectedDate({
+                        startDate:start ? format(start,'yyyy-MM-dd') : null,
+                        endDate:end ? format(end,'yyyy-MM-dd') : null
+                    });
+                } else {
+                    setSelectedDate({
+                        selectDate:format(value, 'yyyy-MM-dd'),
+                    });
+                }
+                closeDatePicker();
+            })
+        });
+    };
 
     // 기안서 작성
     const handleInsert = async () => {
@@ -401,15 +434,8 @@ export default function DocumentInsertPage() {
 
                         <div className="approval-right">
                             <div className="form-group right-form">
-                                <label>일자</label>
-                                <input
-                                    type="date"
-                                    value={date}
-                                    ref={dateRef}
-                                    onClick={() => dateRef.current?.showPicker()}
-                                    onChange={(e) => setDate(e.target.value)}
-                                    onKeyDown={(e) => e.preventDefault()}
-                                />
+                                <label>시행일자</label>
+                                <button onClick={handleDatePicker}>날짜 선택</button>
                             </div>
                             <div className="form-group right-form">
                                 <label>구분</label>
@@ -434,9 +460,7 @@ export default function DocumentInsertPage() {
                                         <input
                                             type="text"
                                             placeholder={`${key} 입력`}
-                                            value={
-                                                dateField ? date : userNameField ? sessionStorage.getItem("user_name") || "" : value
-                                            }
+                                            value={value || ""}
                                             readOnly = {dateField || userNameField}
                                             onChange={(e) => {
                                                 if (dateField || userNameField) return;
