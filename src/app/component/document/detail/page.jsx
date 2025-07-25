@@ -1,3 +1,4 @@
+
 'use client'
 
 import axios from "axios";
@@ -90,6 +91,7 @@ const DocumentDetailModal = ({html, onClose, onApprove, onReject, doc, user_idx}
             </div>
         </div>
     );
+
 };
 
 export default DocumentDetailModal;
