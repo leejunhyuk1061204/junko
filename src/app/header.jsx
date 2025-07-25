@@ -16,7 +16,7 @@ const mainMenus = [
         submenu: [
             { label: '직원 정보 관리', href: '/' },
             { label: '부서 / 조직 관리', href: '/' },
-            { label: '근태 / 출퇴근 관리', href: '/timecard' },
+            { label: '근태 / 출퇴근 관리', href: '/component/timecard' },
             { label: '급여 / 상여 / 수당 관리', href: '/' },
             { label: '인사평가 / 성과 관리', href: '/' },
             { label: '휴가 / 연차 관리', href: '/' },
@@ -51,8 +51,8 @@ const mainMenus = [
         submenu: [
             { label: '주문 목록 / 상세보기', href: '/component/sales' },
             { label: '출고 관리', href: '/component/shipment' },
-            { label: 'CS / 클레임 처리', href: '/claim' },
-            { label: '반품', href: '/return' },
+            { label: 'CS / 클레임 처리', href: '/component/claim' },
+            { label: '반품', href: '/component/return' },
         ],
         href: '/',
     },
