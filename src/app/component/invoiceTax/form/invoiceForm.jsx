@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/navigation'
-import Select from 'react-select'
 
 export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitSuccess }) {
     const router = useRouter()
@@ -57,8 +56,9 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
                         const user_idx = sessionStorage.getItem('user_idx') || 0
                         setForm({
                             ...res.data.data,
+                            approver_ids: res.data.data.approver_ids ?? [],
                             issued_by: res.data.data.issued_by || user_name,
-                            user_idx: res.data.data.user_idx || Number(user_idx)
+                            user_idx: res.data.data.user_idx || Number(user_idx),
                         })
                     }
                 })
@@ -92,10 +92,6 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
     }
 
     const createDocument = async (invoice_idx) => {
-        if (form.status === '확정' && form.approver_ids?.length > 0) {
-            payload.approver_ids = form.approver_ids
-        }
-
         try {
             const user_name = sessionStorage.getItem('user_name') || ''
             const user_idx = sessionStorage.getItem('user_idx') || 0
@@ -179,42 +175,54 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
 
                         <div className="invoice-form-group-horizontal">
                             <label className="invoice-label">결재자 지정</label>
-                            <div style={{ width: '100%' }}>
+                            <div style={{ width: '100%' , marginLeft: '10px'}}>
+                                {/* 일반 select로 변경 */}
+                                <select
+                                    disabled={form.status !== '발행완료'} // ← 추가
+                                    onChange={(e) => {
+                                        const selectedId = Number(e.target.value)
+                                        if (selectedId && !form.approver_ids.includes(selectedId)) {
+                                            setForm(prev => ({
+                                                ...prev,
+                                                approver_ids: [...prev.approver_ids, selectedId],
+                                            }))
+                                        }
+                                        e.target.value = ''
+                                    }}
+                                    className="invoice-input"
+                                    style={{ height: '40px', marginTop: '8px' , width: '100%'}}
+                                >
+                                    <option value="">결재자 선택</option>
+                                    {userList
+                                        .filter(u => !form.approver_ids.includes(u.user_idx))
+                                        .map(user => (
+                                            <option key={user.user_idx} value={user.user_idx}>
+                                                {user.user_name}
+                                            </option>
+                                        ))}
+                                </select>
 
-                                {/* 태그 출력 영역 (인풋 바깥) */}
+                                {/* 선택된 결재자 표시 */}
                                 <div className="selected-approvers">
                                     {form.approver_ids.map(id => {
                                         const user = userList.find(u => u.user_idx === id)
                                         return (
                                             <span key={id} className="approver-tag">
                                                 {user?.user_name}
-                                                <button onClick={() => {
-                                                    setForm(prev => ({
-                                                        ...prev,
-                                                        approver_ids: prev.approver_ids.filter(x => x !== id)
-                                                    }))
-                                                }}>×</button>
+                                                {form.status === '발행완료' && (
+                                                    <button onClick={() => {
+                                                        setForm(prev => ({
+                                                            ...prev,
+                                                            approver_ids: prev.approver_ids.filter(x => x !== id)
+                                                        }))
+                                                    }}>×</button>
+                                                )}
                                             </span>
                                         )
                                     })}
                                 </div>
-
-                                {/* 검색용 select */}
-                                <Select
-                                    options={userOptions.filter(o => !form.approver_ids.includes(o.value))}
-                                    onChange={(selected) => {
-                                        if (selected) {
-                                            setForm(prev => ({
-                                                ...prev,
-                                                approver_ids: [...prev.approver_ids, selected.value]
-                                            }))
-                                        }
-                                    }}
-                                    placeholder="결재자 검색 및 선택"
-                                />
                             </div>
                         </div>
-
 
                         <div className="invoice-form-group-horizontal">
                             <label className="invoice-label">거래처</label>
@@ -226,6 +234,20 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
                                         {c.custom_name}
                                     </option>
                                 ))}
+                            </select>
+                        </div>
+
+                        <div className="invoice-form-group-horizontal">
+                            <label className="invoice-label">상태</label>
+                            <select
+                                name="status"
+                                value={form.status}
+                                onChange={handleChange}
+                                className="invoice-input"
+                                style={{ height: '40px' }}
+                            >
+                                <option value="작성중">작성중</option>
+                                <option value="발행완료">발행완료</option>
                             </select>
                         </div>
 
