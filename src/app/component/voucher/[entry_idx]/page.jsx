@@ -11,19 +11,55 @@ export default function VoucherDetailPage() {
     const [voucher, setVoucher] = useState(null)
     const [previewHtml, setPreviewHtml] = useState('')
     const [previewMode, setPreviewMode] = useState('voucher')
+    const [approvalLines, setApprovalLines] = useState([])
 
+// 전표 데이터 불러오기
     useEffect(() => {
         if (!entry_idx) return
         axios.get(`http://localhost:8080/voucher/detail/${entry_idx}`)
             .then(res => {
-                if (res.data.success) setVoucher(res.data.data)
-                else alert('전표를 불러오지 못했습니다.')
+                if (res.data.success) {
+                    setVoucher(res.data.data)
+                    setApprovalLines(res.data.approval_lines || [])
+                    console.log('approval_lines:', approvalLines)
+                    console.log('approvers 상태:', res.data.data)
+                } else {
+                    alert('전표를 불러오지 못했습니다.')
+                }
             })
             .catch(err => {
                 console.error(err)
                 alert('서버 오류 발생')
             })
     }, [entry_idx])
+
+// approver_ids 기반 approvalLines 구성
+    useEffect(() => {
+        if (!voucher?.approver_ids) return
+
+        const fetchUsers = async () => {
+            try {
+                const res = await axios.post('http://localhost:8080/users/list', {})
+                if (res.data.success) {
+                    const allUsers = res.data.list
+
+                    const lines = voucher.approver_ids.map((id, idx) => {
+                        const user = allUsers.find(u => u.user_idx === id)
+                        return {
+                            user_idx: id,
+                            user_name: user?.user_name || '알 수 없음',
+                        }
+                    })
+
+                    setApprovalLines(lines)
+                }
+            } catch (err) {
+                console.error('유저 목록 불러오기 실패:', err)
+            }
+        }
+
+        fetchUsers()
+    }, [voucher?.approver_ids])
 
     useEffect(() => {
         if (!voucher) return
@@ -78,6 +114,7 @@ export default function VoucherDetailPage() {
                     amount: voucher.amount,
                     user_idx: voucher.user_idx,
                     custom_idx: voucher.custom_idx,
+                    approver_ids: approvers.map(u => u.user_idx),
                 },
             })
 
@@ -94,6 +131,7 @@ export default function VoucherDetailPage() {
                 user_idx: voucher.user_idx,
                 template_idx,
                 variables,
+                approver_ids: approvalLines.map(a => a.user_idx)
             })
 
             if (res.data.success && res.data.document_idx) {
@@ -195,9 +233,38 @@ export default function VoucherDetailPage() {
                         </button>
                     </div>
 
+                    {approvalLines.length > 0 && (
+                        <div style={{ marginTop: '30px' }}>
+                            <h3 className="text-align-left margin-bottom-10">
+                                <span className="product-header">결재라인</span>
+                            </h3>
+                            <table className="product-list margin-bottom-10">
+                                <thead>
+                                <tr>
+                                    <th>순번</th>
+                                    <th>결재자</th>
+                                    <th>상태</th>
+                                    <th>결재일</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {approvalLines.map((line, idx) => (
+                                    <tr key={idx}>
+                                        <td>{line.step}차</td>
+                                        <td>{line.user_name}</td>
+                                        <td>{line.status}</td>
+                                        <td>{line.approved_date ? line.approved_date.slice(0, 10) : '-'}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+
                     <div className="text-align-left" style={{ marginTop: '40px' }}>
-                    <Link href="./" className="template-btn-back">목록</Link>
+                        <Link href="./" className="template-btn-back">목록</Link>
                     </div>
+
                 </div>
 
                 {/* 오른쪽: 문서 미리보기 */}

@@ -3,15 +3,33 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 
-export default function VoucherForm({ formData, onChange }) {
+export default function VoucherForm({ formData, onChange, approvers, setApprovers }) {
     const [customList, setCustomList] = useState([])
+    const [userList, setUserList] = useState([])
 
     useEffect(() => {
         axios.get('http://localhost:8080/custom/list')
             .then(res => {
                 if (res.data?.list) setCustomList(res.data.list)
             })
+
+        axios.post('http://localhost:8080/users/list',{})
+            .then(res => setUserList(res.data?.list || []))
+            .catch(err => console.log('유저 리스트 불러오기 실패',err))
     }, [])
+
+    const addApprover = (e) => {
+        const selectedId = Number(e.target.value)
+        if (selectedId && !approvers.some(u => u.user_idx === selectedId)) {
+            const selectedUser = userList.find(u => u.user_idx === selectedId)
+            if (selectedUser) setApprovers([...approvers, selectedUser])
+        }
+        e.target.value = ''
+    }
+
+    const removeApprover = (id) => {
+        setApprovers(prev => prev.filter(u => u.user_idx !== id))
+    }
 
     return (
         <div>
@@ -74,6 +92,44 @@ export default function VoucherForm({ formData, onChange }) {
                         ))}
                     </select>
                 </div>
+
+                <div className="template-form-group">
+                    <label className="template-label">상태</label>
+                    <select
+                        className="template-input"
+                        name="status"
+                        value={formData.status}
+                        onChange={onChange}
+                    >
+                        <option value="작성중">작성중</option>
+                        <option value="확정">확정</option>
+                    </select>
+                </div>
+
+                <div className="template-form-group">
+                    <label className="template-label">결재자 지정</label>
+                    <select
+                        className="template-input"
+                        disabled={formData.status !== '확정'}
+                        onChange={addApprover}
+                    >
+                        <option value="">결재자 선택</option>
+                        {userList.filter(u => !approvers.some(a => a.user_idx === u.user_idx)).map(user => (
+                            <option key={user.user_idx} value={user.user_idx}>{user.user_name}</option>
+                        ))}
+                    </select>
+                    <div className="selected-approvers">
+                        {approvers.map(user => (
+                            <span key={user.user_idx} className="approver-tag">
+                            {user.user_name}
+                                {formData.status === '확정' && (
+                                    <button onClick={() => removeApprover(user.user_idx)}>×</button>
+                                )}
+                        </span>
+                        ))}
+                    </div>
+                </div>
+
             </div>
         </div>
     )

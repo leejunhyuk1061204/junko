@@ -14,10 +14,12 @@ export default function VoucherInsertPage() {
         custom_name: '',
         custom_owner: '',
         user_name: '',
+        status: '작성중',
     })
     const [templateIdx, setTemplateIdx] = useState(null)
     const [templateList, setTemplateList] = useState([])
     const [previewHtml, setPreviewHtml] = useState('')
+    const [approvers, setApprovers] = useState([])
 
     useEffect(() => {
         axios.get('http://localhost:8080/template/list').then((res) => {
@@ -51,47 +53,31 @@ export default function VoucherInsertPage() {
         if (!templateIdx) return alert('템플릿을 선택하세요')
 
         try {
-            // 1. 전표 저장
+            // 1. 전표 저장 (문서 생성 포함)
             const res = await axios.post('http://localhost:8080/voucher/insert', {
                 ...formData,
                 entry_date: formData.entry_date
                     ? new Date(formData.entry_date).toISOString().slice(0, 10)
                     : '',
                 template_idx: templateIdx,
+                approver_ids: approvers.map(u => u.user_idx),
             })
 
             if (res.data.success && res.data.entry_idx) {
                 const entry_idx = res.data.entry_idx
+                const document_idx = res.data.document_idx // ✅ document_idx 받아야 함
 
-                const variables = res.data.variables
-
-                const docRes = await axios.post('http://localhost:8080/document/insert', {
-                    idx: entry_idx,
-                    type: 'voucher',
-                    user_idx: formData.user_idx,
-                    template_idx: templateIdx,
-                    variables,
+                // 2. PDF 생성
+                const pdfRes = await axios.post('http://localhost:8080/document/pdf', {
+                    document_idx,
                 })
 
-                if (docRes.data.success && docRes.data.document_idx) {
-                    const document_idx = docRes.data.document_idx
-
-                    // 3. PDF 생성
-                    const pdfRes = await axios.post('http://localhost:8080/document/pdf', {
-                        document_idx,
-                    })
-
-                    if (!pdfRes.data.success) {
-                        console.warn('PDF 생성 실패:', pdfRes.data.message || '')
-                        alert('PDF 파일 생성 실패')
-                    }
-                } else {
-                    console.warn('문서 생성 실패:', docRes.data.message || '')
-                    alert('문서 생성 실패')
+                if (!pdfRes.data.success) {
+                    console.warn('PDF 생성 실패:', pdfRes.data.message || '')
+                    alert('PDF 파일 생성 실패')
                 }
 
-                // 4. 분개 문서 생성
-
+                // 3. 분개 문서 생성
                 const entryDetailTemplateIdx = 14
 
                 const entryDetailVariableRes = await axios.post('http://localhost:8080/entry-detail/preview', {
@@ -116,12 +102,12 @@ export default function VoucherInsertPage() {
                     user_idx: formData.user_idx,
                     template_idx: entryDetailTemplateIdx,
                     variables: entryDetailVariableRes.data.variables,
+                    approver_ids: approvers.map(u => u.user_idx),
                 })
 
                 if (entryDetailDocRes.data.success && entryDetailDocRes.data.document_idx) {
                     const entryDetailDocumentIdx = entryDetailDocRes.data.document_idx
 
-                    // 5. 분개 PDF 생성
                     const entryDetailPdfRes = await axios.post('http://localhost:8080/document/pdf', {
                         document_idx: entryDetailDocumentIdx,
                     })
@@ -146,7 +132,6 @@ export default function VoucherInsertPage() {
         }
     }
 
-
     return (
         <div className="wrap page-background">
             <Header />
@@ -157,7 +142,13 @@ export default function VoucherInsertPage() {
             <div className="template-form-container">
                 {/* 왼쪽 입력 영역 */}
                 <div className="template-form-left">
-                    <VoucherForm formData={formData} onChange={handleChange} />
+                    <VoucherForm
+                        formData={formData}
+                        onChange={handleChange}
+                        approvers={approvers}
+                        setApprovers={setApprovers}
+                        setStatus={(newStatus) => setFormData(prev => ({ ...prev, status: newStatus }))}
+                    />
                     <div className="template-form-group">
                         <label className="template-label">템플릿 선택</label>
                         <select value={templateIdx || ''} onChange={(e) => setTemplateIdx(Number(e.target.value))} className="template-input">
