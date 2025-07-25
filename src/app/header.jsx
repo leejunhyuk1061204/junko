@@ -16,7 +16,7 @@ const mainMenus = [
         submenu: [
             { label: '직원 정보 관리', href: '/' },
             { label: '부서 / 조직 관리', href: '/' },
-            { label: '근태 / 출퇴근 관리', href: '/' },
+            { label: '근태 / 출퇴근 관리', href: '/timecard' },
             { label: '급여 / 상여 / 수당 관리', href: '/' },
             { label: '인사평가 / 성과 관리', href: '/' },
             { label: '휴가 / 연차 관리', href: '/' },
@@ -40,26 +40,19 @@ const mainMenus = [
     {
         title: '재고관리',
         submenu: [
-            { label: '재고 현황', href: '/' },
-            { label: '입고 관리', href: '/' },
-            { label: '출고 관리', href: '/' },
-            { label: '재고 조정', href: '/' },
-            { label: '재고 부족 / 품절 알림', href: '/' },
-            { label: '안전 재고 설정', href: '/' },
-            { label: '재고 회전율 통계', href: '/' },
+            { label: '재고 현황', href: '/component/stock' },
+            { label: '입고 관리', href: '/component/receive' },
+            { label: '발주 관리', href: '/component/order' },
         ],
         href: '/',
     },
     {
         title: '판매 / 주문관리',
         submenu: [
-            { label: '주문 목록 / 상세보기', href: '/' },
-            { label: '신규 / 예약 주문 ', href: '/' },
-            { label: '출고 / 배송 관리', href: '/' },
-            { label: '주문 상태 변경', href: '/' },
-            { label: '대량 주문 처리', href: '/' },
-            { label: 'CS / 클레임 처리', href: '/' },
-
+            { label: '주문 목록 / 상세보기', href: '/component/sales' },
+            { label: '출고 관리', href: '/component/shipment' },
+            { label: 'CS / 클레임 처리', href: '/claim' },
+            { label: '반품', href: '/return' },
         ],
         href: '/',
     },
