@@ -8,6 +8,7 @@ import Link from "next/link";
 import axios from "axios";
 import MsgModal from "@/app/component/modal/MsgModal";
 import {CSSTransition} from "react-transition-group";
+import WorkInOutModal from "@/app/component/modal/WorkInOutModal";
 
 const mainMenus = [
     {
@@ -105,6 +106,7 @@ const Header = () => {
     const [msgModalOpen, setMsgModalOpen] = useState({bool:false});
     const [msgCnt, setMsgCnt] = useState(0);
     const [showNotification, setShowNotification] = useState(false);
+    const [workInOutModalOpen, setWorkInOutModalOpen] = useState(false);
 
     useEffect(() => {
         // 클라이언트에서만 sessionStorage 접근 가능
@@ -127,7 +129,7 @@ const Header = () => {
             page:page,
             read_yn:false,
         });
-        console.log(data);
+        // console.log(data);
         setMsgList(data.list);
         setMsgCnt(data.list.length);
     }
@@ -158,6 +160,7 @@ const Header = () => {
         switch (today.getDay()){
             case 1: formatDay='월';
                 break;
+                
             case 2: formatDay='화';
                 break;
             case 3: formatDay='수';
@@ -198,7 +201,7 @@ const Header = () => {
                 {token ? (
                     <div className="header-text flex align-center justify-right width-fit white-space-nowrap gap_15 margin-right-4 position-relative">
                         <div className="header-date-text">{date_time}</div>
-                        <div className='cursor-pointer'><img src='/run.png' alt='run' width={24}/></div>
+                        <div className='cursor-pointer'><img src='/run.png' alt='run' width={24} onClick={()=>setWorkInOutModalOpen(true)}/></div>
                         <div className='cursor-pointer'>{msgCnt>0 ? <IoMailUnreadOutline onClick={()=>setShowMsg(!showMsg)}/> : <IoMailOutline onClick={()=>setShowMsg(!showMsg)}/>}</div>
                         {showMsg ? (<>
                             {msgList?.length > 0 && (
@@ -263,6 +266,7 @@ const Header = () => {
             </nav>
             <Notification show={showNotification} msgCnt={msgCnt}/>
             <MsgModal open={msgModalOpen.bool} onClose={()=>setMsgModalOpen({bool:false})} type={msgModalOpen.type} msg={msgModalOpen.msg} getUnreadMsg={getMsgReceiveList}/>
+            <WorkInOutModal open={workInOutModalOpen} onClose={()=>setWorkInOutModalOpen(false)} />
         </div>
     );
 };

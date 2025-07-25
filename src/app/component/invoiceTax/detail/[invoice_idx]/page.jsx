@@ -26,6 +26,7 @@ export default function InvoiceDetailPage() {
     useEffect(() => {
         const fetchData = async () => {
             const res = await axios.get(`http://localhost:8080/invoice/detail/${params.invoice_idx}`)
+            console.log('응답 데이터:', res.data)
             if (res.data.success) setData(res.data.data)
         }
         fetchData()
@@ -85,21 +86,27 @@ export default function InvoiceDetailPage() {
                         </tr>
                         </thead>
                         <tbody>
-                        {data.details?.map((item, idx) => (
-                            <tr key={idx}>
-                                <td>품의</td>
-                                <td>{item.item_name}</td>
-                                <td>{item.quantity}</td>
-                                <td>{(item.quantity * item.price).toLocaleString()}</td>
-                                <td>{Math.floor(item.quantity * item.price * 0.1).toLocaleString()}</td>
-                            </tr>
-                        ))}
-                        <tr>
-                            <td colSpan={2}>합계</td>
-                            <td>{data.details?.reduce((a, b) => a + b.quantity, 0)}</td>
-                            <td>{data.total_amount.toLocaleString()}</td>
-                            <td>{Math.floor(data.total_amount * 0.1).toLocaleString()}</td>
-                        </tr>
+                        {Array.isArray(data.details) && data.details.length > 0 ? (
+                            <>
+                                {data.details.map((item, idx) => (
+                                    <tr key={idx}>
+                                        <td>품의</td>
+                                        <td>{item.item_name}</td>
+                                        <td>{item.quantity}</td>
+                                        <td>{(item.quantity * item.price).toLocaleString()}</td>
+                                        <td>{Math.floor(item.quantity * item.price * 0.1).toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                                <tr>
+                                    <td colSpan={2}>합계</td>
+                                    <td>{data.details.reduce((a, b) => a + b.quantity, 0)}</td>
+                                    <td>{data.total_amount.toLocaleString()}</td>
+                                    <td>{Math.floor(data.total_amount * 0.1).toLocaleString()}</td>
+                                </tr>
+                            </>
+                        ) : (
+                            <tr><td colSpan={5}>품목 없음</td></tr>
+                        )}
                         </tbody>
                     </table>
 
@@ -119,16 +126,17 @@ export default function InvoiceDetailPage() {
                                         data.approver_ids
                                             .map(id => Number(id))
                                             .map(id => {
-                                                const user = userList.find(u => u.user_idx === id)
-                                                return user ? (
-                                                    <span key={id} className="approver-tag">
-                                                        {user.user_name}
-                                                    </span>
-                                                ) : null
-                                            })
-                                    ) : (
-                                        '없음'
-                                    )}
+                                            const user = userList.find(u => u.user_idx === id)
+                                            return user ? (
+                                                <span key={id} className="approver-tag">
+                                                    {user.user_name}
+                                                </span>
+                                            ) : (
+                                                <span key={id} className="approver-tag">알 수 없음</span>
+                                            )
+                                        })
+                                    ) : '없음'}
+
                                 </div>
                             </td>
                         </tr>

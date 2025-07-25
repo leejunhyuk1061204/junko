@@ -9,6 +9,7 @@ import VoucherForm from '@/app/component/voucher/insert/VoucherForm'
 export default function VoucherUpdatePage() {
     const { entry_idx } = useParams()
     const router = useRouter()
+    const [approvers, setApprovers] = useState([])
 
     const [formData, setFormData] = useState({
         entry_type: '',
@@ -19,6 +20,7 @@ export default function VoucherUpdatePage() {
         custom_owner: '',
         user_name: '',
         user_idx: '',
+        status: '작성중',
     })
 
     const [templateIdx, setTemplateIdx] = useState(null)
@@ -32,6 +34,12 @@ export default function VoucherUpdatePage() {
         axios.get(`http://localhost:8080/voucher/detail/${entry_idx}`).then((res) => {
             if (res.data.success) {
                 const dto = res.data.data
+                const approvalLines = res.data.approval_lines ?? []
+                setApprovers(approvalLines.map(a => ({
+                    user_idx: a.user_idx,
+                    user_name: a.user_name
+                })))
+
                 setFormData({
                     entry_type: dto.entry_type,
                     entry_date: dto.entry_date,
@@ -45,6 +53,10 @@ export default function VoucherUpdatePage() {
                 })
                 setTemplateIdx(dto.template_idx || null)
                 setDocumentIdx(dto.document_idx || null)
+                setApprovers(approvalLines)
+
+                console.log('approval_lines:', approvalLines)
+                console.log('approvers 상태:', approvers)
             }
         })
 
@@ -76,12 +88,21 @@ export default function VoucherUpdatePage() {
 
         try {
             // 1. 전표 수정
-            const res = await axios.put(`http://localhost:8080/voucher/update/${entry_idx}`, {
-                ...formData,
-                entry_date: formData.entry_date,
-                status: formData.status,
-                template_idx: templateIdx,
-            })
+            const res = await axios.put(`http://localhost:8080/voucher/update/${entry_idx}`,
+                {
+                    ...formData,
+                    entry_date: formData.entry_date,
+                    status: formData.status,
+                    template_idx: templateIdx,
+                    document_idx: documentIdx,
+                    approver_ids: approvers.map(u => Number(u.user_idx)),
+                },
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            )
 
             if (!res.data.success) {
                 alert('전표 수정 실패')
@@ -102,6 +123,7 @@ export default function VoucherUpdatePage() {
                 template_idx: templateIdx,
                 user_idx: formData.user_idx,
                 variables: res.data.variables,
+                approver_ids: approvers.map(a => a.user_idx),
             })
 
             if (!updateDocRes.data.success) {
@@ -136,7 +158,14 @@ export default function VoucherUpdatePage() {
 
             <div className="template-form-container">
                 <div className="template-form-left">
-                    <VoucherForm formData={formData} onChange={handleChange} />
+                    <VoucherForm
+                        formData={formData}
+                        onChange={handleChange}
+                        approvers={approvers}
+                        setApprovers={setApprovers}
+                        status={formData.status}
+                        setStatus={(newStatus) => setFormData(prev => ({ ...prev, status: newStatus }))}
+                    />
                     <div className="template-form-group">
                         <label className="template-label">템플릿 선택</label>
                         <select

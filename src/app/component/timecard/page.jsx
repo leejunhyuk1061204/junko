@@ -12,15 +12,20 @@ import {format} from "date-fns";
 import ShipmentUpdateModal from "@/app/component/modal/ShipmentUpdateModal";
 
 const sortOptions = [
-    { id: 1, name: '최신순' , orderColumn : 'shipment_date', orderDirection: 'desc' },
-    { id: 2, name: '오래된순' , orderColumn : 'shipment_date', orderDirection: 'asc' },
-    { id: 3, name: '번호순' , orderColumn : 'shipment_idx', orderDirection: 'asc'}
+    { id: 1, name: '최신순' , orderColumn : 'work_date', orderDirection: 'desc' },
+    { id: 2, name: '오래된순' , orderColumn : 'work_date', orderDirection: 'asc' },
 ];
 
 const statusFilterList = [
     {idx:1, name:'전체'},
-    {idx:2, name:'출고예정'},
-    {idx:3, name:'출고완료'},
+    {idx:2, name:'출근'},
+    {idx:3, name:'퇴근'},
+    {idx:4, name:'지각'},
+    {idx:5, name:'결근'},
+    {idx:6, name:'연차'},
+    {idx:7, name:'반차'},
+    {idx:8, name:'출장'},
+    {idx:9, name:'외근'},
 ]
 
 const shipmentStatusList = [
@@ -36,41 +41,42 @@ const ShipmentPage = () => {
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [selectedSort, setSelectedSort] = useState({ id: 1, name: '최신순' , orderColumn : 'shipment_date', orderDirection: 'desc' },);
+    const [selectedSort, setSelectedSort] = useState({ id: 1, name: '최신순' , orderColumn : 'work_date', orderDirection: 'desc' },);
     const [selectedStatus, setSelectedStatus] = useState({idx:1, name:'전체'});
     const [statusClicked, setStatusClicked] = useState({});
     const statusRef = useRef({});
     const [checkboxChecked, setCheckboxChecked] = useState({});
 
-    const [shipmentList, setShipmentList] = useState([]);
-    const [productModalOpen, setProductModalOpen] = useState({bool:false,idx:0});
-    const [shipmentUpdateModalOpen, setShipmentUpdateModalOpen] = useState({bool:false});
+    const [timecardList, setTimecardList] = useState([]);
+
 
     useEffect(() => {
-        getShipmentList();
+        getTimecardList();
     }, [selectedSort, selectedStatus, page, selectedDate]);
 
-    // shipment 리스트 가져오기
-    const getShipmentList = async(searchText='') => {
-        const {data} = await axios.post('http://localhost:8080/shipment/list',{
-            search:searchText,
-            status:selectedStatus.name === '전체'?'':selectedStatus.name,
-            orderColumn:selectedSort.orderColumn,
-            orderDirection:selectedSort.orderDirection,
+    //  리스트 가져오기
+    const getTimecardList = async() => {
+        const {data} = await axios.post('http://localhost:8080/timecard/list',{
             page:page,
-            shipment_date:selectedDate.selectDate||'',
+            total:total,
+            search:search,
             start_date:selectedDate.startDate||'',
             end_date:selectedDate.endDate||'',
+            work_date:selectedDate.selectDate||'',
+            status:selectedStatus.name === '전체'?'':selectedStatus.name,
+            orderColumn:selectedSort.orderColumn||'',
+            orderDirection:selectedSort.orderDirection||''
         });
         console.log(data);
+        setTimecardList(data.list);
         setTotal(data.total*10);
-        setShipmentList(data.list);
     }
+
 
     // 검색 엔터
     const searchEnter = (e)=>{
         if(e.keyCode === 13){
-            getShipmentList(search);
+            getTimecardList(search);
             setSearch('');
         }
     }
@@ -84,7 +90,7 @@ const ShipmentPage = () => {
     const handleStatusChange = (status) => {
         setSelectedStatus(status);
         setPage(1);
-        getShipmentList();
+        getTimecardList();
     }
 
 
@@ -116,8 +122,8 @@ const ShipmentPage = () => {
     const allCheck = (checked) => {
         console.log(checkboxChecked);
         const updated = {};
-        for (let i=0; i<shipmentList.length; i++) {
-            updated[i] = {bool:checked,idx:shipmentList[i].sales_idx};
+        for (let i=0; i<timecardList.length; i++) {
+            updated[i] = {bool:checked,idx:timecardList[i].sales_idx};
             // console.log(updated[i]);
         }
         setCheckboxChecked(updated);
@@ -162,10 +168,10 @@ const ShipmentPage = () => {
                         {/* 검색 */}
                         <div className='width-fit flex gap_15 align-center'>
                             <input style={{padding:'1.5px'}} type='text' placeholder='검색어를 입력해주세요' value={search} onChange={e=>setSearch(e.target.value)} onKeyUp={e=>searchEnter(e)}/>
-                            <button className='btn white-space-nowrap height-50' onClick={()=>{getShipmentList();setSearch('')}}><FaSearch /></button>
+                            <button className='btn white-space-nowrap height-50' onClick={()=>{getTimecardList();setSearch('')}}><FaSearch /></button>
                         </div>
                         {/* 기간 설정 */}
-                        <div className='width-fit cursor-pointer'><button className='btn' onClick={()=>handleDatePicker()}><FaRegCalendarCheck /> 출고일자</button></div>
+                        <div className='width-fit cursor-pointer'><button className='btn' onClick={()=>handleDatePicker()}><FaRegCalendarCheck /></button></div>
                         {/* 상태필터 */}
                         <div className="select-container" style={{marginRight:0}}>
                             <Listbox value={selectedStatus} onChange={handleStatusChange}>
@@ -193,48 +199,25 @@ const ShipmentPage = () => {
                             </Listbox>
                         </div>
                     </div>
-                    <table className={'checkbox-table text-overflow-table'}>
+                    <table className={'text-overflow-table '}>
                         <thead>
                             <tr>
-                                {/*<th><input type='checkbox' checked={shipmentList?.length > 0 && shipmentList?.every((_, i) => checkboxChecked[i]?.bool === true)} onChange={e=>allCheck(e.target.checked)}/></th>*/}
-                                <th>출고번호</th>
-                                <th>주문번호</th>
-                                <th>송장번호</th>
-                                <th>담당자</th>
-                                <th>출고창고</th>
-                                <th>출고날짜</th>
+                                {/*<th><input type='checkbox' checked={timecardList?.length > 0 && timecardList?.every((_, i) => checkboxChecked[i]?.bool === true)} onChange={e=>allCheck(e.target.checked)}/></th>*/}
+                                <th>사원이름</th>
+                                <th>날짜</th>
+                                <th>시간</th>
                                 <th>상태</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {shipmentList?.map((shipment,i)=>(
-                                <tr key={i} className='cursor-pointer' onClick={()=>setProductModalOpen({bool:true,idx:shipment.sales_idx})}>
-                                    {/*<td><input type='checkbox' checked={checkboxChecked[i]?.bool ?? false} onChange={()=>setCheckboxChecked(prev=>({...prev,[i]:{bool:!checkboxChecked[i]?.bool,idx:shipment.shipment_idx}}))}/></td>*/}
-                                    <td>{shipment.shipment_idx}</td>
-                                    <td>{shipment.sales_idx}</td>
-                                    <td>{shipment.waybill_idx}</td>
-                                    <td>{shipment.user_name}</td>
-                                    <td>{shipment.warehouse_name}</td>
-                                    <td>{shipment.shipment_date}</td>
-                                    <td className={`position-relative cursor-pointer ${statusClicked[i] ? 'show-dropdown':''} `} onClick={(e)=>{e.stopPropagation();changeStatusClicked(i)}} ref={el => (statusRef.current[i] = el)}>
-                                        {shipment.status}
-                                        {statusClicked[i] && shipment.status === '출고예정'
-                                            ? (
-                                                <ul className="listBox-option">
-                                                    {shipmentStatusList.filter(f=>f.name !== shipment.status)?.map((sl) => (
-                                                        <li
-                                                            key={sl.idx}
-                                                            className="listBox-option-item margin-0"
-                                                            onClick={()=>setShipmentUpdateModalOpen({bool:true,shipment:shipment})}
-                                                        >
-                                                            {sl.name}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            ):('')}
-                                    </td>
+                            {timecardList && timecardList?.map((t,i)=>(
+                                <tr key={i}>
+                                    <th>{t.user_name}</th>
+                                    <th>{t.work_date}</th>
+                                    <th>{t.work_time}</th>
+                                    <th>{t.status}</th>
                                 </tr>
-                                ))}
+                            ))}
                         </tbody>
                     </table>
                     {/* 페이지네이션 */}
@@ -251,8 +234,6 @@ const ShipmentPage = () => {
                     </div>
                 </div>
             </div>
-            <ProductModal open={productModalOpen.bool} onClose={()=>setProductModalOpen({bool:false,idx:0})} sales_idx={productModalOpen.idx}/>
-            <ShipmentUpdateModal open={shipmentUpdateModalOpen.bool} onClose={()=>setShipmentUpdateModalOpen({bool:false,shipment:null})} shipment={shipmentUpdateModalOpen.shipment} getShipmentList={getShipmentList}/>
         </div>
     );
 };
