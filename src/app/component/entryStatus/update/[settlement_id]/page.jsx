@@ -10,27 +10,91 @@ export default function EntryStatusUpdatePage() {
     const router = useRouter()
     const [form, setForm] = useState(null)
     const [previewHtml, setPreviewHtml] = useState('')
+    const [approverList, setApproverList] = useState([])
+    const [approvers, setApprovers] = useState([])
+    const [availableAmount, setAvailableAmount] = useState(0)
+    const [errorMsg, setErrorMsg] = useState('')
 
     useEffect(() => {
         if (!settlement_id) return
         axios.get(`http://localhost:8080/settlement/detail/${settlement_id}`)
             .then(res => {
-                if (res.data.success) setForm(res.data.data)
-                else alert('데이터 조회 실패')
+                if (res.data.success) {
+                    setForm(res.data.data)
+                    setApprovers(res.data.data.approvers || [])
+                } else alert('데이터 조회 실패')
             })
             .catch(err => {
                 console.error(err)
                 alert('오류 발생')
             })
+
+        axios.post('http://localhost:8080/users/list', {}).then(res => {
+            if (res.data?.list) setApproverList(res.data.list)
+        })
+
     }, [settlement_id])
 
     useEffect(() => {
         if (form) previewDocument()
     }, [form])
 
+    useEffect(() => {
+        if (form && form.entry_idx) {
+            const entryIdx = parseInt(form.entry_idx)
+            axios.get(`http://localhost:8080/entry/settlement/previewAmount?entry_idx=${entryIdx}`)
+                .then(res => {
+                    const total = res.data?.voucher_amount || 0
+                    const settled = res.data?.settled_amount || 0
+                    setAvailableAmount(total - settled)
+                })
+                .catch(err => {
+                    console.error('잔액 조회 실패', err)
+                    setAvailableAmount(0)
+                })
+        }
+    }, [form])
+
+    useEffect(() => {
+        if (!form?.amount || !availableAmount) {
+            setErrorMsg('')
+            return
+        }
+
+        const v = parseInt(form.amount || 0)
+        if (v > availableAmount) {
+            setErrorMsg('정산 가능 금액을 초과했습니다.')
+        } else {
+            setErrorMsg('')
+        }
+    }, [form?.amount, availableAmount])
+
+
     const handleChange = (e) => {
         const { name, value } = e.target
         setForm(prev => ({ ...prev, [name]: value }))
+
+        if (name === 'amount' && availableAmount > 0) {
+            const v = parseInt(value || 0)
+            if (v > availableAmount) {
+                setErrorMsg('정산 가능 금액을 초과했습니다.')
+            } else {
+                setErrorMsg('')
+            }
+        }
+    }
+
+    const addApprover = (e) => {
+        const selectedIdx = Number(e.target.value)
+        const selectedUser = approverList.find(user => user.user_idx === selectedIdx)
+        if (selectedUser && !approvers.some(a => a.user_idx === selectedIdx)) {
+            setApprovers(prev => [...prev, selectedUser])
+        }
+        e.target.value = ''
+    }
+
+    const removeApprover = (idx) => {
+        setApprovers(prev => prev.filter(u => u.user_idx !== idx))
     }
 
     const previewDocument = async () => {
@@ -57,7 +121,16 @@ export default function EntryStatusUpdatePage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const payload = { ...form }
+
+        const payload = {
+            ...form,
+            approver_ids: approvers.map(u => u.user_idx),
+        }
+
+        if (parseInt(form.amount || 0) > availableAmount) {
+            alert('정산 가능 금액을 초과했습니다.')
+            return
+        }
 
         try {
             const res = await axios.put('http://localhost:8080/settlement/update', payload)
@@ -86,6 +159,7 @@ export default function EntryStatusUpdatePage() {
                             idx: form.settlement_id,
                             user_idx: form.user_idx,
                             user_name: form.user_name || '',
+                            approver_ids: approvers.map(u => u.user_idx),
                         })
 
                         await axios.post('http://localhost:8080/document/pdf', {
@@ -115,7 +189,7 @@ export default function EntryStatusUpdatePage() {
             </h1>
 
             <div className="template-form-container">
-                <div className="template-form-left">
+                <div className="template-form-left" style={{ height: '650px' }}>
                     <form onSubmit={handleSubmit}>
                         <div className="template-form-group">
                             <label className="template-label">정산 ID</label>
@@ -148,12 +222,24 @@ export default function EntryStatusUpdatePage() {
                             <input type="date" name="settlement_day" value={form.settlement_day} onChange={handleChange} className="template-input" />
                         </div>
 
-                        <div className="template-form-group">
+                        <div className="template-form-group" style={{ marginTop: '20px' }}>
                             <label className="template-label">정산 금액</label>
                             <input type="number" name="amount" value={form.amount} onChange={handleChange} className="template-input" />
                         </div>
 
-                        <div className="template-form-group">
+                        {form.entry_idx && (
+                            <div style={{ marginLeft: '50px', marginBottom: '4px', fontSize: '13px', color: '#666' }}>
+                                잔여 정산 가능 금액: {(availableAmount - (parseInt(form.amount || 0) || 0)).toLocaleString()}원
+                            </div>
+                        )}
+
+                        {errorMsg && (
+                            <div style={{ color: 'red', fontSize: '13px', marginLeft: '50px', marginTop: '4px', marginBottom: '4px'}}>
+                                {errorMsg}
+                            </div>
+                        )}
+
+                        <div className="template-form-group" style={{ marginTop: '13px' }}>
                             <label className="template-label">상태</label>
                             <select name="status" value={form.status} onChange={handleChange} className="template-input">
                                 <option value="미정산">미정산</option>
@@ -162,7 +248,34 @@ export default function EntryStatusUpdatePage() {
                             </select>
                         </div>
 
-                        <div style={{ textAlign: 'right', marginTop: '10px' }}>
+                        {form.status === '정산' && (
+                            <div className="template-form-group" style={{ marginBottom: '7px', marginTop: '20px' }}>
+                                <label className="template-label">결재자 지정</label>
+                                <select className="template-input" onChange={addApprover}>
+                                    <option value="">결재자 선택</option>
+                                    {approverList
+                                        .filter(u => !approvers.some(a => a.user_idx === u.user_idx))
+                                        .map(user => (
+                                            <option key={user.user_idx} value={user.user_idx}>
+                                                {user.user_name}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
+                        )}
+                        <div>
+                            <div className="selected-approvers"  style={{ justifyContent: 'center', marginLeft: '50px', marginBottom: '7px' }}>
+                                {approvers.map(user => (
+                                    <span key={user.user_idx} className="approver-tag">
+                                                 {user.user_name}
+                                        <button type="button" onClick={() => removeApprover(user.user_idx)}>×</button>
+                                        </span>
+                                ))}
+                            </div>
+                        </div>
+
+
+                        <div style={{ textAlign: 'right', marginTop: '20px' }}>
                             <button type="submit" className="template-btn-submit">수정</button>
                         </div>
                         <div style={{ textAlign: 'left' }}>

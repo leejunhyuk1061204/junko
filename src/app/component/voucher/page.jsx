@@ -34,8 +34,6 @@ export default function VoucherListPage() {
         {id: '', name: '전체 상태'},
         {id: '작성중', name: '작성중'},
         {id: '확정', name: '확정'},
-        {id: '부분정산', name: '부분정산'},
-        {id: '정산', name: '정산'},
     ]
 
     const fetchData = async () => {

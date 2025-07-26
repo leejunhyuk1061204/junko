@@ -21,8 +21,6 @@ export default function VoucherDetailPage() {
                 if (res.data.success) {
                     setVoucher(res.data.data)
                     setApprovalLines(res.data.approval_lines || [])
-                    console.log('approval_lines:', approvalLines)
-                    console.log('approvers 상태:', res.data.data)
                 } else {
                     alert('전표를 불러오지 못했습니다.')
                 }

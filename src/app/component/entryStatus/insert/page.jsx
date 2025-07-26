@@ -19,7 +19,12 @@ export default function EntryStatusInsertPage() {
     const [totalAmount, setTotalAmount] = useState(0)
     const [templateList, setTemplateList] = useState([])
     const [previewHtml, setPreviewHtml] = useState('')
+    const [approverList, setApproverList] = useState([])
+    const [approvers, setApprovers] = useState([])
     const router = useRouter()
+    const [availableAmount, setAvailableAmount] = useState(0)
+    const [errorMsg, setErrorMsg] = useState('')
+
 
     useEffect(() => {
         const savedUserIdx = sessionStorage.getItem('user_idx')
@@ -29,19 +34,40 @@ export default function EntryStatusInsertPage() {
             setForm(prev => ({
                 ...prev,
                 user_idx: Number(savedUserIdx),
-                user_name: savedUserName || '',  // 없으면 빈 문자열
+                user_name: savedUserName || '',
             }))
         }
     }, [])
 
     useEffect(() => {
         axios.get('http://localhost:8080/voucher/list', { params: { page: 1, size: 1000 } })
-            .then(res => {
-                if (res.data.success) setEntries(res.data.list)
+            .then(async res => {
+                if (res.data.success) {
+                    const fetched = res.data.list
+                    const filtered = []
+
+                    for (const v of fetched) {
+                        try {
+                            const preview = await axios.get(`http://localhost:8080/entry/settlement/previewAmount?entry_idx=${v.entry_idx}`)
+                            const remain = preview.data.voucher_amount - preview.data.settled_amount
+                            if (remain > 0) {
+                                filtered.push({ ...v, remain, custom_name: v.custom_name })
+                            }
+                        } catch (e) {
+                            console.error('previewAmount 조회 실패', e)
+                        }
+                    }
+
+                    setEntries(filtered)
+                }
             })
 
         axios.get('http://localhost:8080/template/list').then(res => {
             if (res.data?.list) setTemplateList(res.data.list)
+        })
+
+        axios.post('http://localhost:8080/users/list',{}).then(res => {
+            if (res.data?.list) setApproverList(res.data.list)
         })
 
         const savedUserIdx = sessionStorage.getItem('user_idx')
@@ -51,11 +77,24 @@ export default function EntryStatusInsertPage() {
     }, [])
 
     const handleChange = (e) => {
-        const {name, value} = e.target
-        setForm(prev => ({...prev, [name]: value}))
+        const { name, value } = e.target
+        let val = value
+
+        if (name === 'amount') {
+            let intVal = parseInt(value || 0)
+            if (intVal > availableAmount) {
+                setErrorMsg('정산 가능 금액을 초과했습니다.')
+                intVal = availableAmount
+            } else {
+                setErrorMsg('')
+            }
+            val = intVal
+        }
+
+        setForm(prev => ({ ...prev, [name]: val }))
     }
 
-    const handleEntryChange = (e) => {
+    const handleEntryChange = async (e) => {
         const selected = entries.find(v => v.entry_idx === parseInt(e.target.value))
         setForm(prev => ({
             ...prev,
@@ -64,26 +103,56 @@ export default function EntryStatusInsertPage() {
             total_amount: selected.amount,
         }))
         setTotalAmount(selected.amount)
+
+        try {
+            const res = await axios.get(`http://localhost:8080/entry/settlement/previewAmount?entry_idx=${selected.entry_idx}`)
+            const total = res.data?.voucher_amount || 0
+            const settled = res.data?.settled_amount || 0
+            setAvailableAmount(total - settled)
+        } catch (err) {
+            console.error('잔액 조회 실패', err)
+            setAvailableAmount(0)
+        }
     }
+
+    const addApprover = (e) => {
+        const selectedIdx = Number(e.target.value)
+        const selectedUser = approverList.find(user => user.user_idx === selectedIdx)
+        if (selectedUser && !approvers.some(a => a.user_idx === selectedIdx)) {
+            setApprovers(prev => [...prev, selectedUser])
+        }
+    }
+
+    const removeApprover = (idx) => {
+        setApprovers(prev => prev.filter(u => u.user_idx !== idx))
+    }
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()
+        if (parseInt(form.amount || 0) > availableAmount) {
+            alert('정산 가능 금액을 초과했습니다.')
+            return
+        }
+
         try {
             const res = await axios.post('http://localhost:8080/settlement/insert', {
                 ...form,
-                user_idx: form.user_idx
+                user_idx: form.user_idx,
+                approver_ids: form.status === '정산' ? approvers.map(u => u.user_idx) : [],
             })
             if (res.data.success) {
-                const entry_idx = form.entry_idx
+                const settlementId = res.data.settlement_id
                 const docRes = await axios.post('http://localhost:8080/document/insert', {
-                    idx: entry_idx,
+                    idx: settlementId,
                     type: 'settlement',
                     user_idx: form.user_idx,
                     template_idx: form.template_idx,
                     variables: {
                         ...res.data.variables,
                         user_name: form.user_name,
-                    }
+                    },
+                    approver_ids: form.status === '정산' ? approvers.map(u => u.user_idx) : [],
                 })
 
                 if (docRes.data.success && docRes.data.document_idx) {
@@ -144,7 +213,7 @@ export default function EntryStatusInsertPage() {
                                 <option value="">전표 선택</option>
                                 {entries.map(v => (
                                     <option key={v.entry_idx} value={v.entry_idx}>
-                                        {v.entry_idx} - {v.custom_name} / {Number(v.amount).toLocaleString()}원
+                                        {v.entry_idx} - {v.custom_name} / {Number(v.amount).toLocaleString()}원 (잔액: {Number(v.remain).toLocaleString()}원)
                                     </option>
                                 ))}
                             </select>
@@ -160,12 +229,32 @@ export default function EntryStatusInsertPage() {
                             <input type="text" value={`${Number(totalAmount).toLocaleString()}원`} readOnly className="template-input bg-gray-100" />
                         </div>
 
-                        <div className="template-form-group">
+                        <div className="template-form-group" style={{ marginTop: '20px' }}>
                             <label className="template-label">정산 금액 (입력)</label>
-                            <input type="number" name="amount" value={form.amount} onChange={handleChange} className="template-input" required />
+                            <input
+                                type="number"
+                                name="amount"
+                                value={form.amount}
+                                onChange={handleChange}
+                                className="template-input"
+                                required
+                                max={availableAmount > 0 ? availableAmount : undefined}
+                            />
                         </div>
 
-                        <div className="template-form-group">
+                        {form.entry_idx && (
+                            <div style={{ marginLeft: '50px', marginTop: '4px', marginBottom: '4px',fontSize: '13px', color: '#666' }}>
+                                잔여 정산 가능 금액: {availableAmount.toLocaleString()}원
+                            </div>
+                        )}
+
+                        {errorMsg && (
+                            <div style={{ color: 'red', fontSize: '13px', marginLeft: '50px', marginTop: '4px', marginBottom: '4px'}}>
+                                {errorMsg}
+                            </div>
+                        )}
+
+                        <div className="template-form-group" style={{ marginTop: '13px' }}>
                             <label className="template-label">상태</label>
                             <select name="status" value={form.status} onChange={handleChange} className="template-input">
                                 <option value="미정산">미정산</option>
@@ -174,7 +263,34 @@ export default function EntryStatusInsertPage() {
                             </select>
                         </div>
 
-                        <div className="template-form-group">
+                        {form.status === '정산' && (
+                            <div className="template-form-group" style={{ marginBottom: '7px'}}>
+                                <label className="template-label">결재자 지정</label>
+                                <select className="template-input" onChange={addApprover}>
+                                    <option value="">결재자 선택</option>
+                                    {approverList
+                                        .filter(u => !approvers.some(a => a.user_idx === u.user_idx))
+                                        .map(user => (
+                                            <option key={user.user_idx} value={user.user_idx}>
+                                                {user.user_name}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
+                        )}
+                        <div className="selected-approvers" style={{ justifyContent: 'center', marginLeft: '50px', marginBottom: '7px' }}>
+                            {approvers.map(user => (
+                                <span key={user.user_idx} className="approver-tag">
+                                                {user.user_name}
+                                    <button type="button" onClick={() => removeApprover(user.user_idx)}>
+                                                ×
+                                            </button>
+                                        </span>
+                            ))}
+                        </div>
+
+
+                        <div className="template-form-group" style={{ marginTop: '10px' }}>
                             <label className="template-label">템플릿 선택</label>
                             <select name="template_idx" value={form.template_idx} onChange={handleChange} className="template-input" required>
                                 <option value="">-- 선택 --</option>

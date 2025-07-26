@@ -22,14 +22,21 @@ export default function ReceiptPaymentFormPage() {
         user_idx: 1,
     });
 
+    const [approvers, setApprovers] = useState([]);
     const [customerOptions, setCustomerOptions] = useState([]);
     const [voucherOptions, setVoucherOptions] = useState([]);
     const [previewHtml, setPreviewHtml] = useState('');
+    const [userOptions, setUserOptions] = useState([]);
 
     useEffect(() => {
         axios.get('http://localhost:8080/custom/list')
             .then(res => {
                 if (res.data.list) setCustomerOptions(res.data.list);
+            });
+
+        axios.post('http://localhost:8080/users/list',{})
+            .then(res => {
+                if (res.data.list) setUserOptions(res.data.list);
             });
 
         const savedUserIdx = sessionStorage.getItem('user_idx');
@@ -59,9 +66,18 @@ export default function ReceiptPaymentFormPage() {
 
     useEffect(() => {
         if (mode === 'update' && rp_idx) {
-            axios.get(`http://localhost:8080/${type === '수금' ? 'receipt' : 'payment'}/detail/${rp_idx}`)
+            axios.get(`http://localhost:8080/receiptPayment/detail/${rp_idx}`)
                 .then(res => {
-                    if (res.data.success) setForm(res.data.data);
+                    if (res.data.success) {
+                        const { data, document } = res.data;
+                        setForm(prev => ({
+                            ...prev,
+                            ...data,
+                            document_idx: document?.document_idx || null,
+                            template_idx: document?.template_idx || 15,
+                        }));
+                        setApprovers(document?.approval_lines || []);
+                    }
                 });
         }
     }, [mode, rp_idx, type]);
@@ -95,6 +111,19 @@ export default function ReceiptPaymentFormPage() {
         };
     };
 
+    const addApprover = (e) => {
+        const selectedId = Number(e.target.value);
+        if (selectedId && !approvers.some(u => u.user_idx === selectedId)) {
+            const selectedUser = userOptions.find(u => u.user_idx === selectedId);
+            if (selectedUser) setApprovers([...approvers, selectedUser]);
+        }
+        e.target.value = '';
+    };
+
+    const removeApprover = (id) => {
+        setApprovers(prev => prev.filter(u => u.user_idx !== id));
+    };
+
     const handlePreview = async () => {
         try {
             const res = await axios.post('http://localhost:8080/document/preview', {
@@ -114,6 +143,11 @@ export default function ReceiptPaymentFormPage() {
 
     const handleSubmit = async () => {
         try {
+            const submitData = {
+                ...form,
+                approver_ids: approvers.map(a => a.user_idx),
+            };
+
             const res = mode === 'insert'
                 ? await axios.post(`http://localhost:8080/${type === '수금' ? 'receipt' : 'payment'}/insert`, form)
                 : await axios.put(`http://localhost:8080/${type === '수금' ? 'receipt' : 'payment'}/update`, form);
@@ -128,6 +162,7 @@ export default function ReceiptPaymentFormPage() {
                     idx,
                     variables,
                     user_idx: Number(sessionStorage.getItem('user_idx')),
+                    approver_ids: submitData.approver_ids,
                 });
 
                 if (docRes.data.success && docRes.data.document_idx) {
@@ -197,6 +232,24 @@ export default function ReceiptPaymentFormPage() {
                     <div className="template-form-group">
                         <label className="template-label" style={{ fontSize: '18px'}}>일자</label>
                         <input type="date" name="transaction_date" value={form.transaction_date || ''} onChange={handleChange} className="template-input" />
+                    </div>
+
+                    <div className="template-form-group" style={{ width: '900px', marginBottom: '7px'}}>
+                        <label className="template-label"  style={{minWidth: '40px', fontSize: '18px'}}>결재자</label>
+                        <select className="template-input" onChange={addApprover}>
+                            <option value="">결재자 선택</option>
+                            {userOptions.filter(u => !approvers.some(a => a.user_idx === u.user_idx)).map(user => (
+                                <option key={user.user_idx} value={user.user_idx}>{user.user_name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="selected-approvers"  style={{ justifyContent: 'center', marginLeft: '50px', marginBottom: '10px' }}>
+                        {approvers.map(user => (
+                            <span key={user.user_idx} className="approver-tag">
+                                    {user.user_name}
+                                <button onClick={() => removeApprover(user.user_idx)}>×</button>
+                                </span>
+                        ))}
                     </div>
 
                     <div className="template-form-group">

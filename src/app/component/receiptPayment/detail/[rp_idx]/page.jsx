@@ -16,6 +16,7 @@ export default function ReceiptPaymentDetailPage() {
 
     const [documentIdx, setDocumentIdx] = useState(null);
     const [fileName, setFileName] = useState('');
+    const [approvalLines, setApprovalLines] = useState([]);
 
     // 문서 및 파일 조회
     useEffect(() => {
@@ -31,6 +32,9 @@ export default function ReceiptPaymentDetailPage() {
                     if (res.data.document) {
                         setDocumentIdx(res.data.document.document_idx);
                         setPreviewHtml(res.data.document.content || '');
+                        if (res.data.approval_lines) {
+                            setApprovalLines(res.data.approval_lines);
+                        }
                     }
 
                     if (res.data.file) {
@@ -89,7 +93,7 @@ export default function ReceiptPaymentDetailPage() {
             </h1>
 
             <div className="template-form-container">
-                <div className="template-form-left" style={{ height: '550px'}}>
+                <div className="template-form-left" style={{ height: '600px'}}>
                     <div className="template-form-group" style={{ marginTop: '40px' }}>
                         <label className="template-label" style={{ fontSize: '18px'}}>구분</label>
                         <div className="template-readonly">{data.type}</div>
@@ -119,6 +123,15 @@ export default function ReceiptPaymentDetailPage() {
                         <label className="template-label" style={{ fontSize: '18px'}}>상태</label>
                         <div className="template-readonly">{data.status}</div>
                     </div>
+
+                    {approvalLines.length > 0 && (
+                        <div className="template-form-group">
+                            <label className="template-label" style={{ fontSize: '18px' }}>결재자</label>
+                            <div className="template-readonly">
+                                {approvalLines.map(a => a.user_name).join(', ')}
+                            </div>
+                        </div>
+                    )}
 
                     <div className="template-form-group">
                         <label className="template-label" style={{ fontSize: '18px'}}>비고</label>

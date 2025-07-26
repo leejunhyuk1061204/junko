@@ -261,7 +261,6 @@ export default function OrderList() {
                         <th>판매 단가</th>
                         <th>할인율</th>
                         <th>카테고리</th>
-                        <th>이미지</th>
                         <th>문서</th>
                     </tr>
                     </thead>
@@ -285,7 +284,6 @@ export default function OrderList() {
                             <td>{order.selling_price.toLocaleString()}원</td>
                             <td>{order.discount_rate}%</td>
                             <td>{order.category_name || '기타'}</td>
-                            <td>-</td>
                             <td>
                                 <button className="product-clickable" onClick={() => openDocsModal(order.product_idx)}>
                                     문서

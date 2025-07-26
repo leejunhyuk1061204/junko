@@ -25,8 +25,8 @@ export default function InvoiceListPage() {
     const statusOptions = [
         {id: '', name: '전체 상태'},
         {id: '작성중', name: '작성중'},
-        {id: '확정', name: '확정'},
-        {id: '정산', name: '정산'},
+        {id: '발행완료', name: '발행완료'},
+        {id: '취소', name: '취소'},
     ]
 
     const fetchData = async () => {

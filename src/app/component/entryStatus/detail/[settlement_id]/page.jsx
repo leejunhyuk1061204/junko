@@ -11,6 +11,8 @@ export default function EntryStatusDetailPage() {
     const [data, setData] = useState(null)
     const [previewHtml, setPreviewHtml] = useState('')
     const [docExists, setDocExists] = useState(false)
+    const [approverList, setApproverList] = useState([])
+    const [approvalLines, setApprovalLines] = useState([])
 
     useEffect(() => {
         if (!settlement_id) return
@@ -23,6 +25,9 @@ export default function EntryStatusDetailPage() {
                         file: res.data.file || null,
                     }
                     setData(merged)
+                    setDocExists(!!res.data.file)
+                    setApprovalLines(res.data.data.approval_lines || [])
+                    console.log(res.data)
                 } else {
                     alert('정산 정보를 불러올 수 없습니다.')
                 }
@@ -31,6 +36,11 @@ export default function EntryStatusDetailPage() {
                 console.error(err)
                 alert('서버 오류 발생')
             })
+
+        axios.post('http://localhost:8080/users/list', {}).then(res => {
+            if (res.data?.list) setApproverList(res.data.list)
+        })
+
     }, [settlement_id])
 
     useEffect(() => {
@@ -96,6 +106,7 @@ export default function EntryStatusDetailPage() {
                 template_idx: 12,
                 custom_name: data.custom_name || '',
                 variables: variableRes.data.variables,
+                approver_ids: data.status === '정산' ? approvalLines.map(line => line.user_idx) : [],
             })
 
 
@@ -113,6 +124,7 @@ export default function EntryStatusDetailPage() {
                         }
                         setData(merged)
                         setDocExists(!!detailRes.data.file)
+                        setApprovalLines(detailRes.data.data.approval_lines || [])
                     }
                 }, 1000) // 1초 후 재조회
 
@@ -152,6 +164,18 @@ export default function EntryStatusDetailPage() {
                         <tr><td>거래처</td><td>{data.custom_name}</td></tr>
                         <tr><td>작성자</td><td>{data.user_name}</td></tr>
                         <tr><td>상태</td><td>{data.status}</td></tr>
+                        {approvalLines.length > 0 && (
+                            <tr>
+                                <td>결재자</td>
+                                <td className="selected-approvers">
+                                    {approvalLines.map((line, index) => (
+                                        <span key={index} className="approver-tag">
+                                        {line.user_name}
+                                        </span>
+                                    ))}
+                                </td>
+                            </tr>
+                        )}
                         </tbody>
                     </table>
 

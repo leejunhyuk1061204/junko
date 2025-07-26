@@ -173,12 +173,11 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
                 <div className="invoice-form-container">
                     <div className="invoice-form-left">
 
-                        <div className="invoice-form-group-horizontal">
-                            <label className="invoice-label">결재자 지정</label>
-                            <div style={{ width: '100%' , marginLeft: '10px'}}>
-                                {/* 일반 select로 변경 */}
+                        <div className="invoice-form-group-horizontal" style={{ width: '500px', marginBottom: '7px'}}>
+                            <label className="invoice-label" style={{minWidth: '70px',marginLeft: '15px'}}>결재자 지정</label>
+                            <div style={{ width: '100%' , marginLeft: '14px', minWidth: '1010px'}}>
                                 <select
-                                    disabled={form.status !== '발행완료'} // ← 추가
+                                    disabled={form.status !== '발행완료'}
                                     onChange={(e) => {
                                         const selectedId = Number(e.target.value)
                                         if (selectedId && !form.approver_ids.includes(selectedId)) {
@@ -201,30 +200,28 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
                                             </option>
                                         ))}
                                 </select>
-
-                                {/* 선택된 결재자 표시 */}
-                                <div className="selected-approvers">
-                                    {form.approver_ids.map(id => {
-                                        const user = userList.find(u => u.user_idx === id)
-                                        return (
-                                            <span key={id} className="approver-tag">
-                                                {user?.user_name}
-                                                {form.status === '발행완료' && (
-                                                    <button onClick={() => {
-                                                        setForm(prev => ({
-                                                            ...prev,
-                                                            approver_ids: prev.approver_ids.filter(x => x !== id)
-                                                        }))
-                                                    }}>×</button>
-                                                )}
-                                            </span>
-                                        )
-                                    })}
-                                </div>
                             </div>
                         </div>
+                        <div className="selected-approvers"  style={{ justifyContent: 'center', marginLeft: '50px', marginBottom: '10px' }}>
+                            {form.approver_ids.map(id => {
+                                const user = userList.find(u => u.user_idx === id)
+                                return (
+                                    <span key={id} className="approver-tag">
+                                                {user?.user_name}
+                                        {form.status === '발행완료' && (
+                                            <button onClick={() => {
+                                                setForm(prev => ({
+                                                    ...prev,
+                                                    approver_ids: prev.approver_ids.filter(x => x !== id)
+                                                }))
+                                            }}>×</button>
+                                        )}
+                                            </span>
+                                )
+                            })}
+                        </div>
 
-                        <div className="invoice-form-group-horizontal">
+                        <div className="invoice-form-group-horizontal" style={{ marginTop: '15px' }}>
                             <label className="invoice-label">거래처</label>
                             <select name="custom_idx" value={form.custom_idx} onChange={handleChange}
                                     style={{ height: '40px'}} className="invoice-input" required>
