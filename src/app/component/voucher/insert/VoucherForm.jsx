@@ -106,10 +106,10 @@ export default function VoucherForm({ formData, onChange, approvers, setApprover
                     </select>
                 </div>
 
-                <div className="template-form-group">
-                    <label className="template-label">결재자 지정</label>
+                <div className="template-form-group" style={{ width: '1000px', marginBottom: '7px'}}>
+                    <label className="template-label" style={{minWidth: '20px'}}>결재자 지정</label>
                     <select
-                        className="template-input"
+                        className="voucher-select-input"
                         disabled={formData.status !== '확정'}
                         onChange={addApprover}
                     >
@@ -118,18 +118,17 @@ export default function VoucherForm({ formData, onChange, approvers, setApprover
                             <option key={user.user_idx} value={user.user_idx}>{user.user_name}</option>
                         ))}
                     </select>
-                    <div className="selected-approvers">
-                        {approvers.map(user => (
-                            <span key={user.user_idx} className="approver-tag">
-                            {user.user_name}
-                                {formData.status === '확정' && (
-                                    <button onClick={() => removeApprover(user.user_idx)}>×</button>
-                                )}
-                        </span>
-                        ))}
-                    </div>
                 </div>
-
+                <div className="selected-approvers" style={{ justifyContent: 'center', marginLeft: '50px', marginBottom: '10px' }}>
+                    {approvers.map(user => (
+                        <span key={user.user_idx} className="approver-tag" style={{}}>
+                            {user.user_name}
+                            {formData.status === '확정' && (
+                                <button onClick={() => removeApprover(user.user_idx)}>×</button>
+                            )}
+                        </span>
+                    ))}
+                </div>
             </div>
         </div>
     )

@@ -7,6 +7,7 @@ import CustomModal from "@/app/component/modal/CustomModal";
 import Pagination from "react-js-pagination";
 import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headlessui/react";
 import { TbSearch } from "react-icons/tb";
+import {useRouter} from "next/navigation";
 
 // 정렬 옵션
 const sortOptions = [
@@ -25,6 +26,7 @@ export default function CustomPage() {
     const [sortKey] = useState("custom_idx"); // 정렬 기준은 custom_idx 고정
     const [sortOrder, setSortOrder] = useState("desc");
     const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
+    const router = useRouter();
 
     const fetchList = async () => {
         const token = sessionStorage.getItem("token");
@@ -138,7 +140,12 @@ export default function CustomPage() {
                     <tbody>
                     {list.map(item => (
                         <tr key={item.custom_idx}>
-                            <td>{item.custom_name}</td>
+                            <td
+                                style={{ cursor: 'pointer', color: '#2a7ae4' }}
+                                onClick={() => router.push(`./custom/detail/${item.custom_idx}`)}
+                            >
+                                {item.custom_name}
+                            </td>
                             <td>{item.custom_owner}</td>
                             <td>{item.custom_phone}</td>
                             <td>{item.email}</td>
