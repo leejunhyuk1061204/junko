@@ -70,24 +70,32 @@ export default function DocumentManagePage() {
     }, []);
 
     useEffect(() => {
-        if (user_idx !== null) fetchDocuments(1);
-    }, [statusFilter, userIdx, search, selectedTab]);
+        if (userIdx !== null && selectedTab) {
+            fetchDocuments({ page: 1, tab: selectedTab });
+        }
+    }, [userIdx, selectedTab]);
 
-    const fetchDocuments = async (page = currentPage, customDate = selectedDate) => {
+    const fetchDocuments = async ({
+        page = currentPage,
+        customDate = selectedDate,
+        tab = selectedTab,
+        status = statusFilter,
+        keyword = search,
+    } = {}) => {
         setLoading(true);
         try {
             const {data} = await axios.get('http://localhost:8080/document/list', {
                 params: {
-                    user_idx: user_idx,
-                    status: statusFilter === '전체' ? '' : statusFilter,
-                    keyword: search,
+                    user_idx: userIdx,
+                    status: status === '전체' ? '' : status,
+                    keyword,
                     start_date: customDate.start_date || '',
                     end_date: customDate.end_date || '',
                     order: 'created_date',
                     sort: 'desc',
                     page,
-                    limit: limit,
-                    tab: selectedTab,
+                    limit,
+                    tab,
                 }
             });
             setDocuments(data.list || []);
@@ -100,8 +108,19 @@ export default function DocumentManagePage() {
         }
     };
 
+    const handleTabChange = (tab) => {
+        setSelectedTab(tab);
+        setSelectedSort(sortOptions[0]);
+        setStatusFilter("전체");
+        setSelectedDate({ start_date: null, end_date: null });
+        setCurrentPage(1);
+        setSearch("");
+        fetchDocuments({ page: 1, tab });
+    }
+
     const handlePageChange = (page) => {
-        fetchDocuments(page);
+        setCurrentPage(page);
+        fetchDocuments({ page, tab: selectedTab });
     };
 
     const handleKeyPress = (e) => {
@@ -111,13 +130,20 @@ export default function DocumentManagePage() {
     };
 
     const handleSearch = () => {
-        fetchDocuments(1);
+        setCurrentPage(1);
+        fetchDocuments({
+            page: 1,
+            tab: selectedTab,
+            status: statusFilter,
+            keyword: search,
+        });
     };
 
     // 결재 상태 옵션
     const handleStatusChange = (status) => {
         setStatusFilter(status);
         setCurrentPage(1);
+        fetchDocuments({ page: 1, status, tab: selectedTab });
     };
 
     // 정렬순 옵션
@@ -187,7 +213,6 @@ export default function DocumentManagePage() {
 
     // 승인
     const handleApprove = async (docIdx) => {
-
         try {
             await axios.post('http://localhost:8080/document/approve', {
                 document_idx: docIdx,
@@ -249,11 +274,11 @@ export default function DocumentManagePage() {
                     <div className="tab-buttons" style={{display: "flex", gap: "4px", marginBottom: "4px"}}>
                         <button
                             className={selectedTab === "상신함" ? "tab-btn-active" : "tab-btn"}
-                            onClick={() => setSelectedTab("상신함")}
+                            onClick={() => handleTabChange("상신함")}
                         >상신함</button>
                         <button
                             className={selectedTab === "수신함" ? "tab-btn-active" : "tab-btn"}
-                            onClick={() => setSelectedTab("수신함")}
+                            onClick={() => handleTabChange("수신함")}
                         >수신함</button>
                     </div>
                 </div>

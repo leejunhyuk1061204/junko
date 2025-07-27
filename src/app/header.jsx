@@ -15,7 +15,7 @@ const mainMenus = [
         title: '인사 관리',
         submenu: [
             { label: '직원 정보 관리', href: '/' },
-            { label: '부서 / 조직 관리', href: '/' },
+            { label: '부서 / 조직 관리', href: '/component/deptManager' },
             { label: '근태 / 출퇴근 관리', href: '/component/timecard' },
             { label: '급여 / 상여 / 수당 관리', href: '/' },
             { label: '인사평가 / 성과 관리', href: '/' },

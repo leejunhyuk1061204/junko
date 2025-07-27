@@ -77,15 +77,19 @@ const DocumentDetailModal = ({html, onClose, onApprove, onReject, doc, user_idx}
 
                 {/*결재자만 버튼 노출*/}
                 {user_idx === currentApproverId && (
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
-                        <button onClick={onClose} className="btn btn-danger">취소</button>
-                        <button onClick={() => onApprove(doc.document_idx)} className="btn btn-primary">승인</button>
-                        <button onClick={() => onReject(doc.document_idx)} className="btn btn-danger">반려</button>
-                        <textarea
-                            value={rejectReason}
-                            onChange={(e) => setRejectReason(e.target.value)}
-                            placeholder="반려 사유 입력"
-                        />
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
+                            <button onClick={onClose} className="doc-detail-btn btn-danger">취소</button>
+                            <button onClick={() => onApprove(doc.document_idx)} className="doc-detail-btn btn-primary">승인</button>
+                            <button onClick={() => onReject(doc.document_idx)} className="doc-detail-btn btn-danger">반려</button>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
+                            <textarea
+                                value={rejectReason}
+                                onChange={(e) => setRejectReason(e.target.value)}
+                                placeholder="반려 사유 입력"
+                            />
+                        </div>
                     </div>
                 )}
             </div>

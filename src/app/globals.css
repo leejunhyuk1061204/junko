@@ -178,9 +178,10 @@ input[type='number']:focus {
 .height-50 {
     height: 50%;
 }
-/*---------------------------- -------------------------*/
 
-.btn{
+
+/*---------------------------- 결재 승인/반려 -------------------------*/
+.doc-detail-btn{
     padding: 5px 15px;
     box-sizing: border-box;
     border : 1px solid var(--border-color);
@@ -194,6 +195,14 @@ input[type='number']:focus {
 .btn:hover{
     background-color:#b8bcc3;
     border : 1px solid #b8bcc3;
+}
+
+.btn-danger {
+
+}
+
+.btn-primary {
+
 }
 
 .wrap{
@@ -720,6 +729,7 @@ input[type='number']:focus {
     background: white;
     box-shadow: 4px 4px 5px rgba(0,0,0,0.15);
     margin:2px;
+    white-space: nowrap;
     /*box-shadow: var(--shadow);*/
 }
 
@@ -4055,17 +4065,18 @@ body.invoice-detail-body-reset {
 
 .approval-left {
     flex: 1;
-    padding-right: 20px;
+    padding-left: 130px;
     display: flex;
     flex-direction: column;
     gap: 3px;
 }
 .approval-right {
     flex: 1;
-    padding-left: 20px;
+    padding-left: 200px;
     display: flex;
     flex-direction: column;
     gap: 20px;
+    justify-content: center;
 }
 
 .vertical-divider {
@@ -4096,6 +4107,7 @@ body.invoice-detail-body-reset {
     width: 100px;
 }
 
+.right-form button,
 .form-group input {
     padding: 6px 10px;
     border: 1px solid #ccc;
@@ -4104,6 +4116,11 @@ body.invoice-detail-body-reset {
     width: 50%;
     margin-top: 10px;
     height: 33px;
+    box-sizing: border-box;
+}
+
+.right-form button {
+    cursor: pointer;
 }
 
 .form-group select {
@@ -4112,11 +4129,6 @@ body.invoice-detail-body-reset {
     border-radius: 13px;
     font-size: 14px;
     width: 20%;
-}
-
-.right-form input[type="date"] {
-    width: 170px;
-    cursor: pointer;
 }
 
 .approver-box {
@@ -4151,25 +4163,42 @@ body.invoice-detail-body-reset {
     gap: 12px;
 }
 
+.variable-box-wrapper {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 30px;
+    background-color: #fff;
+    margin: 20px 0;
+    min-height: 190px;
+}
+
+.variable-box-inner {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .variable-row {
     display: flex;
     align-items: center;
+    justify-content: center;
+    gap: 16px;
 }
 
 .variable-row label {
-    text-align: center;
     width: 160px;
     font-weight: 500;
-    margin: 0 20px 0 380px;
+    text-align: right;
 
 }
 
 .variable-row input {
+    width: 350px;
+    height: 33px;
     padding: 8px 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    width: 350px;
-    height: 33px;
 }
 
 .approver-group {
@@ -4236,6 +4265,17 @@ body.invoice-detail-body-reset {
     flex-shrink: 0; /* 한 줄 유지 */
     background-color: #f9f9f9;
     border-radius: 12px;
+    padding: 4px 2px;
+    display: inline-flex;
+    align-items: center;
+    margin-right: 2px;
+    width: 80px;
+}
+
+.doc-approver-tag {
+    flex-shrink: 0; /* 한 줄 유지 */
+    background-color: #f9f9f9;
+    border: none;
     padding: 4px 2px;
     display: inline-flex;
     align-items: center;
@@ -4420,4 +4460,14 @@ body.invoice-detail-body-reset {
 
 .doc-manage {
     width: 135px;
+}
+
+.unread-row {
+    font-weight: 600;
+    background-color: #f5f7fa;
+}
+
+.doc-idx {
+    width: 11% !important;
+    margin-top: 0 !important;
 }

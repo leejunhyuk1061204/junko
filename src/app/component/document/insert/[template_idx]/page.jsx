@@ -6,6 +6,7 @@ import {TbSearch} from "react-icons/tb";
 import {useParams, useRouter} from "next/navigation";
 import axios from "axios";
 import {useAlertModalStore, useDatePickerStore} from "@/app/zustand/store";
+import format from "date-fns/format";
 
 export default function DocumentInsertPage() {
     const {openModal, closeModal} = useAlertModalStore();
@@ -28,6 +29,7 @@ export default function DocumentInsertPage() {
     const [searchResults, setSearchResults] = useState([]);
     const [highlightIndex, setHighlightIndex] = useState(-1);
     const [templateName, setTemplateName] = useState("");
+    const [userName, setUserName] = useState("");
     const [selectedDate, setSelectedDate] = useState({
         selectedDate: null,
         startDate: null,
@@ -37,10 +39,12 @@ export default function DocumentInsertPage() {
     const dropdownRef = useRef(null);
     const dateRef = useRef(null);
 
+    const today = format(new Date(), "yyyy-MM-dd");
+
     useEffect(() => {
         if (typeof window !== "undefined") {
             const user_idx = sessionStorage.getItem("user_idx");
-            const user_name = sessionStorage.getItem("user_name");
+
             if (!user_idx) {
                 openModal({
                     svg: '❗',
@@ -53,6 +57,30 @@ export default function DocumentInsertPage() {
         }
     }, []);
 
+    // 자동 업데이트 실행
+    useEffect(() => {
+        const user_name = sessionStorage.getItem("user_name");
+        setUserName(user_name);
+
+        const date =
+            selectedDate.startDate && selectedDate.endDate
+                ? `${selectedDate.startDate} ~ ${selectedDate.endDate}`
+                : selectedDate.selectedDate || '';
+
+        setVariables((prev) => {
+            const updated = { ...prev };
+
+            Object.keys(updated).forEach((key) => {
+                if (key.endsWith("date")) {
+                    updated[key] = date;
+                }
+                if (key === "user_name") {
+                    updated[key] = userName;
+                }
+            });
+            return updated;
+        });
+    }, [selectedDate, userName]);
 
     // 템플릿 변수 추출
     const extractVariableKeys = (html) => {
@@ -204,7 +232,6 @@ export default function DocumentInsertPage() {
                 setSearchResults([]);
             }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
@@ -221,26 +248,6 @@ export default function DocumentInsertPage() {
         }
     }, [approvalStep]);
 
-    // 자동 업데이트 실행
-    useEffect(() => {
-        setVariables((prev) => {
-            const updated = { ...prev };
-            Object.keys(updated).forEach((key) => {
-                if (key.endsWith("date")) {
-                    if (selectedDate.selectDate) {
-                        updated[key] = selectedDate.selectDate;
-                    } else if (selectedDate.startDate && selectedDate.endDate) {
-                        updated[key] = `${selectedDate.startDate} ~ ${selectedDate.endDate}`;
-                    }
-                }
-                if (key === "user_name") {
-                    updated[key] = typeof window !== "undefined" ? sessionStorage.getItem("user_name") || "" : "";
-                }
-            });
-            return updated;
-        });
-    }, [selectedDate]);
-
     const handleDatePicker = () => {
         openDatePicker({
             mode:'single',
@@ -255,7 +262,7 @@ export default function DocumentInsertPage() {
                     });
                 } else {
                     setSelectedDate({
-                        selectDate:format(value, 'yyyy-MM-dd'),
+                        selectedDate:format(value, 'yyyy-MM-dd'),
                     });
                 }
                 closeDatePicker();
@@ -278,14 +285,18 @@ export default function DocumentInsertPage() {
         }
 
         // 자동 업데이트 검증용
-        const updatedVars = { ...variables };
-        Object.keys(updatedVars).forEach((key) => {
-            if (key.endsWith("date")) updatedVars[key] = date;
-            if (key === "user_name") updatedVars[key] = typeof window !== "undefined" ? sessionStorage.getItem("user_name") || "" : "";
+        const updated = { ...variables };
+        const date =
+            selectedDate.startDate && selectedDate.endDate
+                ? `${selectedDate.startDate} ~ ${selectedDate.endDate}`
+                : selectedDate.selectedDate || '';
+        Object.keys(updated).forEach((key) => {
+            if (key.endsWith("date")) updated[key] = date;
+            if (key === "user_name") updated[key] = typeof window !== "undefined" ? sessionStorage.getItem("user_name") || "" : "";
         });
 
         // 업데이트된 변수로 검증
-        const isValid = Object.entries(updatedVars).every(([key, value]) => {
+        const isValid = Object.entries(updated).every(([key, value]) => {
             return value && value.trim() !== "";
         });
 
@@ -314,7 +325,7 @@ export default function DocumentInsertPage() {
             user_idx,
             type,
             idx,
-            variables: updatedVars,
+            variables: updated,
             approver_ids: approverIds.map(p => p.user_idx), // 상태값으로 저장된 배열
         };
 
@@ -419,7 +430,7 @@ export default function DocumentInsertPage() {
 
                                     <div className="readonly-approver">
                                         {approverIds.map(person => (
-                                            <div className="approver-tag" key={person.user_idx}>
+                                            <div className="doc-approver-tag" key={person.user_idx}>
                                                 {person.user_name}
                                                 <button onClick={() => handleRemoveApprover(person.user_idx)}>✕</button>
                                             </div>
@@ -435,20 +446,35 @@ export default function DocumentInsertPage() {
                         <div className="approval-right">
                             <div className="form-group right-form">
                                 <label>시행일자</label>
-                                <button onClick={handleDatePicker}>날짜 선택</button>
+                                <button onClick={handleDatePicker}>{selectedDate?.selectedDate || today}</button>
                             </div>
                             <div className="form-group right-form">
-                                <label>구분</label>
-                                <div className="type-field">
-                                    <input type="text" value={templateName} readOnly />
-                                </div>
+                                <label>문서 구분</label>
+                                <input
+                                    type="text"
+                                    id="type"
+                                    value={type}
+                                    onChange={(e) => setType(e.target.value)}
+                                    placeholder="예: 연차, 외근, 출장 등"
+                                />
+                                <input
+                                    className="doc-idx"
+                                    type="number"
+                                    id="idx"
+                                    value={idx}
+                                    onChange={(e) => setIdx(Number(e.target.value))}
+                                />
+                            </div>
+                            <div className="form-group right-form">
+                                <label>형식</label>
+                                <input type="text" value={templateName} readOnly />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div className="approval-box-wrapper">
-                    <div className="approval-box-inner">
+                <div className="variable-box-wrapper">
+                    <div className="variable-box-inner">
                         <div className="input-area">
                             {Object.entries(variables).map(([key, value]) => {
                                 const dateField = key.endsWith("date");
