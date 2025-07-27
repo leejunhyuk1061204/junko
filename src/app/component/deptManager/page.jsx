@@ -1,103 +1,113 @@
-'use client'
+'use client';
 
-import React, {useEffect, useState} from 'react';
-import { OrganizationChart } from 'primereact/organizationchart';
-import 'primereact/resources/themes/lara-light-blue/theme.css'; // 테마
-import 'primereact/resources/primereact.min.css';                    // 컴포넌트 스타일
-import 'primeicons/primeicons.css';
-import axios from "axios";                                        // 아이콘
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useAlertModalStore } from '@/app/zustand/store';
+import Header from '@/app/header';
 
 export default function OrgChartPage() {
-    const [data, setData] = useState([]);
-    const [selectedInfo, setSelectedInfo] = useState(null);
+    const router = useRouter();
+    const { openModal } = useAlertModalStore();
+    const [treeData, setTreeData] = useState(null);
+
+    // 재귀 트리 렌더링
+    const TreeNode = ({ node }) => {
+        const [expanded, setExpanded] = useState(true);
+
+        const isDept = !!node.children;
+        const isUser = !node.children;
+
+        return (
+            <div className="org-tree">
+                <div
+                    className={`org-node ${isDept ? 'dept-node' : 'user-node'}`}
+                    onClick={isDept ? () => setExpanded(!expanded) : undefined}
+                >
+                    {node.name}
+                </div>
+
+                {expanded && node.children && (
+                    <div className="org-children">
+                        {node.children.map((child, idx) => (
+                            <TreeNode key={idx} node={child} />
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
 
     useEffect(() => {
-        const token = sessionStorage.getItem('token');
-        axios.get('https://localhost:8080/orgchart/tree', {
-            headers: {Authorization: token},
-        }).then(res => {
-            console.log("!!!!!!!!!!!!!!!!!!!", res.data);
-            const flatList = res.data.deptTree;
-            const converted = convertToOrgChartFormat(flatList, handleUserClick);
-            setData(converted);
-        });
+        const fetchData = async () => {
+            const token = sessionStorage.getItem('token');
+            if (!token) {
+                openModal({
+                    svg: '❗',
+                    msg1: '해당 페이지 접근 불가',
+                    msg2: '로그인 후 이용해주세요.',
+                    showCancel: false,
+                    onConfirm: () => router.push('./login'),
+                });
+                return;
+            }
+
+            try {
+                const res = await axios.get('http://localhost:8080/orgchart/tree', {
+                    headers: { authorization: token },
+                });
+                const { deptTree, userList } = res.data;
+                const tree = convertToTree(deptTree, userList);
+                setTreeData(tree);
+            } catch (err) {
+                console.error('조직도 불러오기 실패', err);
+            }
+        };
+        fetchData();
     }, []);
 
-    const handleUserClick = (user) => {
-        setSelectedInfo({
-            name: user.user_name,
-            job: user.job_name,
-            phone: user.phone,
-            hire_date: user.hire_date,
+    // 트리 데이터 변환
+    const convertToTree = (flatList, userList) => {
+        const deptMap = {};
+        flatList.forEach(dept => {
+            deptMap[dept.dept_idx] = {
+                name: dept.dept_name,
+                children: [],
+            };
         });
+
+        userList.forEach(user => {
+            const dept = deptMap[user.dept_idx];
+            if (dept) {
+                dept.children.push({ name: `${user.user_name}${user.job_name ? ` ${user.job_name}` : ''}`, info: user });
+            }
+        });
+
+        const root = { name: '조직도', children: [] };
+        flatList.forEach(dept => {
+            const node = deptMap[dept.dept_idx];
+            if (!dept.parent_idx || dept.parent_idx === 0) {
+                root.children.push(node);
+            } else {
+                deptMap[dept.parent_idx]?.children.push(node);
+            }
+        });
+        return root;
     };
 
     return (
-        <div className="flex">
-            <div className="card overflow-x-auto">
-                <OrganizationChart value={data} />
-            </div>
-
-            {/*상세정보 영역*/}
-            <div>
-                <h3>직원 정보</h3>
-                {selectedInfo ? (
-                    <ul>
-                        <li><strong>이름:</strong> {selectedInfo.name}</li>
-                        <li><strong>직급:</strong> {selectedInfo.job}</li>
-                        <li><strong>전화번호:</strong> {selectedInfo.phone}</li>
-                        <li><strong>입사일:</strong> {selectedInfo.hire_date}</li>
-                    </ul>
-                ) : (
-                    <p>직원을 선택하세요.</p>
-                )}
+        <div className="productPage wrap page-background">
+            <Header />
+            <div className="template-list-back justify-content-between items-center"  style={{ paddingLeft: '40px' }}>
+                <div>
+                    <h1 className="text-align-left margin-bottom-10 font-bold margin-left-20 doc-manage" style={{ fontSize: "24px" }}>
+                        조직도
+                    </h1>
+                    <div className="org-tree">
+                        {treeData ? <TreeNode node={treeData} /> : <p>로딩 중...</p>}
+                    </div>
+                </div>
             </div>
         </div>
     );
-}
-
-// flatList → Primereact용 트리 변환 함수
-function convertToOrgChartFormat(flatList, onUserClick) {
-    const map = {};
-    const roots = [];
-
-    // 1. 모든 dept 초기화
-    flatList.forEach(item => {
-        map[item.dept_idx] = {
-            key: `dept-${item.dept_idx}`,
-            label: item.dept_name,
-            expanded: true,
-            children: []
-        };
-    });
-
-    // 2. 직원 추가 (부서에)
-    flatList.forEach(item => {
-        const deptNode = map[item.dept_idx];
-        if (!deptNode) return;
-
-        if (item.users && item.users.length > 0) {
-            const userNodes = item.users.map(user => ({
-                key: `user-${user.user_idx}`,
-                label: `${user.user_name} (${user.job_name})`,
-                type: 'user',
-                selectable: true,
-                className: 'cursor-pointer hover:underline',
-                command: () => onUserClick(user)
-            }));
-            deptNode.children.push(...userNodes);
-        }
-    });
-
-    // 3. 계층 연결
-    flatList.forEach(item => {
-        const node = map[item.dept_idx];
-        if (item.parent_idx && map[item.parent_idx]) {
-            map[item.parent_idx].children.push(node);
-        } else if (!item.parent_idx) {
-            roots.push(node);
-        }
-    });
-
-    return roots;
 }

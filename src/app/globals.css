@@ -4482,3 +4482,92 @@ body.invoice-detail-body-reset {
     width: 11% !important;
     margin-top: 0 !important;
 }
+
+
+/* =============== 조직도 =============== */
+.org-tree {
+    display: flex;
+    justify-content: center;
+    padding-left: 20px;
+    font-family: 'Pretendard', sans-serif;
+}
+
+.org-node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.org-node {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #fff;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    min-width: 110px;
+    z-index: 1;
+    width: fit-content;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+    margin: 4px 0;
+    height: 33px;
+}
+.org-node:hover {
+    background-color: #f2f2f2;
+}
+
+.dept-node {
+    background-color: #e6f0ff;
+    font-weight: 600;
+}
+
+.user-node {
+    background-color: #fefefe;
+    color: #555;
+    font-style: italic;
+    cursor: default;
+}
+
+.org-children {
+    padding-left: 20px;
+    /*display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 2px;
+    margin-top: 20px;
+    position: relative;*/
+}
+
+/* 선 그리기 */
+.org-node-wrapper::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background: #ccc;
+    z-index: 0;
+}
+
+.org-node-wrapper:last-child::after {
+    display: none; /* 마지막 노드는 아래 선 제거 */
+}
+
+/*
+!* 가로 연결선 *!
+.org-children::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #ccc;
+    z-index: 0;
+}*/
