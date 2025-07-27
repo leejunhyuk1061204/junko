@@ -44,10 +44,27 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
             .then(res => res.data?.list && setCustomers(res.data.list))
 
         axios.get('http://localhost:8080/voucher/list', { params: { page: 1, size: 1000 } })
-            .then(res => res.data?.list && setEntries(res.data.list))
-    }, [])
+            .then(async res => {
+                if (!res.data?.list) return
+                const allEntries = res.data.list
 
-    useEffect(() => {
+                const filteredEntries = await Promise.all(
+                    allEntries.map(async entry => {
+                        const usedRes = await axios.get(`http://localhost:8080/used/${entry.entry_idx}`)
+                        const isUsed = usedRes.data?.used
+
+                        // isEdit 상태일 때, 수정 중인 전표는 필터링하지 않음
+                        if (!isUsed || (isEdit && entry.entry_idx === form.entry_idx)) {
+                            return entry
+                        }
+                        return null
+                    })
+                )
+                setEntries(filteredEntries.filter(e => e !== null))
+            })
+    }, [isEdit, form.entry_idx])
+
+        useEffect(() => {
         if (isEdit && invoice_idx) {
             axios.get(`http://localhost:8080/invoice/detail/${invoice_idx}`)
                 .then(res => {

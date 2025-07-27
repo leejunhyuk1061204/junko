@@ -29,8 +29,8 @@ export default function CategoryForm({ data = [], onSuccess, editItem, setEditIt
         if (editItem) {
             // 수정 모드
             payload.category_idx = editItem.category_idx;
-            const res = await axios.put("http://localhost:8080/cate/update", {
-                headers: { Authorization: sessionStorage.getItem("token") },
+            const res = await axios.put("http://localhost:8080/cate/update", payload, {
+                headers: { Authorization: token }
             });
             const data = res.data;
             if (data.success) {
@@ -42,8 +42,8 @@ export default function CategoryForm({ data = [], onSuccess, editItem, setEditIt
             }
         } else {
             // 등록 모드
-            const res = await axios.post("http://localhost:8080/cate/insert", {
-                    Authorization: sessionStorage.getItem("token"),
+            const res = await axios.post("http://localhost:8080/cate/insert", payload, {
+                    headers: { Authorization: token }
             });
             const data = res.data;
             if (data.success) {
