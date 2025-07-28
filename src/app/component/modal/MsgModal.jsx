@@ -69,7 +69,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
         setReadYN({idx:1, name:'전체'},)
         setMsgOption({idx:1, name:'받은 메세지'},)
         setPosition({x:0,y:0});
-        selectedMsg(null);
+        setSelectedMsg(null);
         setMsgForm({});
         setSelectedImportant({idx:1, name:'일반'});
         setUser([]);
@@ -347,7 +347,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                             </div>
                             <div className='flex flex-direction-col' style={{padding:'0 30px'}}>
                                 {msgOption.idx === 1 &&
-                                    <table className='checkbox-table'>
+                                    <table className='checkbox-table overflow-hidden text-overflow-ellipsis'>
                                         <thead>
                                             <tr style={{fontWeight:'bold',fontSize:'18px'}}>
                                                 <td>중요</td>
@@ -365,7 +365,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                                                     onClick={()=>{setMsgType('detail');setSelectedMsg(msg);}}
                                                 >
                                                     <td style={{color:'lightcoral'}}>{msg.important_yn?<FaExclamation />:''}</td>
-                                                    <td>{msg.msg_title}</td>
+                                                    <td className='overflow-hidden text-overflow-ellipsis'>{msg.msg_title}</td>
                                                     <td>{msg.sender_name}</td>
                                                     <td>{msg.read_yn?'읽음':'미확인'}</td>
                                                 </tr>
@@ -391,7 +391,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                                                 onClick={()=>{setMsgType('detail');setSelectedMsg(msg);}}
                                             >
                                                 <td style={{color:'lightcoral'}}>{msg.important_yn?<FaExclamation />:''}</td>
-                                                <td>{msg.msg_title}</td>
+                                                <td className='overflow-hidden text-overflow-ellipsis'>{msg.msg_title}</td>
                                                 <td>{msg.receiver_name}</td>
                                             </tr>
                                         ))}

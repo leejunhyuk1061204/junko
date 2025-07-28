@@ -102,7 +102,7 @@ const WorkInOutModal = ({open,onClose}) => {
                 <>
 
                     {/* 탭 내용 */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' ,padding: '30px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' ,padding: '30px', paddingBottom: '15px' }}>
                         <div className='flex width-auto' style={{margin:'0 30px'}}>
                             <div className='flex flex-direction-col gap_10'>
                                 <div className='text-align-left' style={{fontSize:'20px', fontWeight:'bold'}}>

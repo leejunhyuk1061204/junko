@@ -43,6 +43,7 @@ const mainMenus = [
             { label: '재고 현황', href: '/component/stock' },
             { label: '입고 관리', href: '/component/receive' },
             { label: '발주 관리', href: '/component/order' },
+            { label: '창고 / 구역 관리', href: '/component/warehouse' },
         ],
         href: '/',
     },
@@ -206,7 +207,7 @@ const Header = () => {
                                             style={{top:'90%',left:'70px', fontWeight:'normal'}}
                                             onClick={()=>{setMsgModalOpen({bool:true,type:'detail',msg:msg});setShowMsg(!showMsg)}}
                                         >
-                                            <span className='margin-left-5'>{msg.msg_title}</span>
+                                            <span className='margin-left-5 overflow-hidden text-overflow-ellipsis'>{msg.msg_title}</span>
                                             <span className='margin-right-5'>{msg.sender_name}</span>
                                         </li>
                                     ))}

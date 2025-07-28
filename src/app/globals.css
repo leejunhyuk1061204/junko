@@ -192,6 +192,17 @@ input[type='number']:focus {
     /*box-shadow: var(--shadow);*/
 }
 
+.btn {
+    padding: 5px 15px;
+    box-sizing: border-box;
+    border : 1px solid var(--border-color);
+    border-radius: 6px;
+    text-align: center;
+    cursor: pointer;
+    background-color: #fff ;
+    /*box-shadow: var(--shadow);*/
+}
+
 .btn:hover{
     background-color:#b8bcc3;
     border : 1px solid #b8bcc3;
@@ -509,6 +520,10 @@ input[type='number']:focus {
 
 .overflow-auto {
     overflow: auto;
+}
+
+.overflow-hidden {
+    overflow: hidden;
 }
 
 .rounded {
