@@ -125,7 +125,13 @@ const Header = () => {
         });
         // console.log(data);
         setMsgList(data.list);
-        setMsgCnt(data.list.length);
+        await axios.post('http://localhost:8080/msg/list',{
+            type:'receive',
+            user_idx:sessionStorage.getItem('user_idx') || 0,
+            read_yn:false,
+        }).then((res)=>{
+            setMsgCnt(res.data.list.length);
+        });
     }
 
     // 1분마다 메세지 검색
@@ -276,7 +282,7 @@ const Notification = ({ show, msgCnt }) => {
             unmountOnExit
             nodeRef={notificationRef}
         >
-            <div className="notification" ref={notificationRef} style={{fontSize:'17px'}}>
+            <div className="notification" ref={notificationRef} style={{fontSize:'16px'}}>
                 <p style={{marginTop:'10px'}}>{msgCnt} 개의 읽지 않은 메시지가 있습니다.</p>
             </div>
         </CSSTransition>

@@ -110,7 +110,7 @@ const WorkInOutModal = ({open,onClose}) => {
                                 </div>
                                 <div className='text-align-left margin-bottom-10'>{`${today.getMonth()<10 ? `0${today.getMonth()}월`:`${today.getMonth()}월`} ${today.getDate()}일`}</div>
                             </div>
-                            <div>
+                            <div className='flex flex-direction-col gap_5'>
                                 {timecardList?.length === 0 && <div>출근 정보가 없습니다</div>}
                                 {timecardList?.length > 0 &&
                                     timecardList?.map((t,i)=>(

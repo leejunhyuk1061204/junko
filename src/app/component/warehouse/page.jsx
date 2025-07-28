@@ -120,6 +120,10 @@ const WareHousePage = () => {
                                 const {data} = await axios.post('http://localhost:8080/zone/update', {
                                     zone_idx: selected.zone.zone_idx,
                                     zone_name: zoneForm.zone_name,
+                                },{
+                                    headers: {
+                                        Authorization : sessionStorage.getItem("token")
+                                    }
                                 })
                                 console.log(data);
                                 if (!data.success) {
@@ -172,6 +176,10 @@ const WareHousePage = () => {
                                     warehouse_name: warehouseForm.warehouse_name || '',
                                     warehouse_address: warehouseForm.warehouse_address || '',
                                     user_idx: warehouseForm.user_idx || 0
+                                },{
+                                    headers: {
+                                        Authorization : sessionStorage.getItem("token")
+                                    }
                                 })
                                 console.log(data);
                                 if (!data.success) {
@@ -234,6 +242,10 @@ const WareHousePage = () => {
                                 warehouse_name: warehouseForm.warehouse_name || '',
                                 warehouse_address: warehouseForm.warehouse_address || '',
                                 user_idx: warehouseForm.user_idx || 0
+                            },{
+                                headers: {
+                                    Authorization : sessionStorage.getItem("token")
+                                }
                             })
                             console.log(data);
                             if (!data.success) {
@@ -285,6 +297,10 @@ const WareHousePage = () => {
                             const {data} = await axios.post('http://localhost:8080/zone/insert', {
                                 warehouse_idx:zoneForm.warehouse_idx||0,
                                 zone_name: zoneForm.zone_name || '',
+                            },{
+                                headers: {
+                                    Authorization : sessionStorage.getItem("token")
+                                }
                             })
                             console.log(data);
                             if (!data.success) {
@@ -433,7 +449,7 @@ const WareHousePage = () => {
                     <h3 className="text-align-left margin-bottom-10 margin-0-200 margin-bottom-20">
                         <span className="product-header">창고 목록 / 상세 조회</span>
                     </h3>
-                    <div className={`order-list-back flex gap_20 ${userFocused||warehouseFocused?'show-dropdown':''}`} style={{margin:'0 200px'}}>
+                    <div className={`order-list-back flex gap_20 ${userFocused||warehouseFocused?'show-dropdown':'overflow-auto'}`} style={{margin:'0 200px'}}>
                         <div className='flex flex-25 flex-direction-col'>
                             <div className='border border-gray border-radius padding-30 margin-20 gap_15 flex flex-direction-col '>
                                 {warehouseList.map((warehouse, i) => (
@@ -444,7 +460,7 @@ const WareHousePage = () => {
                         <div className='margin-20 gap_15 flex flex-direction-col justify-content-between'>
                             {insertMode?
                                 <div>
-                                    <table>
+                                    <table className='text-overflow-table'>
                                         <thead>
                                         {insertType ?
                                             <tr>
@@ -554,7 +570,7 @@ const WareHousePage = () => {
                                 </div>
                                 : selected === null ? (<div style={{fontSize:'20px'}}>창고 또는 구역을 선택해주세요</div>):selected?.bool ? (
                                 <div>
-                                    <table>
+                                    <table className='text-overflow-table'>
                                         <thead>
                                             <tr>
                                                 <th>창고번호</th>
@@ -616,7 +632,7 @@ const WareHousePage = () => {
                                 </div>
                             ) : (
                                 <div>
-                                    <table>
+                                    <table className='text-overflow-table'>
                                         <thead>
                                         <tr>
                                             <th>구역번호</th>
@@ -637,11 +653,11 @@ const WareHousePage = () => {
                                 </div>
                             )}
                             <div className='flex gap_10 justify-content-center'>
-                                {insertMode?<button className='btn' onClick={insertForm}>등록</button>:''}
-                                {insertMode?<button className='btn' onClick={()=>setInsertType(!insertType)}>{!insertType?'창고':'구역'}</button>:''}
-                                <button className='btn' onClick={insertUpdate}>{insertMode?'돌아가기':'등록'}</button>
-                                {insertMode?'':<button className='btn' onClick={()=>{setUpdateMode(!updateMode);setZoneForm({});setWarehouseForm({});}}>수정</button>}
-                                {insertMode?'':<button className='btn' onClick={selectedDel}>삭제</button>}
+                                {insertMode?<button className='btn white-space-nowrap' onClick={insertForm}>등록</button>:''}
+                                {insertMode?<button className='btn white-space-nowrap' onClick={()=>setInsertType(!insertType)}>{!insertType?'창고':'구역'}</button>:''}
+                                <button className='btn white-space-nowrap' onClick={insertUpdate}>{insertMode?'돌아가기':'등록'}</button>
+                                {insertMode?'':<button className='btn white-space-nowrap' onClick={()=>{setUpdateMode(!updateMode);setZoneForm({});setWarehouseForm({});}}>수정</button>}
+                                {insertMode?'':<button className='btn white-space-nowrap' onClick={selectedDel}>삭제</button>}
                             </div>
                         </div>
                     </div>

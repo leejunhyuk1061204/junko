@@ -27,7 +27,7 @@ const StockHistoryModal = ({open,onClose,stock}) => {
         if(typeof stock ==='undefined') return;
         getStockHistory();
         console.log(stock);
-    },[stock,selectedType])
+    },[page,stock,selectedType])
 
     const getStockHistory = async () => {
         const {data} = await axios.post('http://localhost:8080/stock/list',{
@@ -117,7 +117,7 @@ const StockHistoryModal = ({open,onClose,stock}) => {
                                 </div>
                             </div>
                             <div>
-                                <table>
+                                <table className='text-overflow-table'>
                                     <thead>
                                         <tr>
                                             <th>번호</th>
@@ -125,8 +125,8 @@ const StockHistoryModal = ({open,onClose,stock}) => {
                                             <th>상품명</th>
                                             <th>옵션명</th>
                                             <th>담당자</th>
-                                            {typeof history.manufacture === 'undefined' ? '':<th>제조일자</th>}
-                                            {typeof history.expiration === 'undefined' ? '':<th>유통기한</th>}
+                                            <th>제조일자</th>
+                                            <th>유통기한</th>
                                             <th>보관창고</th>
                                             <th>보관구역</th>
                                             <th>수량</th>
@@ -141,8 +141,8 @@ const StockHistoryModal = ({open,onClose,stock}) => {
                                             <td>{history.product_name}</td>
                                             <td>{typeof history.product_option_idx === 'undefined' ? '없음':history.combined_name}</td>
                                             <td>{history.user_name}</td>
-                                            {typeof history.manufacture === 'undefined' ? '':<td>history.manufacture</td>}
-                                            {typeof history.expiration === 'undefined' ? '':<td>history.expiration</td>}
+                                            {typeof history.manufacture === 'undefined' ? <td></td>:<td>history.manufacture</td>}
+                                            {typeof history.expiration === 'undefined' ? <td></td>:<td>history.expiration</td>}
                                             <td>{history.warehouse_name}</td>
                                             <td>{history.zone_name}</td>
                                             <td>{history.stock_cnt}</td>

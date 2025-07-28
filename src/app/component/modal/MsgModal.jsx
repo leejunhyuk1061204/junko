@@ -190,6 +190,10 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                 msg_title:msgForm.msg_title,
                 msg_content:msgForm.msg_content,
                 important_yn:selectedImportant.name==='중요'?1:0,
+            },{
+                headers:{
+                    authorization: sessionStorage.getItem("token"),
+                }
             });
             console.log(data);
             if (!data.success) {

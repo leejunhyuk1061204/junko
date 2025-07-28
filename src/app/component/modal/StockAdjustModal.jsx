@@ -46,6 +46,15 @@ const StockAdjustModal = ({open,onClose,stock,getStockSumList}) => {
     }, [userName]);
 
     const insertStock = () => {
+
+        if (!selectedUser) {
+            return openModal({svg: '❗', msg1: '담당자 선택', msg2: '담당자를 선택해주세요.', showCancel: false});
+        }
+
+        if (!stockCnt) {
+            return openModal({svg: '❗', msg1: '수량 입력', msg2: '조정할 수량을 입력해주세요.', showCancel: false});
+        }
+
         openModal({
             svg: '❓',
             msg1: '재고조정 확인',
