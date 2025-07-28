@@ -51,6 +51,21 @@ const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
     }, [userName]);
 
     const updateInfo = async () => {
+
+        // 유효성 검사
+        // 입고 정보 확인
+        if(!idx || !status || !selectedUser || info?.length <= 0 || info?.some(v=>v.product_idx == null) || info?.some(v=>v.stock_cnt == null) || info?.some(v=>v.zone_idx == null)){
+            openModal({
+                svg: '❌',
+                msg1: '입고 정보 확인',
+                msg2: '입고 정보를 확인해주세요',
+                showCancel: false,
+                onConfirm:()=>{
+                    closeModal();
+                }
+            })
+            return false;
+        }
         openModal({
             svg: '❓',
             msg1: '변경 확인',
@@ -59,7 +74,11 @@ const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
             onConfirm: async() => {
                 try {
                     console.log(info);
-                    const {data} = await axios.post('http://localhost:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser})
+                    const {data} = await axios.post('http://localhost:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser},{
+                        headers: {
+                            Authorization: sessionStorage.getItem("token")
+                        }
+                    })
                     console.log(data);
                     if (!data.success) {
                         openModal({

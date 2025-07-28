@@ -78,14 +78,26 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
 
     const insertWaybill = async () => {
          const {custom_idx,warehouse_idx} = waybillForm;
+         
+         if(!custom_idx || !warehouse_idx){
+             openModal({
+                 svg: '❌',
+                 msg1: '정보 확인',
+                 msg2: '송장 정보를 확인해 주세요',
+                 showCancel: false,
+                 onConfirm:()=>{
+                     closeModal();
+                 }
+             })
+             return false;
+         }
+         
          const body = idxList.map(sales_idx => ({
             sales_idx,
              custom_idx,
             warehouse_idx,
          }));
          console.log(body);
-
-
 
         openModal({
             svg: '❓',
@@ -96,7 +108,11 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
                 try {
                     let result = [];
                     for (const b of body) {
-                        const {data} = await axios.post('http://localhost:8080/waybill/insert', b);
+                        const {data} = await axios.post('http://localhost:8080/waybill/insert', b,{
+                            headers: {
+                                Authorization : sessionStorage.getItem("token")
+                            }
+                        });
                         console.log(data);
                         result.push(data.success);
                     }

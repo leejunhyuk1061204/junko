@@ -29,7 +29,7 @@ const statusList = [
     {idx:2, name:'확정'},
     {idx:3, name:'취소'},
     {idx:4, name:'요청'},
-    // {idx:5, name:'입고완료'},
+    {idx:5, name:'입고완료'},
 ]
 
 const DetailOrderModal = dynamic(() => import('../modal/DetailOrderModal'), {
@@ -50,6 +50,7 @@ const OrderListPage = () => {
     const [selectedStatus, setSelectedStatus] = useState({idx:1, name:'전체'});
     const statusRef = useRef({});
     const [selectedDate, setSelectedDate] = useState({});
+    const [isSelected, setIsSelected] = useState(false);
     
     useEffect(() => {
         getOrderList();
@@ -97,7 +98,11 @@ const OrderListPage = () => {
             msg2: '진행 상태를 변경하시겠습니까?',
             showCancel: true,
             onConfirm: async() => {
-                const {data} = await axios.post('http://localhost:8080/order/update',{order_idx:idx,status:status});
+                const {data} = await axios.post('http://localhost:8080/order/update',{order_idx:idx,status:status},{
+                    headers: {
+                        Authorization: sessionStorage.getItem("token")
+                    }
+                });
                 console.log(data);
                 closeModal();
                 setTimeout(()=>{
@@ -190,7 +195,7 @@ const OrderListPage = () => {
         <h3 className="text-align-left margin-bottom-10 margin-30">
             <span className="product-header">발주 목록 / 상세 조회</span>
         </h3>
-        <div className="order-list-back">
+        <div className="order-list-back" style={{overflow:isSelected?'visible !important':''}}>
             <div className="flex gap_10 align-center justify-right margin-bottom-10">
                 {/* 검색 */}
                 <div className='width-fit flex gap_15 align-center'>
@@ -205,7 +210,7 @@ const OrderListPage = () => {
                         <ListboxButton className="select-btn" style={{marginRight:0}}>{selectedStatus.name}</ListboxButton>
                         <ListboxOptions className="select-option">
                             {statusList.map(option => (
-                                <ListboxOption key={option.id} value={option} className="select-option-item">
+                                <ListboxOption key={option.idx} value={option} className="select-option-item">
                                     {option.name}
                                 </ListboxOption>
                             ))}
@@ -221,13 +226,14 @@ const OrderListPage = () => {
                                 <ListboxOption key={option.id} value={option} className="select-option-item">
                                     {option.name}
                                 </ListboxOption>
+
                             ))}
                         </ListboxOptions>
                     </Listbox>
                 </div>
             </div>
 
-            <table className='order-list-table text-overflow-table'>
+            <table className={`order-list-table text-overflow-table ${isSelected ? 'show-dropdown' : ''} `}>
                 <thead>
                     <tr>
                         {/*<th><input type='checkbox'/></th>*/}
@@ -252,17 +258,17 @@ const OrderListPage = () => {
                             <td>{order.price}</td>
                             <td>{order.reg_date}</td>
                             <td>{order.user_name}</td>
-                            <td className={`position-relative cursor-pointer ${statusClicked[i] ? 'show-dropdown':''} `} onClick={(e)=>{e.stopPropagation();changeStatusClicked(i)}} ref={el => (statusRef.current[i] = el)}>
+                            <td className={`position-relative cursor-pointer ${statusClicked[i] ? 'show-dropdown':''} `} onClick={(e)=>{e.stopPropagation();changeStatusClicked(i);setIsSelected(!isSelected)}} ref={el => (statusRef.current[i] = el)}>
                                 {order.status}
                                 {statusClicked[i]
                                 // && order.status ==='요청'
                                     ? (
                                 <ul className="listBox-option">
-                                    {orderStatusList?.map((os) => (
+                                    {orderStatusList?.filter(f=>f.name !== order.status).map((os) => (
                                         <li
                                             key={os.idx}
                                             className="listBox-option-item margin-0"
-                                            onClick={()=>updateOrder(order.order_idx,os.name)}
+                                            onClick={()=>{updateOrder(order.order_idx,os.name);setIsSelected(!isSelected)}}
                                         >
                                             {os.name}
                                         </li>

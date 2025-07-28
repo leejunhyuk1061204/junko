@@ -167,6 +167,29 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
 
     // 출고완료 후 재고 등록
     const insertStock = async() => {
+
+        if (!shipment?.shipment_idx) {
+            return openModal({svg: '❗', msg1: '오류', msg2: '출고 정보가 없습니다.', showCancel: false});
+        }
+
+        if (!selectedUser) {
+            return openModal({svg: '❗', msg1: '담당자 선택', msg2: '담당자를 선택해주세요.', showCancel: false});
+        }
+
+        if (!selectedWarehouse) {
+            return openModal({svg: '❗', msg1: '창고 선택', msg2: '출고 창고를 선택해주세요.', showCancel: false});
+        }
+
+        if (!stockInfo.length) {
+            return openModal({svg: '❗', msg1: '출고 수량 입력', msg2: '출고할 수량을 입력해주세요.', showCancel: false});
+        }
+
+        if (shipmentProductList.some(product => (
+            product.product_cnt !== stockInfo.filter(f => f.product_idx === product.product_idx && (typeof product.product_option_idx === 'undefined' ? true : f.product_option_idx === product.product_option_idx)).reduce((sum, curr) => sum + Number(curr.stock_cnt), 0)
+        ))) {
+            return openModal({svg: '❗', msg1: '출고 수량 불일치', msg2: '출고할 수량을 확인해주세요.', showCancel: false});
+        }
+
         openModal({
             svg: '❓',
             msg1: '출고 완료 확인',
@@ -176,34 +199,16 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
                 closeModal();
                 setTimeout(async ()=>{
                     try {
-                        if (!shipment?.shipment_idx) {
-                            return openModal({svg: '❗', msg1: '오류', msg2: '출고 정보가 없습니다.', showCancel: false});
-                        }
-
-                        if (!selectedUser) {
-                            return openModal({svg: '❗', msg1: '담당자 선택', msg2: '담당자를 선택해주세요.', showCancel: false});
-                        }
-
-                        if (!selectedWarehouse) {
-                            return openModal({svg: '❗', msg1: '창고 선택', msg2: '출고 창고를 선택해주세요.', showCancel: false});
-                        }
-
-                        if (!stockInfo.length) {
-                            return openModal({svg: '❗', msg1: '출고 수량 입력', msg2: '출고할 수량을 입력해주세요.', showCancel: false});
-                        }
-
-                        if (shipmentProductList.some(product => (
-                            product.product_cnt !== stockInfo.filter(f => f.product_idx === product.product_idx && (typeof product.product_option_idx === 'undefined' ? true : f.product_option_idx === product.product_option_idx)).reduce((sum, curr) => sum + Number(curr.stock_cnt), 0)
-                        ))) {
-                            return openModal({svg: '❗', msg1: '출고 수량 불일치', msg2: '출고할 수량을 확인해주세요.', showCancel: false});
-                        }
-
                         const {data} = await axios.post('http://localhost:8080/shipment/update', {
                             shipment_idx: shipment.shipment_idx,
                             status: '출고완료',
                             user_idx: selectedUser,
                             warehouse_idx: selectedWarehouse,
                             stockInfo: stockInfo,
+                        },{
+                            headers: {
+                                Authorization : sessionStorage.getItem("token")
+                            }
                         });
                         console.log(data);
                         if (data.success) {
@@ -381,7 +386,17 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
                                         </thead>
                                         <tbody>
                                             {shipmentProductList.map((product,i)=>(
-                                                <tr key={i} className='cursor-pointer' onClick={()=>setSelectedProduct({bool:selectedProduct?.product?.product_idx !== product.product_idx ,product:selectedProduct?.product?.product_idx === product.product_idx ? null : product})}>
+                                                <tr key={i} className='cursor-pointer'
+                                                    onClick={() => {
+                                                        const isSameProduct =
+                                                            selectedProduct?.product?.product_idx === product.product_idx &&
+                                                            (selectedProduct?.product?.product_option_idx ?? null) === (product.product_option_idx ?? null);
+
+                                                        setSelectedProduct({
+                                                            bool: !isSameProduct,
+                                                            product: isSameProduct ? null : product,
+                                                    });
+                                                }}>
                                                     <td>{product.product_idx}</td>
                                                     <td>{product.product_name}</td>
                                                     <td>{typeof product.combined_name ==='undefined' ? '없음':product.combined_name}</td>
@@ -408,7 +423,7 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            {shipmentProductStockList?.map((product,i)=>(
+                                            {shipmentProductStockList && shipmentProductStockList.length > 0 && shipmentProductStockList?.map((product,i)=>(
                                                 <tr key={i}>
                                                     <td>{product.product_idx}</td>
                                                     <td>{product.product_name}</td>
@@ -428,6 +443,11 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
                                                                onChange={(e)=>changeStockInfo(product,e)}/></td>
                                                 </tr>
                                             ))}
+                                            {shipmentProductStockList && shipmentProductStockList.length <= 0 && (
+                                                <tr>
+                                                    <td colSpan={8}>재고 정보 없음</td>
+                                                </tr>
+                                            )}
                                             </tbody>
                                         </table>
                                     </div>

@@ -10,12 +10,9 @@ const SearchProductModal = ({open,onClose,orderProduct}) => {
     const [total, setTotal] = useState(1);
 
     useEffect(() => {
+        if(!open) return;
         getProducts();
-    },[])
-
-    useEffect(() => {
-        getProducts();
-    },[page])
+    },[open,page])
 
     // 상품 선택
 
@@ -117,8 +114,8 @@ const SearchProductModal = ({open,onClose,orderProduct}) => {
                                 {products && products.map((p,idx)=>(
                                     <tr key={idx} className='cursor-pointer' onClick={()=>selectProdInfo(p)}>
                                         <td>{p.product_idx}</td>
-                                        <td>{p.product_name}</td>
-                                        <td>{p.combined_name||'없음'}</td>
+                                        <td className='overflow-hidden text-overflow-ellipsis'>{p.product_name}</td>
+                                        <td className='overflow-hidden text-overflow-ellipsis'>{p.combined_name||'없음'}</td>
                                     </tr>
                                 ))}
                                 </tbody>

@@ -203,6 +203,10 @@ const SalesInsertPage = () => {
                         const {data} = await axios.post('http://localhost:8080/sales/insert', {
                             sales: salesForm,
                             products: salesProductForm
+                        },{
+                            headers: {
+                                Authorization : sessionStorage.getItem("token")
+                            }
                         });
                         console.log(data);
                         if (!data.success) {
@@ -290,7 +294,7 @@ const SalesInsertPage = () => {
                     </div>
                 </div>
                 <div className='back-ground-white margin-0-200 padding-30 width-auto flex back-radius flex-direction-col margin min-width-400'>
-                    <div className='flex flex-direction-col'>
+                    <div className='flex flex-direction-col margin-bottom-20'>
                         <div className='order-product-text margin-bottom-10 text-align-left'>주문 정보</div>
                         <div>
                             <table>

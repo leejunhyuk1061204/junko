@@ -8,7 +8,7 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
     const {openModal, closeModal} = useAlertModalStore();
 
     const [user, setUser] = useState([]);
-    const [selectedUser, setSelectedUser] = useState({});
+    const [selectedUser, setSelectedUser] = useState(0);
     const [userSearch, setUserSearch] = useState('');
     const [userName, setUserName] = useState('');
     const [userFocused, setUserFocused] = useState(false);
@@ -25,7 +25,7 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
         setUser([]);
-        setSelectedUser({});
+        setSelectedUser(0);
         setUserSearch('');
         setUserName('');
         setUserFocused(false);
@@ -137,6 +137,18 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
     // returnHandle 등록
     const returnHandleInsert = () => {
         console.log(handleForm);
+        if (!selectedUser) {
+            return openModal({svg: '❗', msg1: '담당자 선택', msg2: '담당자를 선택해주세요.', showCancel: false});
+        }
+
+        if(handleForm?.[0].disposal_cnt === 0 && handleForm?.[0].resell_cnt === 0) {
+            return openModal({svg: '❗', msg1: '수량 입력', msg2: '폐기 또는 재입고 수량을 입력해주세요.', showCancel: false});
+        }
+
+        if(handleForm?.[0].resell_cnt > 0 && handleForm?.[0].zone_idx == null){
+            return openModal({svg: '❗', msg1: '구역 입력', msg2: '보관 구역을 입력해주세요.', showCancel: false});
+        }
+
         openModal({
             svg: '❓',
             msg1: '변경 확인',
@@ -151,6 +163,10 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
                             status:"반품완료",
                             user_idx:selectedUser,
                             handle:handleForm
+                        },{
+                            headers: {
+                                Authorization : sessionStorage.getItem("token")
+                            }
                         })
                         console.log(data);
                         if (!data.success) {

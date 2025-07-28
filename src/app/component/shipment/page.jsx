@@ -193,7 +193,7 @@ const ShipmentPage = () => {
                             </Listbox>
                         </div>
                     </div>
-                    <table className={'checkbox-table text-overflow-table'}>
+                    <table className={'text-overflow-table'}>
                         <thead>
                             <tr>
                                 {/*<th><input type='checkbox' checked={shipmentList?.length > 0 && shipmentList?.every((_, i) => checkboxChecked[i]?.bool === true)} onChange={e=>allCheck(e.target.checked)}/></th>*/}

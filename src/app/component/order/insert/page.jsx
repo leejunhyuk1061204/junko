@@ -271,6 +271,7 @@ const OrderInsertPage = () => {
             const tempId = productKeyToTempId[key];
             const order_cnt = prod.order_cnt;
             const delivery_date = orderPlan[idx]?.delivery_date;
+            console.log(delivery_date);
 
             if (tempId && delivery_date) {
                 rawPlan.push({
@@ -292,9 +293,50 @@ const OrderInsertPage = () => {
             orderPlan: mergedOrderPlan
         };
 
-        // console.log('🔥 최종 insertData:', insertData);
-
         // 유효성 검사
+        // 발주 정보 확인
+        if(!order?.custom?.custom_idx || !order?.warehouse?.warehouse_idx || !order?.user?.user_idx){
+            openModal({
+                svg: '❌',
+                msg1: '발주 정보 확인',
+                msg2: '발주 정보를 확인해주세요',
+                showCancel: false,
+                onConfirm:()=>{
+                    closeModal();
+                }
+            })
+            return false;
+        }
+
+        // 날짜 확인
+        if(rawPlan.every(f=>f.delivery_date <= format(new Date(),'yyyy-MM-dd'))){
+            openModal({
+                svg: '❌',
+                msg1: '날짜 확인',
+                msg2: '납품 날짜를 확인해주세요',
+                showCancel: false,
+                onConfirm:()=>{
+                    closeModal();
+                }
+            })
+            return false;
+        }
+
+        // 이메일 확인
+        if(!order?.custom?.email){
+            openModal({
+                svg: '❌',
+                msg1: '이메일 확인',
+                msg2: '거래처의 이메일 정보가 없습니다',
+                showCancel: false,
+                onConfirm:()=>{
+                    closeModal();
+                }
+            })
+            return false;
+        }
+
+        // 수량 확인
         const result = validateOrderPlan(insertData);
         if (!result.valid) {
             openModal({
@@ -383,7 +425,7 @@ const OrderInsertPage = () => {
             if (expected !== actual) {
                 return {
                     valid: false,
-                    message: `tempId ${op.tempId}: 발주 수량 ${expected} ≠ 납품 계획 총합 ${actual}`
+                    message: `상품코드 ${op.product_idx}: 발주 수량 ${expected} ≠ 납품 계획 총합 ${actual}`
                 };
             }
         }
@@ -587,7 +629,7 @@ const OrderInsertPage = () => {
                     </div>
                     <div className='margin-y-20 '>
                         <div className='order-product-text margin-bottom-10 text-align-left'>발주 품목</div>
-                        <table className='order-table text-overflow-ellipsis'>
+                        <table className='order-table'>
                             <thead>
                                 <tr>
                                     <th>상품 코드</th>

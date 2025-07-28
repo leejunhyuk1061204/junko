@@ -770,7 +770,7 @@ input[type='number']:focus {
     background-color: white;
     padding: 10px;
     margin: 30px;
-    overflow-x: auto;
+    /*overflow-x: auto;*/
 }
 
 .product-header{
@@ -1867,6 +1867,7 @@ body.invoice-detail-body-reset {
 .order-table th,
 .order-table td{
     overflow: hidden;
+    text-overflow-ellipsis: auto;
     height: 45px;
 }
 
@@ -2247,7 +2248,7 @@ body.invoice-detail-body-reset {
 
 .show-dropdown,
 .text-overflow-table tbody td.show-dropdown {
-    overflow: visible;
+    overflow: visible !important;
 }
 /*-------------------------회계 전표 css--------------------------------*/
 /* 전체 컨테이너 */

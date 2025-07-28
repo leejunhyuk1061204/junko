@@ -8,6 +8,11 @@ const handleStatusList = [
     {idx:2,name:'처리완료'}
 ]
 
+const returnStatusList = [
+    {idx:1,name:'반품 처리'},
+    {idx:2,name:'반품 없음'}
+]
+
 const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
 
     const {openModal,closeModal} = useAlertModalStore();
@@ -36,6 +41,8 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
     const [handleClaimList, setHandleClaimList] = useState([]);
     const [handleInsertForm, setHandleInsertForm] = useState({});
     const [mode, setMode] = useState(true);
+
+    const [returnStatusFocused, setReturnStatusFocused] = useState(false);
 
     // 모달이 닫힐 때 상태 초기화
     const handleClose = () => {
@@ -165,6 +172,13 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
     // 처리 등록 or 수정
     const handleInsert = () => {
         if(mode) {
+            console.log(handleClaimList);
+            if(handleClaimList?.length>0 && handleClaimList.some(v=>v.status === '처리완료')){
+                return openModal({svg: '❗', msg1: '처리 등록', msg2: '처리 완료된 클레임은 처리 등록이 불가능합니다', showCancel: false});
+            }
+            if(handleInsertForm.returnStatus && (!handleInsertForm.custom_idx || !handleInsertForm.warehouse_idx)){
+                return openModal({svg: '❗', msg1: '등록 실패', msg2: '택배사 또는 입고 창고를 확인해주세요', showCancel: false});
+            }
             openModal({
                 svg: '❓',
                 msg1: '등록 확인',
@@ -179,8 +193,13 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                                 user_idx : selectedUser,
                                 handle_detail : handleInsertForm.handle_detail,
                                 status : handleInsertForm.status,
+                                returnStatus : handleInsertForm.returnStatus,
                                 custom_idx : handleInsertForm.custom_idx||'',
                                 warehouse_idx : handleInsertForm.warehouse_idx||''
+                            },{
+                                headers: {
+                                    Authorization : sessionStorage.getItem("token")
+                                }
                             });
                             console.log(data);
                             if (data.success) {
@@ -233,6 +252,10 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                                 user_idx : selectedUser,
                                 handle_detail : handleInsertForm.handle_detail,
                                 status : handleInsertForm.status,
+                            },{
+                                headers: {
+                                    Authorization : sessionStorage.getItem("token")
+                                }
                             });
                             console.log(data);
                             if (data.success) {
@@ -385,6 +408,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                                                         setHandleInsertForm({handle_detail:handle.handle_detail,status:handle.status,idx:handle.claim_handle_idx})
                                                         setSelectedUser(handle.user_idx);
                                                         setUserSearch(handle.user_name);
+                                                        console.log(handle);
                                                     } else {
                                                         setHandleInsertForm({handle_detail:'',status:''})
                                                         setSelectedUser(0);
@@ -475,8 +499,50 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                                         </div>
                                     </div>
                                 </div>
-                                {handleInsertForm?.status ==='처리완료' && (
-                                    <div className='flex justify-content-between'>
+                                {handleInsertForm?.status ==='처리완료' && mode && (
+                                    <div className='flex justify-content-between gap_20'>
+                                        <div className='flex width-fit gap_15'>
+                                            <div className='flex width-fit align-center'><h3 className='white-space-nowrap'>반품 여부</h3></div>
+                                            <div>
+                                                <div className="listBox-container">
+                                                    <input
+                                                        type="text"
+                                                        className="width-100 border rounded"
+                                                        placeholder="반품 여부"
+                                                        value={handleInsertForm?.returnStatus?'반품 처리':'반품 없음'||''}
+                                                        onChange={(e) => setWarehouseSearch(e.target.value)}
+                                                        onFocus={() => {
+                                                            setReturnStatusFocused(true);
+                                                        }}
+                                                        onBlur={() => setTimeout(() => setReturnStatusFocused(false), 120)}
+                                                    />
+                                                    {returnStatusFocused ? (<>
+                                                        {returnStatusList?.length > 0 && (
+                                                            <ul className="listBox-option">
+                                                                {returnStatusList?.map((rsl) => (
+                                                                    <li
+                                                                        key={rsl.idx}
+                                                                        onClick={() => {
+                                                                            setHandleInsertForm(prev=>({...prev,returnStatus:rsl.name==='반품 처리'}));
+                                                                            if(rsl.name ==='반품 없음'){
+
+                                                                            }
+                                                                            setReturnStatusFocused(false);
+                                                                        }}
+                                                                        className="listBox-option-item margin-0"
+                                                                    >
+                                                                        {rsl.name}
+                                                                    </li>
+                                                                ))}
+                                                            </ul>
+                                                        )}
+                                                        {warehouse?.length === 0 && warehouseSearch && (
+                                                            <div className="position-absolute z-10 width-100 back-ground-white border px-2 py-1 h-over-sky">검색 결과 없음</div>
+                                                        )}
+                                                    </>):('')}
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div className='flex width-fit'>
                                             <div className='flex max-width-80 align-center'><h3>택배사</h3></div>
                                             <div className="listBox-container">

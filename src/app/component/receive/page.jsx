@@ -220,7 +220,7 @@ const ReceivingPage = () => {
                                     && receive.status === '입고예정'
                                     ? (
                                         <ul className="listBox-option">
-                                            {receiveStatusList?.map((rs) => (
+                                            {receiveStatusList?.filter(f=>f.name !== receive.status).map((rs) => (
                                                 <li
                                                     key={rs.idx}
                                                     className="listBox-option-item margin-0"

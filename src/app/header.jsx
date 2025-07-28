@@ -41,8 +41,8 @@ const mainMenus = [
         title: '재고관리',
         submenu: [
             { label: '재고 현황', href: '/component/stock' },
-            { label: '입고 관리', href: '/component/receive' },
             { label: '발주 관리', href: '/component/order' },
+            { label: '입고 관리', href: '/component/receive' },
             { label: '창고 / 구역 관리', href: '/component/warehouse' },
         ],
         href: '/',
@@ -50,7 +50,7 @@ const mainMenus = [
     {
         title: '판매 / 주문관리',
         submenu: [
-            { label: '주문 목록 / 상세보기', href: '/component/sales' },
+            { label: '주문 목록 / 관리', href: '/component/sales' },
             { label: '출고 관리', href: '/component/shipment' },
             { label: 'CS / 클레임 처리', href: '/component/claim' },
             { label: '반품', href: '/component/return' },
@@ -247,7 +247,7 @@ const Header = () => {
                             </p>
                         {/*</Link>*/}
                         {menu.submenu && menu.submenu.length > 0 && (
-                            <div className='submenu'>
+                            <div className='submenu width-auto'>
                                 {menu.submenu.map((sub, subIdx) => (
                                     <Link href={sub.href} key={subIdx}>
                                         <p className="submenu-item">{sub.label}</p>

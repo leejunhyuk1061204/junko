@@ -189,8 +189,8 @@ const DetailOrderModal = ({open,onClose,idx}) => {
                                                 plan.planProduct?.map(product=>(
                                                     <tr key={product.plan_product_idx}>
                                                         <td>{orderProducts.find(item=>item.order_product_idx === product.order_product_idx).product_idx}</td>
-                                                        <td>{orderProducts.find(item=>item.order_product_idx === product.order_product_idx).product_name}</td>
-                                                        <td>{orderProducts.find(item=>item.order_product_idx === product.order_product_idx).product_option_idx === 0 ?
+                                                        <td className='overflow-hidden text-overflow-ellipsis'>{orderProducts.find(item=>item.order_product_idx === product.order_product_idx).product_name}</td>
+                                                        <td className='overflow-hidden text-overflow-ellipsis'>{orderProducts.find(item=>item.order_product_idx === product.order_product_idx).product_option_idx === 0 ?
                                                             '없음' :
                                                             orderProducts.find(item=>item.order_product_idx === product.order_product_idx).combined_name}</td>
                                                         <td>{product.order_cnt}</td>
@@ -220,8 +220,8 @@ const DetailOrderModal = ({open,onClose,idx}) => {
                                         {orderProducts?.map(p=>(
                                             <tr key={p.order_product_idx}>
                                                 <td>{p.product_idx}</td>
-                                                <td>{p.product_name}</td>
-                                                <td>{p.product_option_idx === 0 ? '없음':p.combined_name}</td>
+                                                <td className='overflow-hidden text-overflow-ellipsis'>{p.product_name}</td>
+                                                <td className='overflow-hidden text-overflow-ellipsis'>{p.product_option_idx === 0 ? '없음':p.combined_name}</td>
                                                 <td>{p.purchase_price}</td>
                                                 <td>{p.order_cnt}</td>
                                                 <td>{p.purchase_price*p.order_cnt}</td>

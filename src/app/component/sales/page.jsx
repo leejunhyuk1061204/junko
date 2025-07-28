@@ -60,9 +60,34 @@ const SalesPage = () => {
     },[selectedSort, selectedStatus, page, selectedDate]);
 
     const waybillInsert = () => {
-        if(Object.values(checkboxChecked).length === 0) return;
+        if(Object.values(checkboxChecked).length === 0 || Object.values(checkboxChecked).every(v=>v.bool === false)){
+            openModal({
+                svg: '❌',
+                msg1: '상태 확인',
+                msg2: '하나 이상의 주문을 선택해주세요',
+                showCancel: false,
+                onConfirm:()=>{
+                    closeModal();
+                }
+            })
+            return false;
+        }
+
         const filteredChecked = Object.values(checkboxChecked).filter(f=>f.bool === true);
         const selectedIdx = filteredChecked.map(f=>f.idx);
+        if(salesList.filter(f=>selectedIdx.includes(f.sales_idx)).some(v=>v.status !== '결제 완료')){
+            openModal({
+                svg: '❌',
+                msg1: '상태 확인',
+                msg2: '결제완료인 주문만 선택해주세요',
+                showCancel: false,
+                onConfirm:()=>{
+                    closeModal();
+                }
+            })
+            return false;
+        }
+
         const filteredSalesList = salesList.filter(f=>selectedIdx.includes(f.sales_idx)).filter(f=>f.status === '결제 완료').map(f=>f.sales_idx);
         console.log(filteredSalesList);
         setWaybillInsertModalOpen({bool:true,idxList:filteredSalesList});
@@ -70,13 +95,30 @@ const SalesPage = () => {
 
     // 주문 업데이트
     const updateSales = async (idx,status) => {
+        if(status === '출고 예정'){
+            openModal({
+                svg: '❌',
+                msg1: '상태 확인',
+                msg2: '출고 등록은 송장 등록을 통해 변경해주세요',
+                showCancel: false,
+                onConfirm:()=>{
+                    closeModal();
+                }
+            })
+            return false;
+        }
+        
         openModal({
             svg: '❓',
             msg1: '변경 확인',
             msg2: '상태를 변경하시겠습니까?',
             showCancel: true,
             onConfirm: async() => {
-                const {data} = await axios.post('http://localhost:8080/sales/update',{sales_idx:idx,status:status});
+                const {data} = await axios.post('http://localhost:8080/sales/update',{sales_idx:idx,status:status},{
+                    headers: {
+                        Authorization : sessionStorage.getItem("token")
+                    }
+                });
                 console.log(data);
                 closeModal();
                 setTimeout(()=>{
