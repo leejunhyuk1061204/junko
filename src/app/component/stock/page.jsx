@@ -254,7 +254,7 @@ const StockPage = () => {
                         </div>
                         <div className='margin-20'>
                             <div className='margin-bottom-10'>
-                                <table className='checkbox-table'>
+                                <table className='checkbox-table text-overflow-table'>
                                     <thead>
                                         <tr>
                                             <th><input type='checkbox' checked={stockSumList.length > 0 && stockSumList.every((_, i) => checkboxChecked[i]?.bool === true)} onChange={e=>allCheck(e.target.checked)}/></th>
@@ -296,7 +296,7 @@ const StockPage = () => {
                                         onChange={(page) => setPage(page)}  // set만!
                                     />
                                 </div>
-                                <div className='flex justify-right width-fit'>
+                                <div className='flex justify-right width-fit gap_10'>
                                     <button className='btn cursor-pointer width-fit white-space-nowrap' onClick={stockHistory}>재고 내역</button>
                                     {group.includes('option') && group.includes('manufacture') && group.includes('expiration') && group.includes('warehouse') && group.includes('zone') &&
                                         <button className='btn cursor-pointer width-fit white-space-nowrap' onClick={stockAdjust}>재고 조정</button>

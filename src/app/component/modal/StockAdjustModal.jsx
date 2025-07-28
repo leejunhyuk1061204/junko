@@ -65,6 +65,10 @@ const StockAdjustModal = ({open,onClose,stock,getStockSumList}) => {
                             stock_cnt:Number(stockCnt),
                             type:"조정",
                             user_idx:selectedUser,
+                        },{
+                            headers: {
+                                Authorization : sessionStorage.getItem("token")
+                            }
                         })
                         console.log(data);
                         if (!data.success) {
