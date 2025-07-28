@@ -34,6 +34,9 @@ export default function VoucherListPage() {
         {id: '', name: '전체 상태'},
         {id: '작성중', name: '작성중'},
         {id: '확정', name: '확정'},
+        {id: '미정산', name: '미정산'},
+        {id: '정산', name: '정산'},
+        {id: '부분정산', name: '부분정산'},
     ]
 
     const fetchData = async () => {
@@ -268,11 +271,13 @@ export default function VoucherListPage() {
                                         className="template-input"
                                         style={{ height: '30px', padding: '0 12px', width: '150px', justifyContent: 'center'}}
                                     >
-                                        <option value="작성중">작성중</option>
-                                        <option value="확정">확정</option>
+                                        {statusOptions.map(status => (
+                                            <option key={status.id} value={status.id}>{status.name}</option>
+                                        ))}
                                     </select>
                                 </td>
-                                <td>{item.approved ? '○' : 'X'}</td>
+                                <td>{Number(item.approved) === 1 ? '○' : 'X'}
+                                    {console.log(item.approved)}</td>
                                 <td>
                                     <Link href={`./voucher/update/${item.entry_idx}`}>
                                         <button className="product-btn-small">수정</button>

@@ -198,7 +198,9 @@ export default function OptionManager({ productIdx }) {
             {combinedList.length > 0 && (
                 <div className="option-combined-scroll-box">
                     {combinedList.map((comb, idx) => (
-                        <span key={idx} className="option-tag">{comb.combined_name}</span>
+                        comb?.combined_name ? (
+                            <span key={idx} className="option-tag">{comb.combined_name}</span>
+                        ) : null
                     ))}
                 </div>
             )}

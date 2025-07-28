@@ -192,7 +192,7 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
 
                         <div className="invoice-form-group-horizontal" style={{ width: '500px', marginBottom: '7px'}}>
                             <label className="invoice-label" style={{minWidth: '70px',marginLeft: '15px'}}>결재자 지정</label>
-                            <div style={{ width: '100%' , marginLeft: '14px', minWidth: '1010px'}}>
+                            <div style={{ width: '100%' , marginLeft: '14px', minWidth: '1036px'}}>
                                 <select
                                     disabled={form.status !== '발행완료'}
                                     onChange={(e) => {

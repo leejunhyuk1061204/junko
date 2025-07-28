@@ -19,8 +19,8 @@ export default function OrderList() {
     const [isAllChecked, setIsAllChecked] = useState(false);
     const [orders, setOrders] = useState([]);
     const [categoryOptions, setCategoryOptions] = useState([{ id: 0, name: '전체' }]);
+    const [selectedCategory, setSelectedCategory] = useState({ id: 0, name: '전체' });
     const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
-    const [selectedCategory, setSelectedCategory] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalCount, setTotalCount] = useState(0);
     const pageSize = 10;
@@ -43,12 +43,6 @@ export default function OrderList() {
     useEffect(() => {
         fetchCategoryOptions();
     }, []);
-
-    useEffect(() => {
-        if (categoryOptions.length > 0 && !selectedCategory) {
-            setSelectedCategory(categoryOptions[0]);
-        }
-    }, [categoryOptions]);
 
     useEffect(() => {
         if (selectedCategory?.id !== undefined) {

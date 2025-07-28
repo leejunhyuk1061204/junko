@@ -6,7 +6,7 @@ import axios from 'axios'
 import ProductForm from '../productForm'
 import Header from '@/app/header'
 
-// ✅ 단일 상품 등록 전용 페이지
+// 단일 상품 등록 전용 페이지
 export default function InsertProduct() {
     const router = useRouter()
 

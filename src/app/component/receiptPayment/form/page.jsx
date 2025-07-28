@@ -46,23 +46,29 @@ export default function ReceiptPaymentFormPage() {
     }, []);
 
     useEffect(() => {
-        if (!form.custom_idx) {
-            setVoucherOptions([]);
-            return;
-        }
-
-        axios.get(`http://localhost:8080/custom/select?custom_idx=${form.custom_idx}`)
-            .then(res => {
-                if (res.data.success) {
-                    const name = res.data.data.custom_name;
-                    return axios.get(`http://localhost:8080/voucher/list?page=1&size=100&custom_name=${name}`);
+        const fetchVouchers = async () => {
+            try {
+                let url = 'http://localhost:8080/voucher/list/receivable';
+                if (form.custom_idx) {
+                    // 거래처 이름 조회 후 쿼리 파라미터 추가
+                    const resCustom = await axios.get(`http://localhost:8080/custom/select?custom_idx=${form.custom_idx}`);
+                    if (resCustom.data.success) {
+                        const name = resCustom.data.data.custom_name;
+                        url += `?custom_name=${encodeURIComponent(name)}`;
+                    }
                 }
-            })
-            .then(res => {
-                if (res?.data?.list) setVoucherOptions(res.data.list);
-            })
-            .catch(err => console.error('전표 목록 불러오기 실패:', err));
+                const resVoucher = await axios.get(url);
+                if (resVoucher.data.list) setVoucherOptions(resVoucher.data.list);
+                else setVoucherOptions([]);
+            } catch (err) {
+                console.error('전표 목록 불러오기 실패:', err);
+                setVoucherOptions([]);
+            }
+        };
+
+        fetchVouchers();
     }, [form.custom_idx]);
+
 
     useEffect(() => {
         if (mode === 'update' && rp_idx) {
@@ -208,7 +214,7 @@ export default function ReceiptPaymentFormPage() {
                             <option value="">-- 선택 --</option>
                             {voucherOptions.map(v => (
                                 <option key={v.entry_idx} value={v.entry_idx}>
-                                    [{v.entry_type}] {v.entry_date} - {v.customer_name} ({(v.amount ?? 0).toLocaleString()}원)
+                                    [{v.entry_type}] {v.entry_date} - {v.custom_name} ({(v.amount ?? 0).toLocaleString()}원)
                                 </option>
                             ))}
                         </select>
