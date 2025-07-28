@@ -62,6 +62,33 @@ export default function CategoryTree({ data, onReorder, onEdit, onDelete }) {
         setActiveId(event.active.id);
     };
 
+    const isDescendant = (parentId, targetId, tree) => {
+        const findNode = (id, nodes) => {
+            for (let node of nodes) {
+                if (node.category_idx === id) return node;
+                if (node.children) {
+                    const found = findNode(id, node.children);
+                    if (found) return found;
+                }
+            }
+            return null;
+        };
+
+        const targetNode = findNode(targetId, tree);
+        if (!targetNode) return false;
+
+        const check = (node) => {
+            if (!node.children) return false;
+            for (let child of node.children) {
+                if (child.category_idx === parentId) return true;
+                if (check(child)) return true;
+            }
+            return false;
+        };
+
+        return check(targetNode);
+    };
+
     const handleDragEnd = async (event) => {
         const { active, over } = event;
         setActiveId(null);
@@ -71,6 +98,12 @@ export default function CategoryTree({ data, onReorder, onEdit, onDelete }) {
         const activeItem = flat.find((i) => i.category_idx === active.id);
         const overItem = flat.find((i) => i.category_idx === over.id);
         if (!activeItem || !overItem) return;
+
+        const currentTree = buildTree(flat);
+        if (isDescendant(activeItem.category_idx, overItem.category_idx, currentTree)) {
+            alert('자기 자신의 하위로 이동할 수 없습니다.');
+            return;
+        }
 
         const updatedList = flat.map((item) => {
             if (item.category_idx === activeItem.category_idx) {
