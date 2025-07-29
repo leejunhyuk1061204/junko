@@ -656,7 +656,7 @@ const WareHousePage = () => {
                                 {insertMode?<button className='btn white-space-nowrap' onClick={insertForm}>등록</button>:''}
                                 {insertMode?<button className='btn white-space-nowrap' onClick={()=>setInsertType(!insertType)}>{!insertType?'창고':'구역'}</button>:''}
                                 <button className='btn white-space-nowrap' onClick={insertUpdate}>{insertMode?'돌아가기':'등록'}</button>
-                                {insertMode?'':<button className='btn white-space-nowrap' onClick={()=>{setUpdateMode(!updateMode);setZoneForm({});setWarehouseForm({});}}>수정</button>}
+                                {insertMode?'':<button className='btn white-space-nowrap' onClick={()=>{setUpdateMode(!updateMode);setZoneForm({});setWarehouseForm({});}}>{updateMode ? '수정해제' : '수정'}</button>}
                                 {insertMode?'':<button className='btn white-space-nowrap' onClick={selectedDel}>삭제</button>}
                             </div>
                         </div>

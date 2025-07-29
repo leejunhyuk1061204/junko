@@ -46,6 +46,16 @@ const ShipmentPage = () => {
     const [productModalOpen, setProductModalOpen] = useState({bool:false,idx:0});
     const [shipmentUpdateModalOpen, setShipmentUpdateModalOpen] = useState({bool:false});
 
+    // 초기화
+    const listInitialize = () => {
+        setPage(1);
+        setSearch('');
+        setSelectedSort({ id: 1, name: '최신순' , orderColumn : 'shipment_date', orderDirection: 'desc' });
+        setSelectedStatus({idx:1, name:'전체'});
+        setSelectedDate({});
+        setCheckboxChecked({});
+    }
+
     useEffect(() => {
         getShipmentList();
     }, [selectedSort, selectedStatus, page, selectedDate]);
@@ -180,9 +190,9 @@ const ShipmentPage = () => {
                             </Listbox>
                         </div>
                         {/* 정렬 */}
-                        <div className="select-container">
+                        <div className="select-container" style={{marginRight:0}}>
                             <Listbox value={selectedSort} onChange={handleSortChange}>
-                                <ListboxButton className="select-btn">{selectedSort.name}</ListboxButton>
+                                <ListboxButton className="select-btn" style={{marginRight:0}}>{selectedSort.name}</ListboxButton>
                                 <ListboxOptions className="select-option">
                                     {sortOptions.map(option => (
                                         <ListboxOption key={option.id} value={option} className="select-option-item">
@@ -192,6 +202,7 @@ const ShipmentPage = () => {
                                 </ListboxOptions>
                             </Listbox>
                         </div>
+                        <button className='btn width-fit' style={{padding:'8px 15px'}} onClick={listInitialize}>초기화</button>
                     </div>
                     <table className={'text-overflow-table'}>
                         <thead>

@@ -20,7 +20,7 @@ const sortOptions = [
 
 const statusFilterList = [
     {idx:1, name:'전체'},
-    {idx:2, name:'요청'},
+    {idx:2, name:'요청접수'},
     {idx:3, name:'처리중'},
     {idx:4, name:'처리완료'},
     {idx:5, name:'취소'},
@@ -48,6 +48,16 @@ const ClaimPage = () => {
 
     const [claimList, setClaimList] = useState([]);
     const [handleClaimModalOpen,setHandleClaimModalOpen] = useState({bool:false,claim:null});
+
+    // 초기화
+    const listInitialize = () => {
+        setPage(1);
+        setSearch('');
+        setSelectedSort({ id: 1, name: '최신순' , orderColumn : 'claim_date', orderDirection: 'desc' });
+        setSelectedStatus({idx:1, name:'전체'});
+        setSelectedDate({});
+        setCheckboxChecked({});
+    }
 
     useEffect(() => {
         getClaimList();
@@ -178,9 +188,9 @@ const ClaimPage = () => {
                             </Listbox>
                         </div>
                         {/* 정렬 */}
-                        <div className="select-container">
+                        <div className="select-container" style={{marginRight:0}}>
                             <Listbox value={selectedSort} onChange={handleSortChange}>
-                                <ListboxButton className="select-btn">{selectedSort.name}</ListboxButton>
+                                <ListboxButton className="select-btn" style={{marginRight:0}}>{selectedSort.name}</ListboxButton>
                                 <ListboxOptions className="select-option">
                                     {sortOptions.map(option => (
                                         <ListboxOption key={option.id} value={option} className="select-option-item">
@@ -190,6 +200,7 @@ const ClaimPage = () => {
                                 </ListboxOptions>
                             </Listbox>
                         </div>
+                        <button className='btn width-fit' style={{padding:'8px 15px'}} onClick={listInitialize}>초기화</button>
                     </div>
                     <div>
                     <table className={'text-overflow-table'}>
