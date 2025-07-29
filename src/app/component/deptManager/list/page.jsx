@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useAlertModalStore } from '@/app/zustand/store';
@@ -19,7 +19,7 @@ export default function DeptManagerList() {
         { id: 2, name: '이름순', value: 'user_name ASC' },
     ];
     const [selectedSort, setSelectedSort] = useState(sortOptions[0]);
-    const [sort, setSort] = useState(sortOptions[0].id);
+    const [sort, setSort] = useState(sortOptions[0].value);
 
     const [categoryOptions, setCategoryOptions] = useState([{ id: "", name: "전체 부서" }]);
     const [selectedCategory, setSelectedCategory] = useState(categoryOptions[0]);
@@ -30,15 +30,54 @@ export default function DeptManagerList() {
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
 
+    const searchRef = useRef();
+
     useEffect(() => {
+        fetchDeptList();
         fetchList();
     }, []);
 
     useEffect(() => {
-        fetchList();
-    }, [sort, category]);
+        fetchList(1);
+    }, [sort, category, search]);
 
-    const fetchList = async (page = currentPage) => {
+    const handleSearch = () => {
+        const keyword = searchRef.current.value;
+        setSearch(keyword);
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+        fetchList(page);
+    }
+
+    const handleSortChange = (option) => {
+        setSelectedSort(option);
+        setSort(option.value);
+    };
+
+    const handleCategoryChange = (option) => {
+        setSelectedCategory(option);
+        setCategory(option.id);
+        fetchList();
+    };
+
+    const handleReset = () => {
+        setSort(sortOptions[0].value);
+        setSelectedSort(sortOptions[0]);
+        setSelectedCategory(categoryOptions[0]);
+        setCategory("");
+        setSearch("");
+        fetchList(1);
+    };
+
+    const fetchList = async (page = currentPage, keyword = search) => {
         const token = sessionStorage.getItem("token");
         if (!token) {
             openModal({
@@ -50,60 +89,42 @@ export default function DeptManagerList() {
             });
         }
         try {
-            const res = await axios.post("http://localhost:8080/user/list", null, {
-                params: {
-                    dept_name: category,
-                    search,
-                    sort,
-                    page,
-                    size: pageSize,
-                },
+            const res = await axios.post("http://localhost:8080/user/list", {
+                dept_name: category,
+                search: keyword,
+                sort,
+                page,
+                size: pageSize,
             });
             const fetchedList = res.data.list || [];
             setList(fetchedList);
             setTotalCount(res.data.total || 0);
             setCurrentPage(page);
 
-            // 여기서 부서명 중복 제거해서 카테고리 옵션 생성
-            const deptNames = Array.from(new Set(fetchedList.map(user => user.dept_name))).filter(Boolean);
-            const deptOptions = [
-                { id: "", name: "전체 부서" },
-                ...deptNames.map(name => ({ id: name, name }))
-            ];
-            setCategoryOptions(deptOptions);
-
         } catch (err) {
             console.error("직원 리스트 불러오기 실패:", err);
         }
     };
 
-    const handleSearch = () => {
-        fetchList(1);
-    };
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            handleSearch();
+    const fetchDeptList = async () => {
+        try {
+            const token = sessionStorage.getItem("token");
+            const res = await axios.get("http://localhost:8080/dept/list", {
+                headers: { Authorization: token }
+            });
+            const fetched = res.data.list || [];
+            const options = [
+                { id: "", name: "전체 부서" },
+                ...fetched.map((d) => ({
+                    id: d.dept_name,
+                    name: d.dept_name
+                }))
+            ];
+            setCategoryOptions(options);
+            setSelectedCategory(options[0]);
+        } catch (err) {
+            console.error("부서 목록 불러오기 실패:", err);
         }
-    };
-
-    const handleSortChange = (option) => {
-        setSelectedSort(option);
-        setSort(option.id);
-    };
-
-    const handleCategoryChange = (option) => {
-        setSelectedCategory(option);
-        setCategory(option.id);
-    };
-
-    const handleReset = () => {
-        setSort(sortOptions[0].id);
-        setSelectedSort(sortOptions[0]);
-        setSelectedCategory(categoryOptions[0]);
-        setCategory("");
-        setSearch("");
-        fetchList(currentPage);
     };
 
     return (
@@ -146,6 +167,7 @@ export default function DeptManagerList() {
                         style={{ width: "800px" }}
                         type="text"
                         placeholder="이름 또는 아이디 검색"
+                        ref={searchRef}
                         onKeyDown={handleKeyPress}
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
@@ -159,8 +181,6 @@ export default function DeptManagerList() {
                 <table className="template-table margin-bottom-20">
                     <thead>
                     <tr>
-                        <th style={{ overflow: "visible", width: "35px", }}>
-                        </th>
                         <th style={{ width: "15%" }}>부서</th>
                         <th style={{ width: "25%" }}>직급</th>
                         <th style={{ width: "35%" }}>이름</th>
@@ -182,7 +202,7 @@ export default function DeptManagerList() {
                                     <button className="template-btn-small"
                                             onClick={() => router.push(`/component/deptManager/detail/${item.user_idx}`)}
                                     >
-                                        미리보기
+                                        직원 정보
                                     </button>
                                 </td>
                             </tr>

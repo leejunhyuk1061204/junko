@@ -81,7 +81,7 @@ const DocumentDetailModal = ({html, onClose, onApprove, onReject, doc, user_idx}
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
                             <button onClick={onClose} className="doc-detail-btn btn-danger">취소</button>
                             <button onClick={() => onApprove(doc.document_idx)} className="doc-detail-btn btn-primary">승인</button>
-                            <button onClick={() => onReject(doc.document_idx)} className="doc-detail-btn btn-danger">반려</button>
+                            <button onClick={() => onReject(doc.document_idx, rejectReason)} className="doc-detail-btn btn-danger">반려</button>
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
                             <textarea

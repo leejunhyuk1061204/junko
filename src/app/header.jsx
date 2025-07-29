@@ -78,9 +78,9 @@ const mainMenus = [
     {
         title: '문서 / 업무 관리',
         submenu: [
-            { label: '전자결재', href: '/' },
-            { label: '사내 캘린더', href: '/component/schedule' },
+            { label: '전자결재', href: '/component/document/insert/tempList' },
             { label: '문서 관리', href: '/component/document' },
+            { label: '사내 캘린더', href: '/component/schedule' },
             // { label: '업무 진행 현황', href: '/' },
             // { label: '사내 공지 / 회의록', href: '/' },
             { label: '첨부파일 / 자료실', href: '/component/template' },

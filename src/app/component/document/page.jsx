@@ -346,6 +346,10 @@ export default function DocumentManagePage() {
                             <tr>
                                 <th style={{ width: "6%" }}>문서 번호</th>
                                 <th style={{ width: "13%" }}>구분</th>
+                                {selectedTab === "수신함" && (
+                                    <th style={{ width: "9%" }}>상신인</th>
+                                )}
+
                                 <th style={{ width: "8%" }}>상태</th>
                                 <th style={{ width: "8%" }}>작성일</th>
                                 <th style={{ width: "17%" }}>결재자</th>
@@ -355,13 +359,16 @@ export default function DocumentManagePage() {
                         <tbody>
                             {documents.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="text-align-center">검색 결과가 없습니다.</td>
+                                    <td colSpan={selectedTab === "수신함" ? 7 : 6} className="text-align-center">
+                                        검색 결과가 없습니다.
+                                    </td>
                                 </tr>
                             ) : (
                                 documents.map((doc) => (
                                     <tr key={doc.document_idx}>
                                         <td>{doc.document_idx}</td>
                                         <td>{doc.template_name || '-'}</td>
+                                        {selectedTab === "수신함" && <td>{doc.user_name || '-'}</td>}
                                         <td>
                                             <span className={statusLabel(doc.status)}>{doc.status}</span>
                                         </td>

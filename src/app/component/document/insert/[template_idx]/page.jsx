@@ -21,7 +21,6 @@ export default function DocumentInsertPage() {
     const [type, setType] = useState(""); // 고정 or 선택
     const [idx, setIdx] = useState(0);
     const [variables, setVariables] = useState({
-        user_name: "",
         resign_date: "",
     });
     const [searchName, setSearchName] = useState("");
@@ -29,7 +28,6 @@ export default function DocumentInsertPage() {
     const [searchResults, setSearchResults] = useState([]);
     const [highlightIndex, setHighlightIndex] = useState(-1);
     const [templateName, setTemplateName] = useState("");
-    const [userName, setUserName] = useState("");
     const [selectedDate, setSelectedDate] = useState({
         selectedDate: null,
         startDate: null,
@@ -59,9 +57,6 @@ export default function DocumentInsertPage() {
 
     // 자동 업데이트 실행
     useEffect(() => {
-        const user_name = sessionStorage.getItem("user_name");
-        setUserName(user_name);
-
         const date =
             selectedDate.startDate && selectedDate.endDate
                 ? `${selectedDate.startDate} ~ ${selectedDate.endDate}`
@@ -74,13 +69,10 @@ export default function DocumentInsertPage() {
                 if (key.endsWith("date")) {
                     updated[key] = date;
                 }
-                if (key === "user_name") {
-                    updated[key] = userName;
-                }
             });
             return updated;
         });
-    }, [selectedDate, userName]);
+    }, [selectedDate]);
 
     // 템플릿 변수 추출
     const extractVariableKeys = (html) => {
@@ -478,7 +470,6 @@ export default function DocumentInsertPage() {
                         <div className="input-area">
                             {Object.entries(variables).map(([key, value]) => {
                                 const dateField = key.endsWith("date");
-                                const userNameField = key === "user_name";
 
                                 return (
                                     <div key={key} className="variable-row">
@@ -487,9 +478,9 @@ export default function DocumentInsertPage() {
                                             type="text"
                                             placeholder={`${key} 입력`}
                                             value={value || ""}
-                                            readOnly = {dateField || userNameField}
+                                            readOnly = {dateField}
                                             onChange={(e) => {
-                                                if (dateField || userNameField) return;
+                                                if (dateField) return;
                                                 setVariables({...variables, [key]: e.target.value,});
                                             }}
                                         />
