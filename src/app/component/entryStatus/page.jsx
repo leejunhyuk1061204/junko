@@ -68,7 +68,10 @@ export default function EntryStatusListPage() {
 
         await Promise.all(checkedList.map(id => axios.put(`http://localhost:8080/settlement/del/${id}`)))
         alert('삭제 완료')
-        fetchData()
+
+        fetchData().then(() => {
+            setCheckedList([])
+        })
     }
 
     return (
@@ -148,7 +151,11 @@ export default function EntryStatusListPage() {
                             <td>{Number(item.amount).toLocaleString()}원</td>
                             <td>{item.status}</td>
                             <td>
-                                <Link href={`./entryStatus/update/${item.settlement_id}`} className="template-btn">수정</Link>
+                                {item.status !== '정산' ? (
+                                    <Link href={`./entryStatus/update/${item.settlement_id}`} className="template-btn">수정</Link>
+                                ) : (
+                                    <div style={{ color: '#aaa' }}>-</div>
+                                )}
                             </td>
                         </tr>
                     ))}

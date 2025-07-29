@@ -264,24 +264,19 @@ export default function VoucherListPage() {
                                 <td>{item.entry_date}</td>
                                 <td>{item.user_name}</td>
                                 <td>
-                                    <select
-                                        value={item.status}
-                                        onChange={(e) => handleStatusChange(item.entry_idx, e.target.value)}
-                                        disabled={item.status !== '작성중'}
-                                        className="template-input"
-                                        style={{ height: '30px', padding: '0 12px', width: '150px', justifyContent: 'center'}}
-                                    >
-                                        {statusOptions.map(status => (
-                                            <option key={status.id} value={status.id}>{status.name}</option>
-                                        ))}
-                                    </select>
+                                    <div style={{ padding: '4px 12px' }}>
+                                        {statusOptions.find(status => status.id === item.status)?.name || item.status}
+                                    </div>
                                 </td>
-                                <td>{Number(item.approved) === 1 ? '○' : 'X'}
-                                    {console.log(item.approved)}</td>
+                                <td>{Number(item.approved) === 1 ? '○' : 'X'}</td>
                                 <td>
-                                    <Link href={`./voucher/update/${item.entry_idx}`}>
-                                        <button className="product-btn-small">수정</button>
-                                    </Link>
+                                    {item.status === '작성중' ? (
+                                        <Link href={`./voucher/update/${item.entry_idx}`}>
+                                            <button className="template-btn">수정</button>
+                                        </Link>
+                                    ) : (
+                                        <div style={{ color: '#aaa' }}>-</div>
+                                    )}
                                 </td>
                             </tr>
                         ))}

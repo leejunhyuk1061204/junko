@@ -43,8 +43,11 @@ export default function TemplatePage() {
     }, []);
 
     useEffect(() => {
-        fetchList();
-    }, [sort, category]);
+        const isReady = category !== undefined && sort !== undefined;
+        if (isReady) {
+            fetchList(currentPage);
+        }
+    }, [sort, category, search, currentPage]);
 
     const fetchCategoryList = async () => {
         try {
@@ -125,6 +128,10 @@ export default function TemplatePage() {
             );
             const successCount = deleteResults.filter((res) => res.data?.success).length;
             alert(`${successCount}개 템플릿 삭제 완료`);
+
+            setCheckedItems([]);
+            setIsAllChecked(false);
+
             fetchList();
         } catch (err) {
             console.error("템플릿 삭제 실패:", err);
@@ -187,6 +194,7 @@ export default function TemplatePage() {
         setSelectedCategory(categoryOptions[0]);
         setCategory("");
         setSearch("");
+        setCurrentPage(1);
         fetchList(currentPage);
     };
 
