@@ -11,6 +11,10 @@ export default function OptionManager({ productIdx }) {
     const [selectedOptionIdx, setSelectedOptionIdx] = useState(''); // 선택된 기존 옵션
     const token = sessionStorage.getItem('token');
 
+    useEffect(() => {
+        console.log('usedOptions:', usedOptions);
+    }, [usedOptions]);
+
     const fetchAllOptions = async () => {
         const res = await axios.get('http://localhost:8080/option/list');
         setOptions(res.data.list || []);
@@ -18,7 +22,8 @@ export default function OptionManager({ productIdx }) {
 
     const fetchUsedOptions = async () => {
         const res = await axios.get(`http://localhost:8080/option/using/${productIdx}`);
-        setUsedOptions(res.data.list || []);
+        const filtered = (res.data.list || []).filter(opt => opt.using_idx !== null);
+        setUsedOptions(filtered);
     };
 
     const fetchCombinedList = async () => {
@@ -29,81 +34,64 @@ export default function OptionManager({ productIdx }) {
     const handleOptionInsert = async () => {
         if (selectedOptionIdx) {
             // 이미 추가된 옵션인지 체크
-            const alreadyExists = usedOptions.some(
-                opt => opt.option_idx == selectedOptionIdx
-            );
-            if (alreadyExists) {
+            const selectedId = Number(selectedOptionIdx);
+            if (usedOptions.some(opt => opt.option_idx === selectedId)) {
                 alert('이미 추가된 옵션입니다.');
                 setSelectedOptionIdx('');
                 return;
             }
 
-            // 기존 옵션 재사용
-            const res = await axios.post('http://localhost:8080/option/use', {
-                product_idx: productIdx,
-                option_idx: selectedOptionIdx
-            });
-
-            if (res.data.success) {
-                const addedOption = options.find(opt => opt.option_idx == selectedOptionIdx);
-                if (addedOption) {
-                    setUsedOptions(prev => {
-                        const already = prev.some(
-                            opt => opt.option_idx === addedOption.option_idx || opt.using_idx === res.data.using_idx
-                        );
-                        if (already) return prev;
-                        return [...prev, {
-                            using_idx: res.data.using_idx,
-                            product_idx: productIdx,
-                            option_idx: addedOption.option_idx,
-                            option_name: addedOption.option_name,
-                            option_value: addedOption.option_value
-                        }];
-                    });
-                }
-                setSelectedOptionIdx('');
-            }
-        } else {
-            // 새 옵션 입력
-            const res = await axios.post('http://localhost:8080/option/insert', {
-                option_name: newOption.name,
-                option_value: newOption.value
-            }, {
-                headers: { Authorization: token }
-            });
-
-            if (res.data.success) {
-                const useRes = await axios.post('http://localhost:8080/option/use', {
+            try{
+                // 기존 옵션 재사용
+                const res = await axios.post('http://localhost:8080/option/use', {
                     product_idx: productIdx,
-                    option_idx: res.data.option_idx
+                    option_idx: selectedId
+                },{
+                    headers: { Authorization: token }
                 });
 
-                if (useRes.data.success) {
-                    const addedOption = {
-                        using_idx: useRes.data.using_idx,
-                        product_idx: productIdx,
-                        option_idx: res.data.option_idx,
-                        option_name: newOption.name,
-                        option_value: newOption.value
-                    };
-                    setUsedOptions(prev => {
-                        const already = prev.some(
-                            opt => opt.option_idx === addedOption.option_idx || opt.using_idx === useRes.data.using_idx
-                        );
-                        if (already) return prev;
-                        return [...prev, addedOption];
-                    });
-                    setOptions(prev => [...prev, {
-                        option_idx: res.data.option_idx,
-                        option_name: newOption.name,
-                        option_value: newOption.value
-                    }]);
-                    setNewOption({ name: '', value: '' });
+                if (res.data.success) {
+                    await fetchUsedOptions();  // 서버 최신 상태로 갱신
                     setSelectedOptionIdx('');
                 }
+            } catch (err) {
+                console.error(err);
+                alert('옵션 추가 중 오류가 발생했습니다.');
             }
-        }
-    };
+        }else {
+                try {
+                    const res = await axios.post('http://localhost:8080/option/insert', {
+                        option_name: newOption.name,
+                        option_value: newOption.value
+                    }, {
+                        headers: { Authorization: token }
+                    });
+
+                    if (res.data.success) {
+                        const useRes = await axios.post('http://localhost:8080/option/use', {
+                            product_idx: productIdx,
+                            option_idx: res.data.option_idx
+                        }, {
+                            headers: { Authorization: token }
+                        });
+
+                        if (useRes.data.success) {
+                            await fetchUsedOptions();  // 서버 최신 상태로 갱신
+                            setOptions(prev => [...prev, {
+                                option_idx: res.data.option_idx,
+                                option_name: newOption.name,
+                                option_value: newOption.value
+                            }]);
+                            setNewOption({ name: '', value: '' });
+                            setSelectedOptionIdx('');
+                        }
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert('새 옵션 추가 중 오류가 발생했습니다.');
+                }
+            }
+        };
 
     const handleOptionUnlink = async (using_idx) => {
         await axios.put(`http://localhost:8080/option/use/del/${using_idx}`, null, {
@@ -133,7 +121,6 @@ export default function OptionManager({ productIdx }) {
             console.error('조합 자동 생성 실패:', err);
             alert('조합 생성에 실패했습니다.');
         }
-
         setLoading(false);
     };
 
@@ -182,10 +169,12 @@ export default function OptionManager({ productIdx }) {
 
             <ul className="flex flex-direction-col gap_10 margin-bottom-10">
                 {usedOptions.map(opt => (
-                    <li key={opt.using_idx} className="flex justify-content-between align-center">
-                        <div>{opt.option_name} ({opt.option_value})</div>
-                        <FiTrash2 className="option-del" onClick={() => handleOptionUnlink(opt.using_idx)} />
-                    </li>
+                    opt.using_idx ? (
+                        <li key={opt.using_idx} className="flex justify-content-between align-center">
+                            <div>{opt.option_name} ({opt.option_value})</div>
+                            <FiTrash2 className="option-del" onClick={() => handleOptionUnlink(opt.using_idx)} />
+                        </li>
+                    ) : null
                 ))}
             </ul>
 
@@ -197,9 +186,9 @@ export default function OptionManager({ productIdx }) {
 
             {combinedList.length > 0 && (
                 <div className="option-combined-scroll-box">
-                    {combinedList.map((comb, idx) => (
-                        comb?.combined_name ? (
-                            <span key={idx} className="option-tag">{comb.combined_name}</span>
+                    {combinedList.map((comb) => (
+                        comb?.combined_idx ? (
+                            <span key={comb.combined_idx} className="option-tag">{comb.combined_name}</span>
                         ) : null
                     ))}
                 </div>

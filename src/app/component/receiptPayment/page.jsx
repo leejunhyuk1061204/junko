@@ -9,7 +9,8 @@ import { Listbox, ListboxButton, ListboxOption, ListboxOptions } from "@headless
 export default function ReceiptPaymentListPage() {
     const [receiptList, setReceiptList] = useState([]);
     const [paymentList, setPaymentList] = useState([]);
-    const [selectedItems, setSelectedItems] = useState([]);
+    const [selectedReceipts, setSelectedReceipts] = useState([]);
+    const [selectedPayments, setSelectedPayments] = useState([]);
 
     const [searchKeyword, setSearchKeyword] = useState('');
     const [filterMethod, setFilterMethod] = useState({ id: '', name: '수단 전체' });
@@ -33,11 +34,11 @@ export default function ReceiptPaymentListPage() {
         { id: '확정', name: '확정' }
     ];
 
-    const fetchData = () => {
-        axios.get('http://localhost:8080/receipt/list').then(res => {
+    const fetchData = async () => {
+        await axios.get('http://localhost:8080/receipt/list').then(res => {
             if (res.data.success) setReceiptList(res.data.list);
         });
-        axios.get('http://localhost:8080/payment/list').then(res => {
+        await axios.get('http://localhost:8080/payment/list').then(res => {
             if (res.data.success) setPaymentList(res.data.list);
         });
     };
@@ -60,15 +61,20 @@ export default function ReceiptPaymentListPage() {
         return list.slice(start, start + pageSize);
     };
 
-    const toggleSelect = (rp_idx) => {
-        setSelectedItems(prev =>
-            prev.includes(rp_idx)
-                ? prev.filter(id => id !== rp_idx)
-                : [...prev, rp_idx]
+    const toggleReceiptSelect = (rp_idx) => {
+        setSelectedReceipts(prev =>
+            prev.includes(rp_idx) ? prev.filter(id => id !== rp_idx) : [...prev, rp_idx]
+        );
+    };
+
+    const togglePaymentSelect = (rp_idx) => {
+        setSelectedPayments(prev =>
+            prev.includes(rp_idx) ? prev.filter(id => id !== rp_idx) : [...prev, rp_idx]
         );
     };
 
     const handleDelete = async () => {
+        const selectedItems = [...selectedReceipts, ...selectedPayments];
         if (!selectedItems.length) return alert('삭제할 항목을 선택하세요.');
         if (!confirm('정말 삭제하시겠습니까?')) return;
 
@@ -76,24 +82,31 @@ export default function ReceiptPaymentListPage() {
             await axios.put(`http://localhost:8080/receipt/del/${id}`);
         }
         alert('삭제 완료');
-        setSelectedItems([]);
+        setSelectedReceipts([]);
+        setSelectedPayments([]);
         fetchData();
     };
 
-    const renderTable = (list, type, page, setPage) => (
+    const renderTable = (list, type, page, setPage, selectedItems, setSelectedItems, toggleSelect) => (
         <>
             <table className="basic-table margin-bottom-20">
                 <thead>
                 <tr>
-                    <th><input type="checkbox" onChange={(e) => {
-                        const pageItems = pagedList(filterList(list), page);
-                        const pageIds = pageItems.map(i => i.rp_idx);
-                        if (e.target.checked) {
-                            setSelectedItems(prev => [...new Set([...prev, ...pageIds])]);
-                        } else {
-                            setSelectedItems(prev => prev.filter(id => !pageIds.includes(id)));
-                        }
-                    }} /></th>
+                    <th>
+                    <input
+                        type="checkbox"
+                        checked={pagedList(filterList(list), page).every(i => selectedItems.includes(i.rp_idx))}
+                        onChange={(e) => {
+                            const pageItems = pagedList(filterList(list), page);
+                            const pageIds = pageItems.map(i => i.rp_idx);
+                            if (e.target.checked) {
+                                setSelectedItems(prev => [...new Set([...prev, ...pageIds])]);
+                            } else {
+                                setSelectedItems(prev => prev.filter(id => !pageIds.includes(id)));
+                            }
+                        }}
+                    />
+                    </th>
                     <th>번호</th>
                     <th>거래처</th>
                     <th>금액</th>
@@ -107,7 +120,13 @@ export default function ReceiptPaymentListPage() {
                 <tbody>
                 {pagedList(filterList(list), page).map((item, idx) => (
                     <tr key={item.rp_idx}>
-                        <td><input type="checkbox" checked={selectedItems.includes(item.rp_idx)} onChange={() => toggleSelect(item.rp_idx)} /></td>
+                        <td>
+                        <input
+                            type="checkbox"
+                            checked={selectedItems.includes(item.rp_idx)}
+                            onChange={() => toggleSelect(item.rp_idx)}
+                        />
+                        </td>
                         <td>{(page - 1) * pageSize + idx + 1}</td>
                         <td>
                             <span
@@ -159,7 +178,8 @@ export default function ReceiptPaymentListPage() {
                     <div className="select-container">
                         <Listbox value={filterMethod} onChange={(val) => {
                             setFilterMethod(val);
-                            setCurrentPage(1);
+                            setReceiptPage(1);
+                            setPaymentPage(1);
                         }}>
                             <ListboxButton className="select-btn">{filterMethod.name}</ListboxButton>
                             <ListboxOptions className="select-option">
@@ -179,14 +199,16 @@ export default function ReceiptPaymentListPage() {
                         value={searchKeyword}
                         onChange={(e) => {
                             setSearchKeyword(e.target.value);
-                            setCurrentPage(1);
+                            setReceiptPage(1);
+                            setPaymentPage(1);
                         }}
                     />
 
                     <div className="select-container">
                         <Listbox value={filterStatus} onChange={(val) => {
                             setFilterStatus(val);
-                            setCurrentPage(1);
+                            setReceiptPage(1);
+                            setPaymentPage(1);
                         }}>
                             <ListboxButton className="select-btn">{filterStatus.name}</ListboxButton>
                             <ListboxOptions className="select-option">
@@ -202,22 +224,21 @@ export default function ReceiptPaymentListPage() {
 
                 {/* 수금 */}
                 <h3 className="text-align-left margin-bottom-10"><span className="product-header" style={{ fontSize: '20px'}}>[ 수금 리스트 ]</span></h3>
-                {renderTable(receiptList, '수금', receiptPage, setReceiptPage)}
+                {renderTable(receiptList, '수금', receiptPage, setReceiptPage, selectedReceipts, setSelectedReceipts, toggleReceiptSelect)}
                 <div className="flex justify-right margin-bottom-20">
                     <button className="product-btn" onClick={() => window.location.href = `./receiptPayment/form?type=수금&mode=insert`}>
                         수금 등록
                     </button>
-                    <button className="product-btn-del" onClick={handleDelete}>선택 삭제</button>
                 </div>
 
                 {/* 지급 */}
                 <h3 className="text-align-left margin-bottom-10"><span className="product-header" style={{ fontSize: '20px'}}>[ 지급 리스트 ]</span></h3>
-                {renderTable(paymentList, '지급', paymentPage, setPaymentPage)}
-                <div className="flex justify-right margin-bottom-20">
+                {renderTable(paymentList, '지급', paymentPage, setPaymentPage, selectedPayments, setSelectedPayments, togglePaymentSelect)}
+                <div className="flex justify-content-between margin-bottom-20">
+                    <button className="product-btn-del" onClick={handleDelete}>선택 삭제</button>
                     <button className="product-btn" onClick={() => window.location.href = `./receiptPayment/form?type=지급&mode=insert`}>
                         지급 등록
                     </button>
-                    <button className="product-btn-del" onClick={handleDelete}>선택 삭제</button>
                 </div>
             </div>
         </div>

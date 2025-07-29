@@ -32,6 +32,10 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
     }, [])
 
     useEffect(() => {
+        console.log('initialData in ProductForm:', initialData)
+    }, [initialData])
+
+    useEffect(() => {
         if (initialData && Object.keys(initialData).length > 0) {
             setForm({
                 product_name: initialData.product_name || '',
@@ -263,7 +267,7 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
                 <button
                     type="button"
                     className="btn"
-                    onClick={() => router.push('../product')}
+                    onClick={() => router.push('/component/product')}
                 >
                     목록
                 </button>

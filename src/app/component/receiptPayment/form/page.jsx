@@ -28,6 +28,16 @@ export default function ReceiptPaymentFormPage() {
     const [previewHtml, setPreviewHtml] = useState('');
     const [userOptions, setUserOptions] = useState([]);
 
+    const isFormValid = () => {
+        return (
+            form.custom_idx &&
+            form.entry_idx &&
+            form.amount &&
+            form.method &&
+            form.transaction_date
+        );
+    };
+
     useEffect(() => {
         axios.get('http://localhost:8080/custom/list')
             .then(res => {
@@ -148,6 +158,10 @@ export default function ReceiptPaymentFormPage() {
     };
 
     const handleSubmit = async () => {
+        if (!isFormValid()) {
+            alert('필수 항목을 모두 입력해주세요.');
+            return;
+        }
         try {
             const submitData = {
                 ...form,
@@ -265,7 +279,12 @@ export default function ReceiptPaymentFormPage() {
 
                     <div style={{ textAlign: 'right', marginTop: '10px' }}>
                         <button onClick={handlePreview} className="template-btn-back">미리보기</button>
-                        <button onClick={handleSubmit} className="template-btn-submit" style={{ marginLeft: '10px' }}>
+                        <button
+                            onClick={handleSubmit}
+                            className="template-btn-submit"
+                            style={{ marginLeft: '10px', opacity: isFormValid() ? 1 : 0.5, cursor: isFormValid() ? 'pointer' : 'not-allowed' }}
+                            disabled={!isFormValid()}
+                        >
                             {mode === 'insert' ? '등록하기' : '수정하기'}
                         </button>
                     </div>
