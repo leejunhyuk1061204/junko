@@ -223,7 +223,7 @@ const Header = () => {
                             {msgList?.length === 0 && (
                                 <ul className="listBox-option" style={{width:'50%',top:'90%',left:'70px'}}>
                                     <li className="listBox-option-item margin-0" style={{top:'90%',left:'70px', fontWeight:'normal'}}>미확인 쪽지가 없습니다</li>
-                                    <li className="listBox-option-item margin-0" style={{top:'90%',left:'70px'}}>열기</li>
+                                    <li className="listBox-option-item margin-0" style={{top:'90%',left:'70px'}} onClick={()=>{setMsgModalOpen({bool:true,type:'list'});setShowMsg(!showMsg)}}>열기</li>
                                 </ul>
                             )}
 

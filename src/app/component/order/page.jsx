@@ -51,7 +51,16 @@ const OrderListPage = () => {
     const statusRef = useRef({});
     const [selectedDate, setSelectedDate] = useState({});
     const [isSelected, setIsSelected] = useState(false);
-    
+
+    // 초기화
+    const listInitialize = () => {
+        setPage(1);
+        setSearch('');
+        setSelectedSort({ id: 1, name: '최신순' , orderColumn : 'reg_date', orderDirection: 'desc' });
+        setSelectedStatus({idx:1, name:'전체'});
+        setSelectedDate({});
+    }
+
     useEffect(() => {
         getOrderList();
     },[page,selectedSort,selectedStatus,selectedDate]);
@@ -218,9 +227,9 @@ const OrderListPage = () => {
                     </Listbox>
                 </div>
                 {/* 정렬 */}
-                <div className="select-container">
+                <div className="select-container" style={{marginRight:0}}>
                     <Listbox value={selectedSort} onChange={handleSortChange}>
-                        <ListboxButton className="select-btn">{selectedSort.name}</ListboxButton>
+                        <ListboxButton className="select-btn" style={{marginRight:0}}>{selectedSort.name}</ListboxButton>
                         <ListboxOptions className="select-option">
                             {sortOptions.map(option => (
                                 <ListboxOption key={option.id} value={option} className="select-option-item">
@@ -231,6 +240,7 @@ const OrderListPage = () => {
                         </ListboxOptions>
                     </Listbox>
                 </div>
+                <button className='btn width-fit' style={{padding:'8px 15px'}} onClick={listInitialize}>초기화</button>
             </div>
 
             <table className={`order-list-table text-overflow-table ${isSelected ? 'show-dropdown' : ''} `}>

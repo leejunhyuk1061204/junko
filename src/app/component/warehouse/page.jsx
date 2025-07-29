@@ -656,7 +656,7 @@ const WareHousePage = () => {
                                 {insertMode?<button className='btn white-space-nowrap' onClick={insertForm}>등록</button>:''}
                                 {insertMode?<button className='btn white-space-nowrap' onClick={()=>setInsertType(!insertType)}>{!insertType?'창고':'구역'}</button>:''}
                                 <button className='btn white-space-nowrap' onClick={insertUpdate}>{insertMode?'돌아가기':'등록'}</button>
-                                {insertMode?'':<button className='btn white-space-nowrap' onClick={()=>{setUpdateMode(!updateMode);setZoneForm({});setWarehouseForm({});}}>수정</button>}
+                                {insertMode?'':<button className='btn white-space-nowrap' onClick={()=>{setUpdateMode(!updateMode);setZoneForm({});setWarehouseForm({});}}>{updateMode ? '수정해제' : '수정'}</button>}
                                 {insertMode?'':<button className='btn white-space-nowrap' onClick={selectedDel}>삭제</button>}
                             </div>
                         </div>
@@ -680,6 +680,10 @@ const Warehouse = ({warehouse,zoneList,getWarehouseList,getZoneList,onSelect}) =
                 const {data} = await axios.post('http://localhost:8080/zone/update',{
                     zone_idx:item.idx,
                     warehouse_idx:warehouse.warehouse_idx
+                },{
+                    headers: {
+                        Authorization : sessionStorage.getItem("token")
+                    }
                 });
                 console.log(data);
                 if(data.success){

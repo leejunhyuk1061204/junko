@@ -165,6 +165,30 @@ const SalesInsertPage = () => {
         console.log(salesForm); // {}
         console.log(salesProductForm); // []
         console.log(csvFile); // null
+        console.log(salesProductForm.length);
+
+        const hasSalesInput = Object.keys(salesForm).length > 0;
+        console.log('hasSalesInput', hasSalesInput);
+        const hasProductInput = salesProductForm.length > 0;
+        console.log('hasProductInput', hasProductInput);
+
+        const salesValid = hasSalesInput && salesForm.customer && salesForm.customer_phone && salesForm.customer_address && salesForm.payment_option && salesForm.status;
+        console.log('salesValid', salesValid);
+        const productValid = hasProductInput && salesProductForm.length > 0 && salesProductForm.every(item=>
+            item.product_idx && item.product_cnt
+        );
+        console.log('productValid', productValid);
+        console.log(csvFile);
+
+        if(!hasSalesInput || !hasProductInput || !salesValid || !productValid) {
+            openModal({
+                svg: '❗',
+                msg1: '입력 오류',
+                msg2: '입력한 주문 정보 또는 상품 정보에 누락된 항목이 있습니다.',
+                showCancel: false,
+            });
+            return;
+        }
 
         openModal({
             svg: '❓',
@@ -174,29 +198,6 @@ const SalesInsertPage = () => {
             onConfirm: async() => {
                 let csvSuccess = true;
                 let insertSuccess = true;
-
-                const hasSalesInput = Object.keys(salesForm).length > 0;
-                console.log('hasSalesInput', hasSalesInput);
-                const hasProductInput = salesProductForm.length > 0;
-                console.log('hasProductInput', hasProductInput);
-
-                const salesValid = hasSalesInput && salesForm.customer && salesForm.customer_phone && salesForm.customer_address && salesForm.payment_option && salesForm.status;
-                console.log('salesValid', salesValid);
-                const productValid = hasProductInput && salesProductForm.length>0 && salesProductForm.every(item=>
-                    item.product_idx && item.product_cnt
-                );
-                console.log('productValid', productValid);
-                console.log(csvFile);
-
-                if((hasSalesInput || hasProductInput) && !salesValid && !productValid) {
-                    openModal({
-                        svg: '❗',
-                        msg1: '입력 오류',
-                        msg2: '입력한 주문 정보 또는 상품 정보에 누락된 항목이 있습니다.',
-                        showCancel: false,
-                    });
-                    return;
-                }
 
                 if(salesValid && productValid) {
                     try {
@@ -476,7 +477,10 @@ const SalesInsertPage = () => {
                         </div>
                     </div>
                     <div className='flex justify-right margin-y-20 gap_10'>
-                        <div className='flex align-center justify-content-center width-fit'>
+                        <div className='flex align-center justify-content-center width-fit gap_10'>
+                            <span>
+                                {csvFile ? csvFile.name : '선택된 파일 없음'}
+                            </span>
                             <input
                                 type="file"
                                 id='salesFile'
