@@ -819,6 +819,18 @@ input[type='number']:focus {
     z-index: 10;
 }
 
+.option-info {
+    position: absolute;
+    z-index: 999;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 26%;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
 .select-option-item {
     padding: 3px 3px;
     font-size: 14px;
@@ -828,6 +840,15 @@ input[type='number']:focus {
 .select-option-item:hover{
     border-radius: 6px;
     background-color: #C0D5FF;
+}
+
+.option-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.option-item:hover{
+    background-color: #f0f0f0;
 }
 
 .product-btn{
@@ -4591,7 +4612,6 @@ body.invoice-detail-body-reset {
 .info-table-wrapper {
     display: flex;
     justify-content: center;
-    width: 100%;
 }
 
 .info-table {
@@ -4600,6 +4620,7 @@ body.invoice-detail-body-reset {
     width: 90%;
     min-width: 400px;
     max-width: 600px;
+    max-height: 90px;
 }
 
 .info-table td, th {
@@ -4608,8 +4629,140 @@ body.invoice-detail-body-reset {
     text-align: left;
 }
 
+.info-table input {
+    text-align: left;
+    padding: 4px;
+}
+
 .info-table th {
     background-color: #f9f9f9;
     width: 190px;
 }
 
+
+/* =============== 기안서 수정본 =============== */
+.doc-template {
+    ont-family: 'Arial', sans-serif;
+    color: #333;
+    font-size: 14px;
+}
+
+.doc-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.document-table {
+    border-collapse: collapse;
+    margin: 13px 0 1px 0;
+    text-align: left;
+}
+
+.document-table.approval td {
+    height: 60px;
+}
+
+.document-section-title {
+    font-weight: bold;
+    background-color: #f1f1f1;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #000;
+}
+
+.document-content {
+    border: 1px solid #000;
+    padding: 20px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+}
+
+.document-content .underline {
+    text-decoration: underline;
+    font-weight: bold;
+}
+
+.document-content ul {
+    list-style: decimal;
+    padding-left: 20px;
+    margin-top: 10px;
+}
+
+.document-content li {
+    margin-bottom: 6px;
+}
+
+.document-table th,
+.document-table td {
+    border: 1px solid #000;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.title-row th.title-header {
+    width: 15%;
+    background-color: #f0f0f0; /* 제목 배경색 */
+    font-weight: bold;
+}
+
+.title-row td.title-cell {
+    text-align: left;
+    background-color: #ffffff;
+}
+
+.document-section-title {
+    font-weight: bold;
+    background-color: #eee;
+    padding: 10px;
+    margin-top: -1px; /* 제목 칸과 딱 붙게 */
+    border: 1px solid #000;
+    border-top: none;
+}
+
+.document-top-table {
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 13px 0 1px 0;
+}
+
+.document-top-table th,
+.document-top-table td {
+    border: 1px solid #000;
+    padding: 6px 10px;
+    text-align: center;
+}
+
+.document-top-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.document-top-table th {
+    background-color: #e6e6e6;
+    width: 95px;
+}
+
+.document-top-table td {
+    width: auto;
+}
+
+/* 결재라인 테이블 */
+.approval-line-table {
+    border-collapse: collapse;
+    font-size: 14px;
+    width: 100%;
+    margin: 13px 0 1px 0;
+}
+
+.approval-line-table th,
+.approval-line-table td {
+    text-align: center;
+    border: 1px solid #000;
+    padding: 6px 10px;
+    text-align: center;
+}
+
+.approval-line-table th {
+    background-color: #f0f0f0;
+}

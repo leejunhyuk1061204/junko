@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {useParams, useRouter} from 'next/navigation';
 import axios from 'axios';
-import {useAlertModalStore} from "@/app/zustand/store";
+import EmployeeEdit from "@/app/component/deptManager/update/page";
 
 const EmployeeDetailModal = ({user_idx, onClose}) => {
-    const {openModal, closeModal} = useAlertModalStore();
+    const [showEditModal, setShowEditModal] = useState(false);
     const [form, setForm] = useState({});
     const token = typeof window !== 'undefined' ? sessionStorage.getItem("token") : null;
 
@@ -21,25 +20,9 @@ const EmployeeDetailModal = ({user_idx, onClose}) => {
         });
     }, [user_idx]);
 
-    const handleUpdateJobDept = async () => {
-        const { dept_idx, job_idx } = form;
-        await axios.post("http://localhost:8080/JobNdept/update", { dept_idx, job_idx, user_idx }, {
-            headers: { Authorization: token }
-        });
-        openModal({
-            svg: '✔',
-            msg1: '처리 완료',
-            msg2: '수정되었습니다.',
-            showCancel: false,
-        });
-    };
-
-    const handleEmpUpdate = async () => {
-        await axios.post("http://localhost:8080/emp/update", form, {
-            headers: { Authorization: token }
-        });
-        alert("정보 수정 완료");
-    };
+    const handleEditClick = () => {
+        setShowEditModal(true);
+    }
 
     return (
         <div
@@ -66,7 +49,7 @@ const EmployeeDetailModal = ({user_idx, onClose}) => {
                     borderRadius: '10px',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
                     padding: '40px 30px',
-                    minHeight: '55vh',
+                    height: '63vh',
                     overflowY: 'auto',
                     position: 'relative',
                     width: '550px',
@@ -97,16 +80,22 @@ const EmployeeDetailModal = ({user_idx, onClose}) => {
                         <tr><th>전화번호</th><td>{form?.phone || '-'}</td></tr>
                         <tr><th>주소</th><td>{form?.address || '-'}</td></tr>
                         <tr><th>입사일</th><td>{form?.hire_date || '-'}</td></tr>
+                        <tr><th>부서</th><td>{form?.dept_name || '-'}</td></tr>
+                        <tr><th>직책</th><td>{form?.job_name || '-'}</td></tr>
                         <tr><th>재직상태</th><td>{form?.status || '-'}</td></tr>
-                        <tr><th>직책(job_idx)</th><td>{form?.job_idx || '-'}</td></tr>
-                        <tr><th>부서(dept_idx)</th><td>{form?.dept_idx || '-'}</td></tr>
                         </tbody>
                     </table>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
                     <button onClick={onClose} className="doc-detail-btn btn-danger">취소</button>
-                    <button onClick={handleEmpUpdate} className="doc-detail-btn btn-primary">수정</button>
+                    <button onClick={handleEditClick} className="doc-detail-btn btn-primary">수정</button>
                 </div>
+                {showEditModal && (
+                    <EmployeeEdit
+                        user_idx={user_idx}
+                        onClose={() => setShowEditModal(false)}
+                    />
+                )}
             </div>
         </div>
 
