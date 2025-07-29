@@ -135,7 +135,7 @@ const ReturnPage = () => {
         <div className='productPage wrap page-background'>
             <Header/>
             <h3 className="text-align-left margin-bottom-10 margin-30">
-                <span className="product-header">입고 목록 / 상세 조회</span>
+                <span className="product-header">반품 입고 목록 / 상세 조회</span>
             </h3>
             <div className="order-list-back">
                 <div className="flex gap_10 align-center justify-right margin-bottom-10">

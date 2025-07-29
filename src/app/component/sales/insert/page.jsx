@@ -477,7 +477,10 @@ const SalesInsertPage = () => {
                         </div>
                     </div>
                     <div className='flex justify-right margin-y-20 gap_10'>
-                        <div className='flex align-center justify-content-center width-fit'>
+                        <div className='flex align-center justify-content-center width-fit gap_10'>
+                            <span>
+                                {csvFile ? csvFile.name : '선택된 파일 없음'}
+                            </span>
                             <input
                                 type="file"
                                 id='salesFile'

@@ -680,6 +680,10 @@ const Warehouse = ({warehouse,zoneList,getWarehouseList,getZoneList,onSelect}) =
                 const {data} = await axios.post('http://localhost:8080/zone/update',{
                     zone_idx:item.idx,
                     warehouse_idx:warehouse.warehouse_idx
+                },{
+                    headers: {
+                        Authorization : sessionStorage.getItem("token")
+                    }
                 });
                 console.log(data);
                 if(data.success){

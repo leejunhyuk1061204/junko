@@ -6,6 +6,9 @@ import Pagination from "react-js-pagination";
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import {useAlertModalStore} from "@/app/zustand/store";
 import {FaExclamation} from "react-icons/fa6";
+import {format} from "date-fns";
+import dayjs from '@/app/component/utills/dayjs/dayjs-config'
+
 
 const msgOptionList = [
     {idx:1, name:'받은 메세지'},
@@ -212,9 +215,10 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                     onConfirm: () => {
                         setMsgType('list');
                         setMsgForm({});
-                        setSelectedStatus({idx:1, name:'일반'},);
                         setSelectedUser(0);
                         setPage(1);
+                        getReceiveMsgList();
+                        getSendMsgList();
                     }
                 })
             }
@@ -357,6 +361,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                                                 <td>중요</td>
                                                 <td>제목</td>
                                                 <td>보낸 사람</td>
+                                                <td>보낸 시간</td>
                                                 <td>수신 확인</td>
                                             </tr>
                                         </thead>
@@ -371,6 +376,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                                                     <td style={{color:'lightcoral'}}>{msg.important_yn?<FaExclamation />:''}</td>
                                                     <td className='overflow-hidden text-overflow-ellipsis'>{msg.msg_title}</td>
                                                     <td>{msg.sender_name}</td>
+                                                    <td>{format(msg.sent_at,'yyyy-MM-dd') === format(new Date(),'yyyy-MM-dd')? dayjs(msg.sent_at).tz('Asia/Seoul').format('HH:mm') : format(msg.sent_at,'yyyy-MM-dd')}</td>
                                                     <td>{msg.read_yn?'읽음':'미확인'}</td>
                                                 </tr>
                                             ))}
@@ -507,17 +513,29 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                         {msgType==='detail' && selectedMsg !== null &&
                             <div className='flex flex-direction-col gap_20'>
                                 {msgOption.idx === 1 &&
-                                    <div className='flex width-auto' style={{padding:'0 30px'}}>
+                                    <div className='flex width-auto flex-1' style={{padding:'0 30px'}}>
                                         <div className='flex flex-25 align-center justify-content-center'>보낸 사람</div>
                                         <div>{selectedMsg?.sender_name || ''}</div>
                                     </div>
                                 }
                                 {msgOption.idx === 2 &&
-                                    <div className='flex width-auto' style={{padding:'0 30px'}}>
+                                    <div className='flex width-auto flex-1' style={{padding:'0 30px'}}>
                                         <div className='flex flex-25 align-center justify-content-center'>받는 사람</div>
                                         <div>{selectedMsg?.receiver_name || ''}</div>
                                     </div>
                                 }
+                                {format(selectedMsg?.sent_at,'yyyy-MM-dd') === format(new Date(),'yyyy-MM-dd')?
+                                    <div className='flex width-auto flex-1 ' style={{padding:'0 30px'}}>
+                                        <div className='flex flex-25 align-center justify-content-center'>보낸 시간</div>
+                                        <div>{dayjs(selectedMsg?.sent_at).tz('Asia/Seoul').format('HH:mm') || ''}</div>
+                                    </div>
+                                    :
+                                    <div className='flex width-auto flex-1 ' style={{padding:'0 30px'}}>
+                                        <div className='flex flex-25 align-center justify-content-center'>보낸 날짜</div>
+                                        <div>{format(selectedMsg?.sent_at,'yyyy-MM-dd') || ''}</div>
+                                    </div>
+                                }
+
                                 <div className='flex width-auto' style={{padding:'0 30px'}}>
                                     <div className='flex flex-25 align-center justify-content-center'>제목</div>
                                     <div>{selectedMsg?.msg_title || ''}</div>
