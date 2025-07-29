@@ -41,8 +41,8 @@ export default function InsertProductCsv() {
     return (
         <div className='productPage wrap page-background'>
             <Header />
+            <h3 className="order-head-text margin-bottom-20 text-align-left margin-left-20">CSV 상품 등록</h3>
             <div className="csv-upload-section padding-30 back-ground-white border-radius">
-                <h3 className="order-head-text margin-bottom-20 text-align-left">CSV 상품 등록</h3>
                 <input
                     type="file"
                     accept=".csv"
@@ -52,6 +52,15 @@ export default function InsertProductCsv() {
                 <button className="btn" onClick={handleCsvUpload}>
                     CSV 업로드
                 </button>
+            </div>
+            <div>
+            <button
+                type="button"
+                className="btn margin-top-20"
+                onClick={() => router.push('../product')}
+            >
+                목록
+            </button>
             </div>
         </div>
     )
