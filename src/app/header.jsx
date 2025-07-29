@@ -9,6 +9,7 @@ import axios from "axios";
 import MsgModal from "@/app/component/modal/MsgModal";
 import {CSSTransition} from "react-transition-group";
 import WorkInOutModal from "@/app/component/modal/WorkInOutModal";
+import ProfileModal from "@/app/component/modal/ProfileModal";
 
 const mainMenus = [
     {
@@ -101,6 +102,7 @@ const Header = () => {
     const [msgCnt, setMsgCnt] = useState(0);
     const [showNotification, setShowNotification] = useState(false);
     const [workInOutModalOpen, setWorkInOutModalOpen] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
 
     useEffect(() => {
         // 클라이언트에서만 sessionStorage 접근 가능
@@ -184,6 +186,12 @@ const Header = () => {
 
     startTimer();
 
+    const handleProfileOpen = () => {
+        setShowProfile(true);
+    };
+    const handleProfileClose = () => {
+        setShowProfile(false);
+    };
 
     const handleLogout = () => {
         sessionStorage.removeItem('token');
@@ -228,8 +236,7 @@ const Header = () => {
                             )}
 
                         </>):('')}
-                        <div className='cursor-pointer'><BsPersonCircle/></div>
-                        <div className='cursor-pointer'><IoSettingsOutline/></div>
+                        <div className='cursor-pointer' onClick={handleProfileOpen}><BsPersonCircle/></div>
                         <div className='header-login-text'>환영합니다  {sessionStorage.getItem('user_name')} 님</div>
                         <button className='cursor-pointer header-login-text' onClick={handleLogout}>로그아웃</button>
                     </div>
@@ -244,6 +251,7 @@ const Header = () => {
                     </div>
                 )}
             </div>
+            {showProfile && <ProfileModal onClose={handleProfileClose} />}
             <nav className='navigation_bar flex'>
                 {mainMenus.map((menu, idx) => (
                     <div className='menu-item margin-y-10 flex' key={idx}>

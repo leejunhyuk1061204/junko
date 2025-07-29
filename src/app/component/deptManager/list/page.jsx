@@ -8,6 +8,7 @@ import Header from '@/app/header';
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from "@headlessui/react";
 import {TbSearch} from "react-icons/tb";
 import Pagination from "react-js-pagination";
+import EmployeeDetailModal from "@/app/component/deptManager/detail/[user_idx]/page";
 
 export default function DeptManagerList() {
     const router = useRouter();
@@ -29,6 +30,9 @@ export default function DeptManagerList() {
     const [currentPage, setCurrentPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [totalCount, setTotalCount] = useState(0);
+
+    const [showUserDetailModal, setShowUserDetailModal] = useState(false);
+    const [selectedUserIdx, setSelectedUserIdx] = useState(null);
 
     const searchRef = useRef();
 
@@ -200,7 +204,10 @@ export default function DeptManagerList() {
                                 <td>{item.hire_date}</td>
                                 <td>
                                     <button className="template-btn-small"
-                                            onClick={() => router.push(`/component/deptManager/detail/${item.user_idx}`)}
+                                            onClick={() => {
+                                                setSelectedUserIdx(item.user_idx);
+                                                setShowUserDetailModal(true);
+                                            }}
                                     >
                                         직원 정보
                                     </button>
@@ -226,7 +233,12 @@ export default function DeptManagerList() {
                         onChange={(page) => fetchList(page)}
                     />
                 </div>
-
+                {showUserDetailModal && (
+                    <EmployeeDetailModal
+                        user_idx={selectedUserIdx}
+                        onClose={() => setShowUserDetailModal(false)}
+                    />
+                )}
             </div>
         </div>
     );

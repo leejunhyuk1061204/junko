@@ -1,12 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
 
-export default function EmployeeDetailPage({ params }) {
-    const user_idx = params.user_idx;
-    const router = useRouter();
-    const [user, setUser] = useState({});
+import { useEffect, useState } from 'react';
+import {useParams, useRouter} from 'next/navigation';
+import axios from 'axios';
+import {useAlertModalStore} from "@/app/zustand/store";
+
+const EmployeeDetailModal = ({user_idx, onClose}) => {
+    const {openModal, closeModal} = useAlertModalStore();
     const [form, setForm] = useState({});
     const token = typeof window !== 'undefined' ? sessionStorage.getItem("token") : null;
 
@@ -15,8 +15,8 @@ export default function EmployeeDetailPage({ params }) {
         axios.get(`http://localhost:8080/user/detail/${user_idx}`, {
             headers: { Authorization: token }
         }).then(res => {
+            console.log("!!!!!!!!!!!!",res);
             const detail = res.data.userDetail;
-            setUser(detail);
             setForm(detail);
         });
     }, [user_idx]);
@@ -26,16 +26,12 @@ export default function EmployeeDetailPage({ params }) {
         await axios.post("http://localhost:8080/JobNdept/update", { dept_idx, job_idx, user_idx }, {
             headers: { Authorization: token }
         });
-        alert("직책/부서가 수정되었습니다.");
-    };
-
-    const handleResign = async () => {
-        if (!confirm("퇴사 처리 하시겠습니까?")) return;
-        await axios.post("http://localhost:8080/resign/update", { user_idx }, {
-            headers: { Authorization: token }
+        openModal({
+            svg: '✔',
+            msg1: '처리 완료',
+            msg2: '수정되었습니다.',
+            showCancel: false,
         });
-        alert("퇴사 처리 완료");
-        router.push('/component/deptManager'); // 목록으로 이동
     };
 
     const handleEmpUpdate = async () => {
@@ -46,25 +42,75 @@ export default function EmployeeDetailPage({ params }) {
     };
 
     return (
-        <div className="wrap page-background">
-            <h1>직원 상세</h1>
-            <div>
-                <label>이름</label>
-                <input value={form.user_name || ''} onChange={e => setForm({ ...form, user_name: e.target.value })} />
-            </div>
-            <div>
-                <label>부서</label>
-                <input value={form.dept_idx || ''} onChange={e => setForm({ ...form, dept_idx: e.target.value })} />
-            </div>
-            <div>
-                <label>직책</label>
-                <input value={form.job_idx || ''} onChange={e => setForm({ ...form, job_idx: e.target.value })} />
-            </div>
-            <div>
-                <button onClick={handleUpdateJobDept}>직책/부서 수정</button>
-                <button onClick={handleEmpUpdate}>기타 정보 수정</button>
-                <button onClick={handleResign}>퇴사 처리</button>
+        <div
+            className="modal-overlay"
+            onClick={onClose}
+            style={{
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(0,0,0,0.3)',
+                zIndex: 1000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}
+        >
+            <div
+                className="info-modal-content"
+                onClick={(e) => e.stopPropagation()} // 내부 클릭은 닫히는 이벤트 전파 막음
+                style={{
+                    background: '#fff',
+                    borderRadius: '10px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                    padding: '40px 30px',
+                    minHeight: '55vh',
+                    overflowY: 'auto',
+                    position: 'relative',
+                    width: '550px',
+                }}
+            >
+                <button
+                    style={{
+                        position: 'absolute',
+                        right: 20,
+                        top: 20,
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '2.5rem',
+                        cursor: 'pointer'
+                    }}
+                    onClick={onClose}
+                >
+                    &times;
+                </button>
+
+                <h1 style={{marginTop: '10px', fontSize: '19px', fontWeight: '600'}}>직원 정보</h1>
+                <div className="info-table-wrapper">
+                    <table className="info-table">
+                        <tbody>
+                        <tr><th>아이디</th><td>{form?.user_id || '-'}</td></tr>
+                        <tr><th>이름</th><td>{form?.user_name || '-'}</td></tr>
+                        <tr><th>이메일</th><td>{form?.email || '-'}</td></tr>
+                        <tr><th>전화번호</th><td>{form?.phone || '-'}</td></tr>
+                        <tr><th>주소</th><td>{form?.address || '-'}</td></tr>
+                        <tr><th>입사일</th><td>{form?.hire_date || '-'}</td></tr>
+                        <tr><th>재직상태</th><td>{form?.status || '-'}</td></tr>
+                        <tr><th>직책(job_idx)</th><td>{form?.job_idx || '-'}</td></tr>
+                        <tr><th>부서(dept_idx)</th><td>{form?.dept_idx || '-'}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '24px' }}>
+                    <button onClick={onClose} className="doc-detail-btn btn-danger">취소</button>
+                    <button onClick={handleEmpUpdate} className="doc-detail-btn btn-primary">수정</button>
+                </div>
             </div>
         </div>
+
     );
-}
+};
+
+export default EmployeeDetailModal;

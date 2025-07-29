@@ -4587,3 +4587,29 @@ body.invoice-detail-body-reset {
     background: #ccc;
     z-index: 0;
 }*/
+
+.info-table-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.info-table {
+    margin-top: 40px;
+    border-collapse: collapse;
+    width: 90%;
+    min-width: 400px;
+    max-width: 600px;
+}
+
+.info-table td, th {
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.info-table th {
+    background-color: #f9f9f9;
+    width: 190px;
+}
+
