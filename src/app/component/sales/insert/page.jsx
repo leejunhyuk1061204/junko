@@ -180,7 +180,7 @@ const SalesInsertPage = () => {
         console.log('productValid', productValid);
         console.log(csvFile);
 
-        if(!((hasSalesInput || hasProductInput) && !salesValid && !productValid)) {
+        if(!hasSalesInput || !hasProductInput || !salesValid || !productValid) {
             openModal({
                 svg: '❗',
                 msg1: '입력 오류',
