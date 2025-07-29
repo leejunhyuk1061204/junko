@@ -57,7 +57,7 @@ const ClaimPage = () => {
         const {data} = await axios.post('http://localhost:8080/claim/list',{
             page:page,
             status:selectedStatus.name === '전체'?'':selectedStatus.name,
-            search:searchText,
+            search:search,
             orderColumn:selectedSort.orderColumn,
             orderDirection:selectedSort.orderDirection,
             claim_date:selectedDate.selectDate||'',
@@ -152,7 +152,7 @@ const ClaimPage = () => {
             <div className='productPage wrap page-background'>
                 <Header/>
                 <h3 className="text-align-left margin-bottom-10 margin-30">
-                    <span className="product-header">주문 목록 / 상세 조회</span>
+                    <span className="product-header">클레임 목록 / 상세 조회</span>
                 </h3>
                 <div className={`order-list-back ${Object.values(statusClicked).some(v=>v === true) ?'overflow-visible-important':''}`}>
                     <div className="flex gap_10 align-center justify-right margin-bottom-10">
