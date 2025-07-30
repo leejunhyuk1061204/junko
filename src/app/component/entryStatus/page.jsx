@@ -135,7 +135,6 @@ export default function EntryStatusListPage() {
                         <th>정산일</th>
                         <th>정산금액</th>
                         <th>상태</th>
-                        <th>수정</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -150,13 +149,6 @@ export default function EntryStatusListPage() {
                             <td>{item.settlement_day}</td>
                             <td>{Number(item.amount).toLocaleString()}원</td>
                             <td>{item.status}</td>
-                            <td>
-                                {item.status !== '정산' ? (
-                                    <Link href={`./entryStatus/update/${item.settlement_id}`} className="template-btn">수정</Link>
-                                ) : (
-                                    <div style={{ color: '#aaa' }}>-</div>
-                                )}
-                            </td>
                         </tr>
                     ))}
                     {list.length < size &&
