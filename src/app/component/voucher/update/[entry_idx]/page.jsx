@@ -31,7 +31,7 @@ export default function VoucherUpdatePage() {
     useEffect(() => {
         if (!entry_idx) return
 
-        axios.get(`http://192.168.0.122/voucher/detail/${entry_idx}`).then((res) => {
+        axios.get(`http://192.168.0.122:8080/voucher/detail/${entry_idx}`).then((res) => {
             if (res.data.success) {
                 const dto = res.data.data
                 const approvalLines = res.data.approval_lines ?? []
@@ -60,7 +60,7 @@ export default function VoucherUpdatePage() {
             }
         })
 
-        axios.get('http://192.168.0.122/template/list').then((res) => {
+        axios.get('http://192.168.0.122:8080/template/list').then((res) => {
             if (res.data?.list) setTemplateList(res.data.list)
         })
     }, [entry_idx])
@@ -73,7 +73,7 @@ export default function VoucherUpdatePage() {
     const previewDocument = async () => {
         if (!templateIdx) return alert('템플릿을 선택하세요')
 
-        const res = await axios.post('http://192.168.0.122/voucher/preview', {
+        const res = await axios.post('http://192.168.0.122:8080/voucher/preview', {
             template_idx: templateIdx,
             variables: formData,
         })
@@ -88,7 +88,7 @@ export default function VoucherUpdatePage() {
 
         try {
             // 1. 전표 수정
-            const res = await axios.put(`http://192.168.0.122/voucher/update/${entry_idx}`,
+            const res = await axios.put(`http://192.168.0.122:8080/voucher/update/${entry_idx}`,
                 {
                     ...formData,
                     entry_date: formData.entry_date,
@@ -109,14 +109,14 @@ export default function VoucherUpdatePage() {
                 return
             }
 
-            const detailRes = await axios.get(`http://192.168.0.122/voucher/detail/${entry_idx}`)
+            const detailRes = await axios.get(`http://192.168.0.122:8080/voucher/detail/${entry_idx}`)
             if (!detailRes.data.success) {
                 alert('전표 재조회 실패')
                 return
             }
 
             // 2. 문서 update
-            const updateDocRes = await axios.put('http://192.168.0.122/document/update', {
+            const updateDocRes = await axios.put('http://192.168.0.122:8080/document/update', {
                 document_idx: documentIdx,
                 idx: Number(entry_idx),
                 type: 'voucher',
@@ -132,7 +132,7 @@ export default function VoucherUpdatePage() {
             }
 
             // 3. PDF 재생성
-            const pdfRes = await axios.post('http://192.168.0.122/document/pdf', {
+            const pdfRes = await axios.post('http://192.168.0.122:8080/document/pdf', {
                 document_idx: updateDocRes.data.document_idx
             })
 

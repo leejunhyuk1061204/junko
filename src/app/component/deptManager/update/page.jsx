@@ -16,7 +16,7 @@ const EmployeeEdit = ({ user_idx, onClose, getUserDetail }) => {
     useEffect(() => {
         if (!token || !user_idx) return;
         // 직원 상세 정보 불러오기
-        axios.get(`http://192.168.0.122/user/detail/${user_idx}`, {
+        axios.get(`http://192.168.0.122:8080/user/detail/${user_idx}`, {
             headers: { Authorization: token }
         }).then(res => {
             const detail = res.data.userDetail;
@@ -24,22 +24,22 @@ const EmployeeEdit = ({ user_idx, onClose, getUserDetail }) => {
         });
 
         // 부서 목록
-        axios.get(`http://192.168.0.122/dept/list`, {
+        axios.get(`http://192.168.0.122:8080/dept/list`, {
             headers: { Authorization: token }
         }).then(res => setDeptList(res.data.list));
 
         // 직책 목록
-        axios.get(`http://192.168.0.122/job/list`)
+        axios.get(`http://192.168.0.122:8080/job/list`)
             .then(res => setJobList(res.data));
 
         // 근무상태 목록
-        axios.get(`http://192.168.0.122/status/list`)
+        axios.get(`http://192.168.0.122:8080/status/list`)
             .then(res => setStatusList(res.data));
 
         }, []);
 
     const handleUpdate = async () => {
-        await axios.post(`http://192.168.0.122/emp/update`, form, {
+        await axios.post(`http://192.168.0.122:8080/emp/update`, form, {
             headers: { Authorization: token }
         });
         openModal({

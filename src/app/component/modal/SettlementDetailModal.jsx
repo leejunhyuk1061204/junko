@@ -20,7 +20,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
 
     const fetchFiles = async () => {
         try {
-            const res = await axios.get(`http://192.168.0.122/settlementFileList/${data.settlement_idx}`);
+            const res = await axios.get(`http://192.168.0.122:8080/settlementFileList/${data.settlement_idx}`);
             setFiles(res.data.files || []);
         } catch (err) {
             console.error('파일 목록 조회 실패:', err);
@@ -29,7 +29,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
 
     const fetchLogs = async () => {
         try {
-            const res = await axios.get(`http://192.168.0.122/settlementLogs/${data.settlement_idx}`);
+            const res = await axios.get(`http://192.168.0.122:8080/settlementLogs/${data.settlement_idx}`);
             setLogs(res.data.logs || []);
         } catch (err) {
             console.error('로그 이력 조회 실패:', err);
@@ -37,13 +37,13 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
     };
 
     const handleFileDownload = (fileIdx) => {
-        window.open(`http://192.168.0.122/settlementFileDown/${fileIdx}`);
+        window.open(`http://192.168.0.122:8080/settlementFileDown/${fileIdx}`);
     };
 
     const handleFileDelete = async (fileIdx) => {
         const token = sessionStorage.getItem('token');
         try {
-            await axios.delete(`http://192.168.0.122/settlementFileDel/${fileIdx}`, {
+            await axios.delete(`http://192.168.0.122:8080/settlementFileDel/${fileIdx}`, {
                 headers: { Authorization: token }
             });
             fetchFiles();
@@ -55,14 +55,14 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
 
     const handleDownloadPdf = async () => {
         try {
-            const res = await axios.post(`http://192.168.0.122/settlementPdf`, null, {
+            const res = await axios.post(`http://192.168.0.122:8080/settlementPdf`, null, {
                 params: {
                     settlement_idx: data.settlement_idx,
                     template_idx: 1
                 }
             });
             const link = document.createElement('a');
-            link.href = `http://192.168.0.122/static/pdf/${res.data.filename}`;
+            link.href = `http://192.168.0.122:8080/static/pdf/${res.data.filename}`;
             link.download = res.data.filename;
             link.click();
         } catch (err) {
@@ -74,7 +74,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
     const handleConfirmSettlement = async () => {
         const token = sessionStorage.getItem('token');
         try {
-            const res = await axios.post(`http://192.168.0.122/settlementFinal/${data.settlement_idx}`, null, {
+            const res = await axios.post(`http://192.168.0.122:8080/settlementFinal/${data.settlement_idx}`, null, {
                 headers: { Authorization: token }
             });
             alert(res.data.message);
@@ -88,7 +88,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
     const handleRequestReopen = async () => {
         const token = sessionStorage.getItem('token');
         try {
-            const res = await axios.post(`http://192.168.0.122/settlementReq/${data.settlement_idx}`, null, {
+            const res = await axios.post(`http://192.168.0.122:8080/settlementReq/${data.settlement_idx}`, null, {
                 headers: { Authorization: token }
             });
             alert(res.data.message);

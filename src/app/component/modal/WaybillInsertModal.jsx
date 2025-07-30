@@ -37,7 +37,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
 
     // 거래처 리스트
     const getCustom = async (searchText='') => {
-        const {data} = await axios.post(`http://192.168.0.122/custom/list2`,{custom_type:'택배사',search:searchText});
+        const {data} = await axios.post(`http://192.168.0.122:8080/custom/list2`,{custom_type:'택배사',search:searchText});
         // 택배사 메서드 하나 만들던가 ;;
         setCustom(data.list);
         console.log(data);
@@ -58,7 +58,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
 
     // 창고 리스트
     const getWarehouse = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
+        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
         setWarehouse(data.list);
         // console.log('창고 불러오기');
     }
@@ -108,7 +108,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
                 try {
                     let result = [];
                     for (const b of body) {
-                        const {data} = await axios.post('http://192.168.0.122/waybill/insert', b,{
+                        const {data} = await axios.post('http://192.168.0.122:8080/waybill/insert', b,{
                             headers: {
                                 Authorization : sessionStorage.getItem("token")
                             }

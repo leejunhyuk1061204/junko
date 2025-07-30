@@ -8,12 +8,12 @@ export default function VoucherForm({ formData, onChange, approvers, setApprover
     const [userList, setUserList] = useState([])
 
     useEffect(() => {
-        axios.get('http://192.168.0.122/custom/list')
+        axios.get('http://192.168.0.122:8080/custom/list')
             .then(res => {
                 if (res.data?.list) setCustomList(res.data.list)
             })
 
-        axios.post('http://192.168.0.122/users/list',{})
+        axios.post('http://192.168.0.122:8080/users/list',{})
             .then(res => setUserList(res.data?.list || []))
             .catch(err => console.log('유저 리스트 불러오기 실패',err))
     }, [])

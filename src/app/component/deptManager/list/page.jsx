@@ -93,7 +93,7 @@ export default function DeptManagerList() {
             });
         }
         try {
-            const res = await axios.post("http://192.168.0.122/user/list", {
+            const res = await axios.post("http://192.168.0.122:8080/user/list", {
                 dept_name: category,
                 search: keyword,
                 sort,
@@ -113,7 +113,7 @@ export default function DeptManagerList() {
     const fetchDeptList = async () => {
         try {
             const token = sessionStorage.getItem("token");
-            const res = await axios.get("http://192.168.0.122/dept/list", {
+            const res = await axios.get("http://192.168.0.122:8080/dept/list", {
                 headers: { Authorization: token }
             });
             const fetched = res.data.list || [];

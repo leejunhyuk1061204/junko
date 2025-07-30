@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 //  하드코딩된 백엔드 API 주소
-const API = 'http://192.168.0.122';
+const API = 'http://192.168.0.122:8080';
 
 //  수금/지급 등록
 export const capRegist = async (data, token) => {

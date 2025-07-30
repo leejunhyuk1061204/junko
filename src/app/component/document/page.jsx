@@ -84,7 +84,7 @@ export default function DocumentManagePage() {
     } = {}) => {
         setLoading(true);
         try {
-            const {data} = await axios.get('http://192.168.0.122/document/list', {
+            const {data} = await axios.get('http://192.168.0.122:8080/document/list', {
                 params: {
                     user_idx: userIdx,
                     status: status === '전체' ? '' : status,
@@ -188,7 +188,7 @@ export default function DocumentManagePage() {
     // 상세보기
     const handleView = async (doc) => {
         try {
-            const {data} = await axios.post('http://192.168.0.122/document/preview', {
+            const {data} = await axios.post('http://192.168.0.122:8080/document/preview', {
                 template_idx: doc.template_idx,
                 variables: doc.variables || {}
             });
@@ -214,7 +214,7 @@ export default function DocumentManagePage() {
     // 승인
     const handleApprove = async (docIdx) => {
         try {
-            await axios.post('http://192.168.0.122/document/approve', {
+            await axios.post('http://192.168.0.122:8080/document/approve', {
                 document_idx: docIdx,
                 user_idx: user_idx,
                 status: '승인완료'
@@ -244,7 +244,7 @@ export default function DocumentManagePage() {
             return;
         }
         try {
-            await axios.post('http://192.168.0.122/document/reject', {
+            await axios.post('http://192.168.0.122:8080/document/reject', {
                 document_idx: docIdx,
                 user_idx: user_idx,
                 comment: comment,

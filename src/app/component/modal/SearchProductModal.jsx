@@ -28,7 +28,7 @@ const SearchProductModal = ({open,onClose,orderProduct}) => {
 
     // 상품 리스트 검색
     const getProducts = async ()=> {
-        const {data} = await axios.post('http://192.168.0.122/productNoption/list',{search:search,page:page});
+        const {data} = await axios.post('http://192.168.0.122:8080/productNoption/list',{search:search,page:page});
         console.log(data);
         setProducts(data.list);
         setTotal(data.total);

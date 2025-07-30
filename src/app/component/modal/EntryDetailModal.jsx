@@ -24,9 +24,9 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
     useEffect(() => {
         if (!open || !entry) return
-        axios.get(`http://192.168.0.122/entryFileList/${entry.entry_idx}/upload`)
+        axios.get(`http://192.168.0.122:8080/entryFileList/${entry.entry_idx}/upload`)
             .then(res => setFiles(res.data.files || []))
-        axios.get(`http://192.168.0.122/accountDeptList/${entry.entry_idx}/detail`)
+        axios.get(`http://192.168.0.122:8080/accountDeptList/${entry.entry_idx}/detail`)
             .then(res => setDeptList(res.data.data || []))
     }, [entry, open])
 
@@ -35,7 +35,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
             const token = sessionStorage.getItem("token");
             const user_idx = sessionStorage.getItem("user_idx");
 
-            await axios.patch(`http://192.168.0.122/accountStatusUpdate/${entry.entry_idx}/status`, {
+            await axios.patch(`http://192.168.0.122:8080/accountStatusUpdate/${entry.entry_idx}/status`, {
                 status: newStatus,
                 logMsg: `${newStatus} 처리됨`
             }, {
@@ -57,7 +57,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
     const handleDeleteDept = async (dept_idx) => {
         if (!window.confirm("삭제할까요?")) return
-        await axios.delete(`http://192.168.0.122/accountDeptDelete/${entry.entry_idx}/details/${dept_idx}`)
+        await axios.delete(`http://192.168.0.122:8080/accountDeptDelete/${entry.entry_idx}/details/${dept_idx}`)
         setDeptList(prev => prev.filter(d => d.dept_idx !== dept_idx))
     }
 
@@ -95,7 +95,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                         setSelectedFile(file)
                                         setDeptPreviewUrl(null)
                                     }}>미리보기</button>
-                                    <button className="entryList-fabBtn gray small" onClick={() => window.open(`http://192.168.0.122/download/file/${file.file_idx}`, '_blank')}>다운로드</button>
+                                    <button className="entryList-fabBtn gray small" onClick={() => window.open(`http://192.168.0.122:8080/download/file/${file.file_idx}`, '_blank')}>다운로드</button>
                                 </div>
                             ))
                         ) : (
@@ -129,12 +129,12 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                                     <td>{dept.amount.toLocaleString()}원</td>
                                     <td>
                                         <button className="entryList-fabBtn gray small" onClick={async () => {
-                                            const res = await axios.post("http://192.168.0.122/accountDeptPdf", {
+                                            const res = await axios.post("http://192.168.0.122:8080/accountDeptPdf", {
                                                 dept_idx: dept.dept_idx,
                                                 template_idx: 14
                                             })
                                             if (res.data.success) {
-                                                setDeptPreviewUrl(`http://192.168.0.122/deptfileDown/${res.data.file_idx}?preview=true`)
+                                                setDeptPreviewUrl(`http://192.168.0.122:8080/deptfileDown/${res.data.file_idx}?preview=true`)
                                                 setSelectedFile(null)
                                             } else {
                                                 alert("PDF 실패")
@@ -176,12 +176,12 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                     <EntryEditModal open={editOpen} onClose={() => setEditOpen(false)} entry={entry} onSuccess={() => { onClose(); window.location.reload(); }} />
                     {showDeptRegist && (
                         <DeptRegistModal entry_idx={entry.entry_idx} onClose={() => setShowDeptRegist(false)} onSuccess={() => {
-                            axios.get(`http://192.168.0.122/accountDeptList/${entry.entry_idx}/detail`).then(res => setDeptList(res.data.data || []))
+                            axios.get(`http://192.168.0.122:8080/accountDeptList/${entry.entry_idx}/detail`).then(res => setDeptList(res.data.data || []))
                         }} />
                     )}
                     {editDeptOpen && selectedDept && (
                         <DeptEditModal entry_idx={entry.entry_idx} dept={selectedDept} onClose={() => setEditDeptOpen(false)} onSuccess={() => {
-                            axios.get(`http://192.168.0.122/accountDeptList/${entry.entry_idx}/detail`).then(res => setDeptList(res.data.data || []))
+                            axios.get(`http://192.168.0.122:8080/accountDeptList/${entry.entry_idx}/detail`).then(res => setDeptList(res.data.data || []))
                         }} />
                     )}
                 </div>
@@ -191,9 +191,9 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         <>
                             <h3 style={titleStyle}>전표 미리보기</h3>
                             {selectedFile.type === 'entry' ? (
-                                <iframe src={`http://192.168.0.122/entryFileDown/${selectedFile.file_idx}?preview=true`} width="100%" height="500px" style={previewStyle} />
+                                <iframe src={`http://192.168.0.122:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} width="100%" height="500px" style={previewStyle} />
                             ) : (
-                                <img src={`http://192.168.0.122/entryFileDown/${selectedFile.file_idx}?preview=true`} alt="첨부" style={previewStyle} />
+                                <img src={`http://192.168.0.122:8080/entryFileDown/${selectedFile.file_idx}?preview=true`} alt="첨부" style={previewStyle} />
                             )}
                             <div style={{ marginTop: 10, textAlign: 'right' }}>
                                 <button className="entryList-fabBtn gray" onClick={() => setSelectedFile(null)}>닫기</button>

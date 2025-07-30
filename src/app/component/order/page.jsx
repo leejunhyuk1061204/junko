@@ -83,7 +83,7 @@ const OrderListPage = () => {
 
     // 오더 리스트 가져오기
     const getOrderList = async() => {
-        const {data} = await axios.post('http://192.168.0.122/order/list',
+        const {data} = await axios.post('http://192.168.0.122:8080/order/list',
             {
                 page:page,
                 orderColumn : selectedSort.orderColumn,
@@ -107,7 +107,7 @@ const OrderListPage = () => {
             msg2: '진행 상태를 변경하시겠습니까?',
             showCancel: true,
             onConfirm: async() => {
-                const {data} = await axios.post('http://192.168.0.122/order/update',{order_idx:idx,status:status},{
+                const {data} = await axios.post('http://192.168.0.122:8080/order/update',{order_idx:idx,status:status},{
                     headers: {
                         Authorization: sessionStorage.getItem("token")
                     }

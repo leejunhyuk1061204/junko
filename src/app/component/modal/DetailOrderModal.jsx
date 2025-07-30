@@ -25,7 +25,7 @@ const DetailOrderModal = ({open,onClose,idx}) => {
 
     // pdf 다운로드
     const downloadPDF = async() => {
-        const {data, headers} = await axios.get(`http://192.168.0.122/download/pdf?idx=${idx}&type=발주서`,{
+        const {data, headers} = await axios.get(`http://192.168.0.122:8080/download/pdf?idx=${idx}&type=발주서`,{
             responseType: 'blob',
         });
         console.log(data);
@@ -49,13 +49,13 @@ const DetailOrderModal = ({open,onClose,idx}) => {
 
     // 워드 다운로드
     const downloadWord = async() => {
-        const {data} = await axios.get(`http://192.168.0.122/download/docx?idx=${idx}&type=발주서`);
+        const {data} = await axios.get(`http://192.168.0.122:8080/download/docx?idx=${idx}&type=발주서`);
         console.log(data);
     }
 
     // 발주서
     const getFileInfo = async ()=>{
-        const {data} = await axios.get(`http://192.168.0.122/file/search/${idx}`);
+        const {data} = await axios.get(`http://192.168.0.122:8080/file/search/${idx}`);
         console.log(data);
         if(data.success){
             setFileInfo({success:true, fileInfo:data.file});
@@ -69,7 +69,7 @@ const DetailOrderModal = ({open,onClose,idx}) => {
 
         try {
             const { data } = await axios.get(
-                `http://192.168.0.122/pdf/preview/${fileInfo.fileInfo.new_filename}`,
+                `http://192.168.0.122:8080/pdf/preview/${fileInfo.fileInfo.new_filename}`,
                 { responseType: 'blob' }
             );
 
@@ -83,7 +83,7 @@ const DetailOrderModal = ({open,onClose,idx}) => {
 
     // order 가져오기
     const getOrder = async () =>{
-        const {data} = await axios.get(`http://192.168.0.122/order/full/detail/${idx}`);
+        const {data} = await axios.get(`http://192.168.0.122:8080/order/full/detail/${idx}`);
         console.log(data);
         setOrder(data.full.order);
         setOrderProducts(data.full.orderProduct);

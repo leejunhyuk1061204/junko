@@ -108,7 +108,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122/users/list',{page:1,user_name:searchText});
+        const {data} = await axios.post('http://192.168.0.122:8080/users/list',{page:1,user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -149,13 +149,13 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
 
     // 메세지 읽음
     const readMsg = async () => {
-        const {data} = await axios.put(`http://192.168.0.122/msg/read/${selectedMsg.msg_idx}`);
+        const {data} = await axios.put(`http://192.168.0.122:8080/msg/read/${selectedMsg.msg_idx}`);
         console.log(data);
     }
 
     // 받는 메세지 리스트
     const getReceiveMsgList = async() =>{
-        const {data} = await axios.post('http://192.168.0.122/msg/list',{
+        const {data} = await axios.post('http://192.168.0.122:8080/msg/list',{
             type:'receive',
             page:page,
             user_idx: sessionStorage.getItem('user_idx'),
@@ -169,7 +169,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
 
     // 보낸 메세지 리스트
     const getSendMsgList = async() =>{
-        const {data} = await axios.post('http://192.168.0.122/msg/list',{
+        const {data} = await axios.post('http://192.168.0.122:8080/msg/list',{
             type:'send',
             page:page,
             user_idx: sessionStorage.getItem('user_idx'),
@@ -187,7 +187,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
 
     const sendMsg = async () => {
         try {
-            const {data} = await axios.post('http://192.168.0.122/msg/insert',{
+            const {data} = await axios.post('http://192.168.0.122:8080/msg/insert',{
                 sender_idx: sessionStorage.getItem('user_idx'),
                 receiver_idx:selectedUser,
                 msg_title:msgForm.msg_title,

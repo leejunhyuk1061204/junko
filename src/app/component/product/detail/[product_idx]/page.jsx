@@ -26,13 +26,13 @@ export default function ProductDetail() {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const res = await axios.get(`http://192.168.0.122/product/detail/${product_idx}`, {
+                const res = await axios.get(`http://192.168.0.122:8080/product/detail/${product_idx}`, {
                     headers: { Authorization: sessionStorage.getItem('token') },
                 });
                 const data = res.data?.data || {};
                 setProduct(data);
                 if (data.imageUrls?.length > 0) {
-                    setMainImg(`http://192.168.0.122/images/${data.imageUrls[0]}`);
+                    setMainImg(`http://192.168.0.122:8080/images/${data.imageUrls[0]}`);
                 }
             } catch (err) {
                 console.error('상품 상세 조회 실패:', err);
@@ -84,8 +84,8 @@ export default function ProductDetail() {
                                     {product.imageUrls.map((img, i) => (
                                         <img
                                             key={i}
-                                            src={`http://192.168.0.122/images/${img}`}
-                                            onClick={() => setMainImg(`http://192.168.0.122/images/${img}`)}
+                                            src={`http://192.168.0.122:8080/images/${img}`}
+                                            onClick={() => setMainImg(`http://192.168.0.122:8080/images/${img}`)}
                                             className={`product-thumbnail-img ${mainImg?.includes(img) ? 'active' : ''}`}
                                             alt={`썸네일 ${i}`}
                                         />

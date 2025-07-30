@@ -51,7 +51,7 @@ const OrderInsertPage = () => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122/users/list',{page:1,user_name:searchText});
+        const {data} = await axios.post('http://192.168.0.122:8080/users/list',{page:1,user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -72,7 +72,7 @@ const OrderInsertPage = () => {
 
     // 거래처 리스트
     const getCustom = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122/custom/list2',{search:searchText});
+        const {data} = await axios.post('http://192.168.0.122:8080/custom/list2',{search:searchText});
         setCustom(data.list);
         console.log(data);
     }
@@ -92,7 +92,7 @@ const OrderInsertPage = () => {
 
     // 창고 리스트
     const getWarehouse = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122/warehouse/list',{page:1,warehouse_name:searchText});
+        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{page:1,warehouse_name:searchText});
         setWarehouse(data.list);
         // console.log('창고 불러오기');
     }
@@ -357,7 +357,7 @@ const OrderInsertPage = () => {
             msg2: '발주를 등록 하시겠습니까?',
             showCancel: true,
             onConfirm: async() => {
-                const {data} = await axios.post('http://192.168.0.122/order/full/insert',insertData,{
+                const {data} = await axios.post('http://192.168.0.122:8080/order/full/insert',insertData,{
                     headers: {
                         Authorization : sessionStorage.getItem("token")
                     }

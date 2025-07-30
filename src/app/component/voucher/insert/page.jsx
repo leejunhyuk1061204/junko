@@ -22,7 +22,7 @@ export default function VoucherInsertPage() {
     const [approvers, setApprovers] = useState([])
 
     useEffect(() => {
-        axios.get('http://192.168.0.122/template/list').then((res) => {
+        axios.get('http://192.168.0.122:8080/template/list').then((res) => {
             if (res.data?.list) setTemplateList(res.data.list)
         })
 
@@ -40,7 +40,7 @@ export default function VoucherInsertPage() {
     const previewDocument = async () => {
         if (!templateIdx) return alert('템플릿을 선택하세요')
 
-        const res = await axios.post('http://192.168.0.122/voucher/preview', {
+        const res = await axios.post('http://192.168.0.122:8080/voucher/preview', {
             template_idx: templateIdx,
             variables: formData,
         })
@@ -54,7 +54,7 @@ export default function VoucherInsertPage() {
 
         try {
             // 1. 전표 저장 (문서 생성 포함)
-            const res = await axios.post('http://192.168.0.122/voucher/insert', {
+            const res = await axios.post('http://192.168.0.122:8080/voucher/insert', {
                 ...formData,
                 entry_date: formData.entry_date
                     ? new Date(formData.entry_date).toISOString().slice(0, 10)
@@ -68,7 +68,7 @@ export default function VoucherInsertPage() {
                 const document_idx = res.data.document_idx // ✅ document_idx 받아야 함
 
                 // 2. PDF 생성
-                const pdfRes = await axios.post('http://192.168.0.122/document/pdf', {
+                const pdfRes = await axios.post('http://192.168.0.122:8080/document/pdf', {
                     document_idx,
                 })
 
@@ -80,7 +80,7 @@ export default function VoucherInsertPage() {
                 // 3. 분개 문서 생성
                 const entryDetailTemplateIdx = 14
 
-                const entryDetailVariableRes = await axios.post('http://192.168.0.122/entry-detail/preview', {
+                const entryDetailVariableRes = await axios.post('http://192.168.0.122:8080/entry-detail/preview', {
                     template_idx: entryDetailTemplateIdx,
                     variables: {
                         entry_idx: entry_idx,
@@ -96,7 +96,7 @@ export default function VoucherInsertPage() {
                     return
                 }
 
-                const entryDetailDocRes = await axios.post('http://192.168.0.122/document/insert', {
+                const entryDetailDocRes = await axios.post('http://192.168.0.122:8080/document/insert', {
                     idx: entry_idx,
                     type: 'entry_detail',
                     user_idx: formData.user_idx,
@@ -108,7 +108,7 @@ export default function VoucherInsertPage() {
                 if (entryDetailDocRes.data.success && entryDetailDocRes.data.document_idx) {
                     const entryDetailDocumentIdx = entryDetailDocRes.data.document_idx
 
-                    const entryDetailPdfRes = await axios.post('http://192.168.0.122/document/pdf', {
+                    const entryDetailPdfRes = await axios.post('http://192.168.0.122:8080/document/pdf', {
                         document_idx: entryDetailDocumentIdx,
                     })
 

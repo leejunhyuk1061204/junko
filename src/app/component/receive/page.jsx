@@ -58,7 +58,7 @@ const ReceivingPage = () => {
 
     // 입고 리스트 가져오기
     const getReceiveList = async () => {
-        const {data} = await axios.post('http://192.168.0.122/receive/list',
+        const {data} = await axios.post('http://192.168.0.122:8080/receive/list',
             {
                 page:page,
                 orderColumn : selectedSort.orderColumn,
@@ -77,7 +77,7 @@ const ReceivingPage = () => {
     // 입고 상태 수정하기
     const updateReceiveStatus = (idx,status) => {
         setInputModalOpen({bool:true,idx:idx,status:status});
-        // const {date} = await axios.post('http://192.168.0.122/receive/update',{receive_idx : idx , status : status})
+        // const {date} = await axios.post('http://192.168.0.122:8080/receive/update',{receive_idx : idx , status : status})
         // console.log(data);
         // if(!data.success){
         //     openModal({

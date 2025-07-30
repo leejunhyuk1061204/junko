@@ -78,7 +78,7 @@ export const useChartStore = create((set) => ({
                 endDate: endDate ?? null,
             };
 
-            const {data} = await axios.post('http://192.168.0.122/list/chart', payload,
+            const {data} = await axios.post('http://192./list/chart', payload,
                 {headers: {Authorization: token}});
 
             if (data.success && data.loginYN) {
@@ -107,7 +107,7 @@ export const useCategoryStore = create((set) => ({
         set({categoryLoading: true});
         try {
             const token = sessionStorage.getItem("token");
-            const {data} = await axios.get('http://192.168.0.122/chart/category/list', {
+            const {data} = await axios.get('http://192.168.0.122:8080/chart/category/list', {
                 headers: {Authorization: token}});
 
             if (data.loginYN) {

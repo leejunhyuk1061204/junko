@@ -24,7 +24,7 @@ export default function DeptEditModal({ entry_idx, dept, onClose, onSuccess }) {
 
     // 계정과목 리스트 불러오기
     useEffect(() => {
-        axios.get("http://192.168.0.122/accountSubjectList")
+        axios.get("http://192.168.0.122:8080/accountSubjectList")
             .then(res => setSubjects(res.data || []))
             .catch(err => console.error("계정과목 불러오기 실패", err))
     }, [])
@@ -40,7 +40,7 @@ export default function DeptEditModal({ entry_idx, dept, onClose, onSuccess }) {
 
         try {
             const res = await axios.put(
-                `http://192.168.0.122/accountDeptUpdate/${entry_idx}/details/${dept.dept_idx}`,
+                `http://192.168.0.122:8080/accountDeptUpdate/${entry_idx}/details/${dept.dept_idx}`,
                 {
                     as_idx: form.as_idx,
                     amount: form.amount,

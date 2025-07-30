@@ -46,14 +46,14 @@ const StockPage = () => {
     },[warehouseList])
 
     const getLowStockList = async () => {
-        const {data} = await axios.post('http://192.168.0.122/lowStock/list',{page:lowStockPage});
+        const {data} = await axios.post('http://192.168.0.122:8080/lowStock/list',{page:lowStockPage});
         console.log('lowStockList',data);
         setLowStockList(data.list);
         setLowStockTotal(data.total*10);
     }
 
     const getStockSumList = async () => {
-        const {data} = await axios.post('http://192.168.0.122/stock/sum/list',{
+        const {data} = await axios.post('http://192.168.0.122:8080/stock/sum/list',{
             page:page,
             warehouse_idx: selected?.warehouse?.warehouse_idx || 0,
             zone_idx: selected?.zone?.zone_idx || 0,
@@ -65,13 +65,13 @@ const StockPage = () => {
     }
 
     const getWarehouseList = async () => {
-        const {data} = await axios.post('http://192.168.0.122/warehouse/list',{});
+        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{});
         console.log(data);
         setWarehouseList(data.list);
     }
 
     const getZoneList = async () => {
-        const {data} = await axios.post('http://192.168.0.122/zone/list',{});
+        const {data} = await axios.post('http://192.168.0.122:8080/zone/list',{});
         console.log(data);
         setZoneList(data.list);
     }

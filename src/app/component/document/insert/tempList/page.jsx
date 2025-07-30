@@ -44,7 +44,7 @@ export default function selectTemplate() {
 
     const fetchCategoryList = async () => {
         try {
-            const res = await axios.get("http://192.168.0.122/template/category/list");
+            const res = await axios.get("http://192.168.0.122:8080/template/category/list");
             const fetched = res.data.list || [];
             const formatted = [
                 { id: "", name: "전체" },
@@ -71,7 +71,7 @@ export default function selectTemplate() {
         }
 
         try {
-            const res = await axios.get("http://192.168.0.122/template/list", {
+            const res = await axios.get("http://192.168.0.122:8080/template/list", {
                 params: {
                     category,
                     search,
@@ -127,7 +127,7 @@ export default function selectTemplate() {
         const token = sessionStorage.getItem("token");
 
         try {
-            const res = await axios.get(`http://192.168.0.122/template/preview/${template_idx}`, {
+            const res = await axios.get(`http://192.168.0.122:8080/template/preview/${template_idx}`, {
                 headers: { Authorization: token }
             });
 

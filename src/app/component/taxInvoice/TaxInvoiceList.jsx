@@ -21,7 +21,7 @@ export default function TaxInvoiceList() {
 
     const fetchInvoices = async () => {
         try {
-            const res = await axios.get('http://192.168.0.122/taxInvoiceSearch', {
+            const res = await axios.get('http://192.168.0.122:8080/taxInvoiceSearch', {
                 params: { page, search, status },
             })
             if (res.data.success) {
@@ -41,7 +41,7 @@ export default function TaxInvoiceList() {
     const handleDelete = async (invoice_idx) => {
         if (!window.confirm('정말 삭제하시겠습니까?')) return
         try {
-            const res = await axios.delete(`http://192.168.0.122/taxInvoiceDel/${invoice_idx}`, {
+            const res = await axios.delete(`http://192.168.0.122:8080/taxInvoiceDel/${invoice_idx}`, {
                 headers: { Authorization: localStorage.getItem('token') },
             })
             if (res.data.success) {
@@ -58,7 +58,7 @@ export default function TaxInvoiceList() {
 
     const handlePreviewPdf = async (invoice_idx) => {
         try {
-            const res = await axios.post('http://192.168.0.122/taxInvoicePdf', null, {
+            const res = await axios.post('http://192.168.0.122:8080/taxInvoicePdf', null, {
                 params: {
                     invoice_idx,
                     template_idx: 1,

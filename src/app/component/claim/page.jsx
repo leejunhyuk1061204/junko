@@ -65,7 +65,7 @@ const ClaimPage = () => {
 
     // 클레임 리스트 가져오기
     const getClaimList = async(searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122/claim/list',{
+        const {data} = await axios.post('http://192.168.0.122:8080/claim/list',{
             page:page,
             status:selectedStatus.name === '전체'?'':selectedStatus.name,
             search:search,

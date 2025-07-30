@@ -40,7 +40,7 @@ export default function EntryStatusInsertPage() {
     }, [])
 
     useEffect(() => {
-        axios.get('http://192.168.0.122/voucher/list', { params: { page: 1, size: 1000 } })
+        axios.get('http://192.168.0.122:8080/voucher/list', { params: { page: 1, size: 1000 } })
             .then(async res => {
                 if (res.data.success) {
                     const fetched = res.data.list
@@ -48,7 +48,7 @@ export default function EntryStatusInsertPage() {
 
                     for (const v of fetched) {
                         try {
-                            const preview = await axios.get(`http://192.168.0.122/entry/settlement/previewAmount?entry_idx=${v.entry_idx}`)
+                            const preview = await axios.get(`http://192.168.0.122:8080/entry/settlement/previewAmount?entry_idx=${v.entry_idx}`)
                             const remain = preview.data.voucher_amount - preview.data.settled_amount
                             if (remain > 0) {
                                 filtered.push({ ...v, remain, custom_name: v.custom_name })
@@ -62,11 +62,11 @@ export default function EntryStatusInsertPage() {
                 }
             })
 
-        axios.get('http://192.168.0.122/template/list').then(res => {
+        axios.get('http://192.168.0.122:8080/template/list').then(res => {
             if (res.data?.list) setTemplateList(res.data.list)
         })
 
-        axios.post('http://192.168.0.122/users/list',{}).then(res => {
+        axios.post('http://192.168.0.122:8080/users/list',{}).then(res => {
             if (res.data?.list) setApproverList(res.data.list)
         })
 
@@ -105,7 +105,7 @@ export default function EntryStatusInsertPage() {
         setTotalAmount(selected.amount)
 
         try {
-            const res = await axios.get(`http://192.168.0.122/entry/settlement/previewAmount?entry_idx=${selected.entry_idx}`)
+            const res = await axios.get(`http://192.168.0.122:8080/entry/settlement/previewAmount?entry_idx=${selected.entry_idx}`)
             const total = res.data?.voucher_amount || 0
             const settled = res.data?.settled_amount || 0
             setAvailableAmount(total - settled)
@@ -136,14 +136,14 @@ export default function EntryStatusInsertPage() {
         }
 
         try {
-            const res = await axios.post('http://192.168.0.122/settlement/insert', {
+            const res = await axios.post('http://192.168.0.122:8080/settlement/insert', {
                 ...form,
                 user_idx: form.user_idx,
                 approver_ids: form.status === '정산' ? approvers.map(u => u.user_idx) : [],
             })
             if (res.data.success) {
                 const settlementId = res.data.settlement_id
-                const docRes = await axios.post('http://192.168.0.122/document/insert', {
+                const docRes = await axios.post('http://192.168.0.122:8080/document/insert', {
                     idx: settlementId,
                     type: 'settlement',
                     user_idx: form.user_idx,
@@ -156,7 +156,7 @@ export default function EntryStatusInsertPage() {
                 })
 
                 if (docRes.data.success && docRes.data.document_idx) {
-                    const pdfRes = await axios.post('http://192.168.0.122/document/pdf', {
+                    const pdfRes = await axios.post('http://192.168.0.122:8080/document/pdf', {
                         document_idx: docRes.data.document_idx,
                     })
 
@@ -182,7 +182,7 @@ export default function EntryStatusInsertPage() {
         if (!form.template_idx) return alert('템플릿을 선택하세요')
 
         try {
-            const res = await axios.post('http://192.168.0.122/settlement/preview', {
+            const res = await axios.post('http://192.168.0.122:8080/settlement/preview', {
                 template_idx: form.template_idx,
                 variables: {
                     ...form,

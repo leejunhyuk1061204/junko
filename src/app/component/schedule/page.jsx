@@ -78,9 +78,9 @@ export default function SchedulePage() {
 
             // 일정 불러오기
             const [personalRes, deptRes, workRes] = await Promise.all([
-                axios.post('http://192.168.0.122/schedule/list', {type: 'personal'}, {headers: {Authorization: token}}),
-                axios.post('http://192.168.0.122/schedule/list', {type: 'dept'}, {headers: {Authorization: token}}),
-                axios.post('http://192.168.0.122/schedule/list', {type: 'work'}, {headers: {Authorization: token}}),
+                axios.post('http://192.168.0.122:8080/schedule/list', {type: 'personal'}, {headers: {Authorization: token}}),
+                axios.post('http://192.168.0.122:8080/schedule/list', {type: 'dept'}, {headers: {Authorization: token}}),
+                axios.post('http://192.168.0.122:8080/schedule/list', {type: 'work'}, {headers: {Authorization: token}}),
             ]);
 
             const allEvents = [
@@ -184,7 +184,7 @@ export default function SchedulePage() {
         const endDate = format(inputInfo.end, 'yyyy-MM-dd');
 
         try {
-            const {data} = await axios.post('http://192.168.0.122/schedule/insert', {
+            const {data} = await axios.post('http://192.168.0.122:8080/schedule/insert', {
                 title: titleToSend,
                 description: form.description,
                 start_date: startDate,
@@ -230,7 +230,7 @@ export default function SchedulePage() {
         }
 
         try {
-            const {data} = await axios.post('http://192.168.0.122/schedule/update', {
+            const {data} = await axios.post('http://192.168.0.122:8080/schedule/update', {
                 schedule_idx: editData.schedule_idx,
                 title: editData.title,
                 description: editData.description,
@@ -273,7 +273,7 @@ export default function SchedulePage() {
              showCancel: true,
              onConfirm: async () => {
                  try {
-                     const {data} = await axios.put('http://192.168.0.122/schedule/del', null, {
+                     const {data} = await axios.put('http://192.168.0.122:8080/schedule/del', null, {
                          params: {schedule_idx, user_idx},
                          headers: {Authorization: token}
                      });
