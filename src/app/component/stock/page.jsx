@@ -22,11 +22,15 @@ const StockPage = () => {
     const [page, setPage] = useState(1);
     const [stockAdjustModalOpen, setStockAdjustModalOpen] = useState({bool:false});
     const [stockHistoryModalOpen, setStockHistoryModalOpen] = useState({bool:false});
+    const [lowStockPage, setLowStockPage] = useState(1);
+    const [lowStockTotal, setLowStockTotal] = useState(0);
+    const [lowStockList, setLowStockList] = useState([]);
 
     useEffect(() => {
         getWarehouseList();
         getZoneList();
         getStockSumList();
+        getLowStockList();
     }, []);
 
     useEffect(() => {
@@ -34,8 +38,19 @@ const StockPage = () => {
     },[selected,group,page]);
 
     useEffect(()=>{
+        getLowStockList();
+    },[lowStockPage])
+
+    useEffect(()=>{
         setShowZone(Array(warehouseList.length).fill(false));
     },[warehouseList])
+
+    const getLowStockList = async () => {
+        const {data} = await axios.post('http://localhost:8080/lowStock/list',{page:lowStockPage});
+        console.log('lowStockList',data);
+        setLowStockList(data.list);
+        setLowStockTotal(data.total*10);
+    }
 
     const getStockSumList = async () => {
         const {data} = await axios.post('http://localhost:8080/stock/sum/list',{
@@ -303,6 +318,47 @@ const StockPage = () => {
                                     }
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <h3 className="text-align-left margin-bottom-10 margin-30 margin-bottom-20">
+                    <span className="product-header">재고 부족 상품</span>
+                </h3>
+                <div className='order-list-back flex flex-direction-col'>
+                    <div className='margin-bottom-10'>
+                        <table className='text-overflow-table'>
+                            <thead>
+                                <tr>
+                                    <th>상품 코드</th>
+                                    <th>상품 이름</th>
+                                    <th>옵션 이름</th>
+                                    <th>최소 재고 수량</th>
+                                    <th>현재 수량</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {lowStockList?.map((stock,i)=>(
+                                <tr key={i}>
+                                    <td>{stock.product_idx}</td>
+                                    <td>{stock.product_name}</td>
+                                    <td>{typeof stock.combined_name === 'undefined' ? '없음' : stock.combined_name}</td>
+                                    <td>{stock.min_cnt}</td>
+                                    <td>{stock.total_stock}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                    {/* 페이지네이션 */}
+                    <div className="product-pagination flex justify-content-between gap_5 margin-bottom-10">
+                        <div className='flex justify-content-center'>
+                            <Pagination
+                                activePage={lowStockPage}
+                                itemsCountPerPage={10}
+                                totalItemsCount={lowStockTotal}
+                                pageRangeDisplayed={5}
+                                onChange={(page) => setLowStockPage(page)}  // set만!
+                            />
                         </div>
                     </div>
                 </div>

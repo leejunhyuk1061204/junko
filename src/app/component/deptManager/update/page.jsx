@@ -5,7 +5,7 @@ import axios from 'axios';
 import {Listbox, ListboxButton, ListboxOption, ListboxOptions} from '@headlessui/react';
 import {useAlertModalStore} from "@/app/zustand/store";
 
-const EmployeeEdit = ({ user_idx, onClose }) => {
+const EmployeeEdit = ({ user_idx, onClose, getUserDetail }) => {
     const {openModal} = useAlertModalStore();
     const [form, setForm] = useState({});
     const [deptList, setDeptList] = useState([]);
@@ -15,7 +15,6 @@ const EmployeeEdit = ({ user_idx, onClose }) => {
 
     useEffect(() => {
         if (!token || !user_idx) return;
-
         // 직원 상세 정보 불러오기
         axios.get(`http://localhost:8080/user/detail/${user_idx}`, {
             headers: { Authorization: token }
@@ -39,7 +38,6 @@ const EmployeeEdit = ({ user_idx, onClose }) => {
 
         }, []);
 
-
     const handleUpdate = async () => {
         await axios.post(`http://localhost:8080/emp/update`, form, {
             headers: { Authorization: token }
@@ -49,6 +47,9 @@ const EmployeeEdit = ({ user_idx, onClose }) => {
             msg1: '수정 완료',
             msg2: '수정되었습니다.',
             showCancel: false,
+            onConfirm: async ()=>{
+                await getUserDetail();
+            }
         });
         onClose();
     };

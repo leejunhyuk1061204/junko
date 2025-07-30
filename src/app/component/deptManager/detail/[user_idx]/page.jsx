@@ -11,6 +11,10 @@ const EmployeeDetailModal = ({user_idx, onClose}) => {
 
     useEffect(() => {
         if (!token) return;
+        getUserDetail();
+    }, [user_idx]);
+
+    const getUserDetail = async () => {
         axios.get(`http://localhost:8080/user/detail/${user_idx}`, {
             headers: { Authorization: token }
         }).then(res => {
@@ -18,7 +22,7 @@ const EmployeeDetailModal = ({user_idx, onClose}) => {
             const detail = res.data.userDetail;
             setForm(detail);
         });
-    }, [user_idx]);
+    }
 
     const handleEditClick = () => {
         setShowEditModal(true);
@@ -94,6 +98,7 @@ const EmployeeDetailModal = ({user_idx, onClose}) => {
                     <EmployeeEdit
                         user_idx={user_idx}
                         onClose={() => setShowEditModal(false)}
+                        getUserDetail={getUserDetail}
                     />
                 )}
             </div>
