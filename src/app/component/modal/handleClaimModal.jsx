@@ -198,7 +198,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                                 warehouse_idx : handleInsertForm.warehouse_idx||''
                             },{
                                 headers: {
-                                    Authorization : sessionStorage.getItem("token")
+                                    Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                                 }
                             });
                             console.log(data);
@@ -254,7 +254,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                                 status : handleInsertForm.status,
                             },{
                                 headers: {
-                                    Authorization : sessionStorage.getItem("token")
+                                    Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                                 }
                             });
                             console.log(data);

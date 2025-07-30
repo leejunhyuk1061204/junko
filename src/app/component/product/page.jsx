@@ -103,7 +103,7 @@ export default function OrderList() {
     };
 
     const fetchOrders = async (page, sortId, categoryId, search = '') => {
-        const token = sessionStorage.getItem('token')
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
         const url = 'http://192.168.0.122:8080/product/list'
 
         const payload = {
@@ -148,7 +148,7 @@ export default function OrderList() {
         if (!window.confirm('선택한 상품을 삭제하시겠습니까?')) return;
 
         try {
-            const token = sessionStorage.getItem('token');
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             console.log('삭제 요청 전 토큰:', token);
 
             // 병렬 삭제 요청

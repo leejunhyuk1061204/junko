@@ -32,7 +32,7 @@ export default function CustomModal({ editItem, onClose, onSuccess }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
 
         const url = editItem
             ? "http://192.168.0.122:8080/custom/update"

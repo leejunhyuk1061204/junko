@@ -1,7 +1,11 @@
 'use client'
 import React, {useEffect, useState} from 'react';
 import axios from "axios";
-import PdfViewer from "@/app/component/pdfviewer/page";
+import dynamic from 'next/dynamic'
+
+// const PdfViewer = dynamic(() => import('@/app/component/pdfviewer/page'), {
+//     ssr: false, // 서버 사이드 렌더링을 비활성화
+// });
 
 const DetailOrderModal = ({open,onClose,idx}) => {
 
@@ -11,6 +15,11 @@ const DetailOrderModal = ({open,onClose,idx}) => {
     const [fileInfo, setFileInfo] = useState({});
     const [file, setFile] = useState(null);
     const [pdfViewer, setPdfViewer] = useState(false);
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     useEffect(() => {
         if(idx===null) return;
@@ -231,18 +240,18 @@ const DetailOrderModal = ({open,onClose,idx}) => {
                                         </tbody>
                                     </table>
                                 </div >
-                                {fileInfo.success ? (<>
-                                    {pdfViewer && (
-                                        <div style={{maxHeight:'500px', overflowY:'auto'}}>
-                                            <PdfViewer file={file}/>
-                                        </div>
-                                        )}
-                                    <div className='flex gap_20 justify-content-center'>
-                                        <button className='btn' onClick={()=>setPdfViewer(!pdfViewer)}>PDF 미리보기</button>
-                                        <button className='btn' onClick={downloadPDF}>PDF 다운로드</button>
-                                        {/*<button className='btn' onClick={downloadWord}>워드 다운로드</button>*/}
-                                    </div>
-                                </>):(<div className='margin-bottom-20'><p>발주서가 없습니다.</p></div>)}
+                                {/*{typeof window !=='undefined' && fileInfo.success && isClient ? (<>*/}
+                                {/*    {pdfViewer && (*/}
+                                {/*        <div style={{maxHeight:'500px', overflowY:'auto'}}>*/}
+                                {/*            <PdfViewer file={file}/>*/}
+                                {/*        </div>*/}
+                                {/*        )}*/}
+                                {/*    <div className='flex gap_20 justify-content-center'>*/}
+                                {/*        <button className='btn' onClick={()=>setPdfViewer(!pdfViewer)}>PDF 미리보기</button>*/}
+                                {/*        <button className='btn' onClick={downloadPDF}>PDF 다운로드</button>*/}
+                                {/*        /!*<button className='btn' onClick={downloadWord}>워드 다운로드</button>*!/*/}
+                                {/*    </div>*/}
+                                {/*</>):(<div className='margin-bottom-20'><p>발주서가 없습니다.</p></div>)}*/}
                             </div>
                         </>
                     </div>

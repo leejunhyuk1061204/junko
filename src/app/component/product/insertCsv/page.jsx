@@ -21,7 +21,7 @@ export default function InsertProductCsv() {
         try {
             const res = await axios.post('http://192.168.0.122:8080/product/csv', fd, {
                 headers: {
-                    Authorization: sessionStorage.getItem("token"),
+                    Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                     'Content-Type': 'multipart/form-data',
                 },
             })

@@ -359,7 +359,7 @@ const OrderInsertPage = () => {
             onConfirm: async() => {
                 const {data} = await axios.post('http://192.168.0.122:8080/order/full/insert',insertData,{
                     headers: {
-                        Authorization : sessionStorage.getItem("token")
+                        Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                     }
                 })
                 // console.log(data);

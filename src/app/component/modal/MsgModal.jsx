@@ -158,7 +158,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
         const {data} = await axios.post('http://192.168.0.122:8080/msg/list',{
             type:'receive',
             page:page,
-            user_idx: sessionStorage.getItem('user_idx'),
+            user_idx: (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0),
             important_yn: importantYN.name === '중요'? 1 : importantYN.name === '일반' ? 0 : null,
             read_yn:readYN.name === '읽음' ? 1 : readYN.name === '미확인' ? 0 : null,
         });
@@ -172,7 +172,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
         const {data} = await axios.post('http://192.168.0.122:8080/msg/list',{
             type:'send',
             page:page,
-            user_idx: sessionStorage.getItem('user_idx'),
+            user_idx: (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0),
             important_yn: importantYN.name === '중요'? 1 : importantYN.name === '일반' ? 0 : null,
         });
         console.log('send',data);
@@ -188,14 +188,14 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
     const sendMsg = async () => {
         try {
             const {data} = await axios.post('http://192.168.0.122:8080/msg/insert',{
-                sender_idx: sessionStorage.getItem('user_idx'),
+                sender_idx: (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0),
                 receiver_idx:selectedUser,
                 msg_title:msgForm.msg_title,
                 msg_content:msgForm.msg_content,
                 important_yn:selectedImportant.name==='중요'?1:0,
             },{
                 headers:{
-                    authorization: sessionStorage.getItem("token"),
+                    authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                 }
             });
             console.log(data);
@@ -459,7 +459,7 @@ const MsgModal = ({open,onClose,type,msg,getUnreadMsg}) => {
                                         {userFocused ? (<>
                                             {user?.length > 0 && (
                                                 <ul className="listBox-option">
-                                                    {user?.filter(f=>f.user_idx !== sessionStorage.getItem("user_idx")).map((u) => (
+                                                    {user?.filter(f=>f.user_idx !== (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)).map((u) => (
                                                         <li
                                                             key={u.user_idx}
                                                             onClick={() => {

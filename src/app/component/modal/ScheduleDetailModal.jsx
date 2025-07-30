@@ -13,7 +13,7 @@ export default function ScheduleDetailModal ({
     const modalRef = useRef(null);
 
     if (!open || !event) return null;
-    const user_idx = parseInt(sessionStorage.getItem("user_idx"), 10);
+    const user_idx = parseInt((typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0), 10);
 
     const data = event.resource || {};
     const start = event.start;

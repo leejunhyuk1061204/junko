@@ -20,7 +20,7 @@ export default function SettlementEditModal({ data, onClose, onSuccess }) {
         try {
             const res = await axios.put(`http://192.168.0.122:8080/settlementUpdate/${data.settlement_idx}`, form, {
                 headers: {
-                    Authorization: sessionStorage.getItem("token"),
+                    Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                 },
             });
             if (res.data.result === 'success') {

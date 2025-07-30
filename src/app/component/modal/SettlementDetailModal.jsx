@@ -41,7 +41,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
     };
 
     const handleFileDelete = async (fileIdx) => {
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             await axios.delete(`http://192.168.0.122:8080/settlementFileDel/${fileIdx}`, {
                 headers: { Authorization: token }
@@ -72,7 +72,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
     };
 
     const handleConfirmSettlement = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             const res = await axios.post(`http://192.168.0.122:8080/settlementFinal/${data.settlement_idx}`, null, {
                 headers: { Authorization: token }
@@ -86,7 +86,7 @@ export default function SettlementDetailModal({ data, onClose, showPdf, setShowP
     };
 
     const handleRequestReopen = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             const res = await axios.post(`http://192.168.0.122:8080/settlementReq/${data.settlement_idx}`, null, {
                 headers: { Authorization: token }

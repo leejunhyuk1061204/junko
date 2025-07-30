@@ -72,7 +72,7 @@ export default function SalesChart() {
         : [];
 
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         if (!token) {
             openModal({
                 svg: '❗',
@@ -630,7 +630,7 @@ export default function SalesChart() {
     // EXCEL download
     const handleDownloadExcel = async () => {
         try {
-            const token = sessionStorage.getItem('token');
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             const categoryIdx = selectedSub?.category_idx ?? selectedParent?.category_idx ?? null;
             const params = new URLSearchParams();
             if (categoryIdx) params.append('categoryIdx', categoryIdx);
@@ -655,7 +655,7 @@ export default function SalesChart() {
     // PDF download
     const handleDownloadPdf = async () => {
         try {
-            const token = sessionStorage.getItem('token');
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             const categoryIdx = selectedSub?.category_idx ?? selectedParent?.category_idx ?? null;
             const params = new URLSearchParams();
             if (categoryIdx) params.append('categoryIdx', categoryIdx);

@@ -59,7 +59,7 @@ export default function selectTemplate() {
     };
 
     const fetchList = async (page = currentPage) => {
-        const user_id = sessionStorage.getItem("user_id");
+        const user_id = (typeof window !== "undefined" ? sessionStorage.getItem("user_id") : "");
         if (!user_id) {
             openModal({
                 svg: '❗',
@@ -124,7 +124,7 @@ export default function selectTemplate() {
     };
 
     const handlePreview = async (template_idx) => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
 
         try {
             const res = await axios.get(`http://192.168.0.122:8080/template/preview/${template_idx}`, {

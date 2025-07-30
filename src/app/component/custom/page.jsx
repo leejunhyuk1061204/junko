@@ -29,7 +29,7 @@ export default function CustomPage() {
     const router = useRouter();
 
     const fetchList = async () => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         const res = await axios.get("http://192.168.0.122:8080/custom/list", {
             headers: { Authorization: token },
             params: {
@@ -67,7 +67,7 @@ export default function CustomPage() {
     const handleDelete = async (custom_idx) => {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             const res = await axios.put("http://192.168.0.122:8080/custom/del", null, {
                 headers: { Authorization: token },

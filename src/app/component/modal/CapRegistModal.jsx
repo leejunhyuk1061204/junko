@@ -22,7 +22,7 @@ const CapRegistModal = ({ onClose, onSuccess }) => {
     const [file, setFile] = useState(null);
     const [customList, setCustomList] = useState([]);
     const [linkedList, setLinkedList] = useState([]);
-    const token = sessionStorage.getItem('token');
+    const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
 
     useEffect(() => {
         fetchDropdowns();

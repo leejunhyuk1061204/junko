@@ -25,8 +25,8 @@ export default function DeptRegistModal({ entry_idx, onClose, onSuccess }) {
     }
 
     const handleSubmit = async () => {
-        const token = sessionStorage.getItem("token")
-        const user_idx = sessionStorage.getItem("user_idx")
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
+        const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)
 
         if (!form.as_idx || !form.amount) {
             alert("계정과목과 금액을 입력해주세요")

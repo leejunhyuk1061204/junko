@@ -66,7 +66,7 @@ export default function TemplatePage() {
     };
 
     const fetchList = async (page = currentPage) => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             const res = await axios.get("http://192.168.0.122:8080/template/list", {
                 headers: { Authorization: token },
@@ -117,7 +117,7 @@ export default function TemplatePage() {
         }
         if (!window.confirm("선택한 템플릿을 삭제하시겠습니까?")) return;
         try {
-            const token = sessionStorage.getItem("token");
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             const deleteResults = await Promise.all(
                 checkedItems.map((template_idx) =>
                     axios.put("http://192.168.0.122:8080/template/del", null, {
@@ -150,7 +150,7 @@ export default function TemplatePage() {
     };
 
     const handlePreview = async (template_idx) => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
 
         try {
             const res = await axios.get(`http://192.168.0.122:8080/template/preview/${template_idx}`, {

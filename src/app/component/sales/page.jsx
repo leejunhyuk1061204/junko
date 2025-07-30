@@ -116,7 +116,7 @@ const SalesPage = () => {
             onConfirm: async() => {
                 const {data} = await axios.post('http://192.168.0.122:8080/sales/update',{sales_idx:idx,status:status},{
                     headers: {
-                        Authorization : sessionStorage.getItem("token")
+                        Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                     }
                 });
                 console.log(data);

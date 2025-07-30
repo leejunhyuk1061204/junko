@@ -40,7 +40,7 @@ export default function OrgChartPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const token = sessionStorage.getItem('token');
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             if (!token) {
                 openModal({
                     svg: '❗',

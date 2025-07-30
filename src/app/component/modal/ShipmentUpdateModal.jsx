@@ -207,7 +207,7 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
                             stockInfo: stockInfo,
                         },{
                             headers: {
-                                Authorization : sessionStorage.getItem("token")
+                                Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                             }
                         });
                         console.log(data);

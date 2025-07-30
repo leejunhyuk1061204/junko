@@ -87,7 +87,7 @@ export default function Page() {
 
         if (!window.confirm(`총 ${selectedList.length}건 삭제할까요?`)) return
 
-        const token = sessionStorage.getItem('token')
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
 
         try {
             for (const idx of selectedList) {

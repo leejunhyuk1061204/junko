@@ -11,7 +11,7 @@ export default function DocsModal({ productIdx, onClose }) {
     };
 
     const fetchDocs = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         const res = await axios.get(`http://192.168.0.122:8080/product/${productIdx}/docs`, {
             headers: { Authorization: token }
         });
@@ -21,7 +21,7 @@ export default function DocsModal({ productIdx, onClose }) {
     const handleUpload = async () => {
         if (uploadFiles.length === 0) return;
 
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         const formData = new FormData();
         uploadFiles.forEach(file => formData.append('docs', file));
 
@@ -33,7 +33,7 @@ export default function DocsModal({ productIdx, onClose }) {
     };
 
     const handleDelete = async (docId) => {
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         await axios.put(`http://192.168.0.122:8080/product/docs/${docId}/del`, null, {
             headers: { Authorization: token }
         });
@@ -45,7 +45,7 @@ export default function DocsModal({ productIdx, onClose }) {
     }, [productIdx]);
 
     const handleDownload = async (filename, oriFilename) => {
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         const res = await axios.get(`http://192.168.0.122:8080/product/docs/${filename}`, {
             headers: { Authorization: token },
             responseType: 'blob'

@@ -49,7 +49,7 @@ function UserReportContent() {
                 if (res.data.list) setUserOptions(res.data.list);
             });
 
-        const savedUserIdx = sessionStorage.getItem('user_idx');
+        const savedUserIdx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0);
         if (savedUserIdx) {
             setForm(prev => ({ ...prev, user_idx: Number(savedUserIdx) }));
         }
@@ -193,7 +193,7 @@ function UserReportContent() {
                     type: 'receipt_payment',
                     idx,
                     variables,
-                    user_idx: Number(sessionStorage.getItem('user_idx')),
+                    user_idx: Number((typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)),
                     approver_ids: submitData.approver_ids,
                 });
 

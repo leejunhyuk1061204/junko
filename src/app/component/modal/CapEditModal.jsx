@@ -21,7 +21,7 @@ const CapEditModal = ({ capIdx, onClose, onSuccess }) => {
 
     const [customList, setCustomList] = useState([]);
     const [linkedList, setLinkedList] = useState([]);
-    const token = sessionStorage.getItem('token');
+    const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
 
     useEffect(() => {
         fetchDetail();

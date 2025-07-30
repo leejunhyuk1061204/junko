@@ -9,7 +9,7 @@ export default function OptionManager({ productIdx }) {
     const [loading, setLoading] = useState(false);
     const [newOption, setNewOption] = useState({ name: '', value: '' });
     const [selectedOptionIdx, setSelectedOptionIdx] = useState(''); // 선택된 기존 옵션
-    const token = sessionStorage.getItem('token');
+    const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
 
     useEffect(() => {
         console.log('usedOptions:', usedOptions);

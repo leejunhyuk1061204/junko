@@ -76,7 +76,7 @@ const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
                     console.log(info);
                     const {data} = await axios.post('http://192.168.0.122:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser},{
                         headers: {
-                            Authorization: sessionStorage.getItem("token")
+                            Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                         }
                     })
                     console.log(data);

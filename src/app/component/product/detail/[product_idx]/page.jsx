@@ -27,7 +27,7 @@ export default function ProductDetail() {
         const fetchProduct = async () => {
             try {
                 const res = await axios.get(`http://192.168.0.122:8080/product/detail/${product_idx}`, {
-                    headers: { Authorization: sessionStorage.getItem('token') },
+                    headers: { Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : "") },
                 });
                 const data = res.data?.data || {};
                 setProduct(data);

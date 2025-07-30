@@ -12,7 +12,7 @@ export default function TemplateUpdatePage() {
     const router = useRouter();
 
     useEffect(() => {
-        const token = sessionStorage.getItem('token')
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
         axios.get(`http://192.168.0.122:8080/template/detail`, {
             headers: { Authorization: token },
             params: {template_idx: template_idx}
@@ -25,7 +25,7 @@ export default function TemplateUpdatePage() {
     }, [template_idx])
 
     const handleUpdateSubmit = async (updatedData) => {
-        const token = sessionStorage.getItem('token')
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
         try {
             await axios.put(`http://192.168.0.122:8080/template/update`, {
                 ...updatedData,

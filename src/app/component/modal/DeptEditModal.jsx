@@ -35,8 +35,8 @@ export default function DeptEditModal({ entry_idx, dept, onClose, onSuccess }) {
     }
 
     const handleSubmit = async () => {
-        const token = sessionStorage.getItem("token")
-        const user_idx = sessionStorage.getItem("user_idx")
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
+        const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)
 
         try {
             const res = await axios.put(

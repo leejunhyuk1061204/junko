@@ -12,7 +12,7 @@ export default function CategoryPage() {
     const [editItem, setEditItem] = useState(null);
 
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         axios.get("http://192.168.0.122:8080/cate/tree", {
             headers: { Authorization: token },
         })
@@ -36,7 +36,7 @@ export default function CategoryPage() {
 
     // 삭제 함수
     const handleDelete = async (category_idx) => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             const res = await axios.delete('http://192.168.0.122:8080/cate/delete', {
                 headers: { Authorization: token },

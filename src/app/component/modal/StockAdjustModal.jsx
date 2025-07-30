@@ -76,7 +76,7 @@ const StockAdjustModal = ({open,onClose,stock,getStockSumList}) => {
                             user_idx:selectedUser,
                         },{
                             headers: {
-                                Authorization : sessionStorage.getItem("token")
+                                Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                             }
                         })
                         console.log(data);

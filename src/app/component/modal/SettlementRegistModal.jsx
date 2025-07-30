@@ -52,7 +52,7 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
         }
 
         try {
-            const token = sessionStorage.getItem('token');
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             const res = await axios.post('http://192.168.0.122:8080/psRegister', form, {
                 headers: { Authorization: token }
             });

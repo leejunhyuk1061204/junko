@@ -211,7 +211,7 @@ const SalesInsertPage = () => {
                             products: salesProductForm
                         },{
                             headers: {
-                                Authorization : sessionStorage.getItem("token")
+                                Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                             }
                         });
                         console.log(data);
@@ -232,7 +232,7 @@ const SalesInsertPage = () => {
                         const { data } = await axios.post('http://192.168.0.122:8080/sales/csv', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
-                                Authorization : sessionStorage.getItem("token")
+                                Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                             }
                         });
 

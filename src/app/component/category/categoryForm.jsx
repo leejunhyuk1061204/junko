@@ -19,7 +19,7 @@ export default function CategoryForm({ data = [], onSuccess, editItem, setEditIt
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
 
         const payload = {
             category_name: name,

@@ -122,7 +122,7 @@ const WareHousePage = () => {
                                     zone_name: zoneForm.zone_name,
                                 },{
                                     headers: {
-                                        Authorization : sessionStorage.getItem("token")
+                                        Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                                     }
                                 })
                                 console.log(data);
@@ -178,7 +178,7 @@ const WareHousePage = () => {
                                     user_idx: warehouseForm.user_idx || 0
                                 },{
                                     headers: {
-                                        Authorization : sessionStorage.getItem("token")
+                                        Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                                     }
                                 })
                                 console.log(data);
@@ -244,7 +244,7 @@ const WareHousePage = () => {
                                 user_idx: warehouseForm.user_idx || 0
                             },{
                                 headers: {
-                                    Authorization : sessionStorage.getItem("token")
+                                    Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                                 }
                             })
                             console.log(data);
@@ -299,7 +299,7 @@ const WareHousePage = () => {
                                 zone_name: zoneForm.zone_name || '',
                             },{
                                 headers: {
-                                    Authorization : sessionStorage.getItem("token")
+                                    Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                                 }
                             })
                             console.log(data);
@@ -682,7 +682,7 @@ const Warehouse = ({warehouse,zoneList,getWarehouseList,getZoneList,onSelect}) =
                     warehouse_idx:warehouse.warehouse_idx
                 },{
                     headers: {
-                        Authorization : sessionStorage.getItem("token")
+                        Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                     }
                 });
                 console.log(data);

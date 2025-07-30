@@ -24,7 +24,7 @@ export default function UpdateProduct() {
                 formData,
                 {
                     headers: {
-                        Authorization: sessionStorage.getItem("token"),
+                        Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                         "Content-Type": "multipart/form-data",
                     },
                 }
@@ -46,7 +46,7 @@ export default function UpdateProduct() {
                 productFormData,
                 {
                     headers: {
-                        Authorization: sessionStorage.getItem("token")
+                        Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                     },
                 }
             );

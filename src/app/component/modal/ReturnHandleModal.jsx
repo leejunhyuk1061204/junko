@@ -165,7 +165,7 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
                             handle:handleForm
                         },{
                             headers: {
-                                Authorization : sessionStorage.getItem("token")
+                                Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                             }
                         })
                         console.log(data);

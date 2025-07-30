@@ -26,7 +26,7 @@ export default function VoucherInsertPage() {
             if (res.data?.list) setTemplateList(res.data.list)
         })
 
-        const savedUserIdx = sessionStorage.getItem('user_idx')
+        const savedUserIdx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)
         if (savedUserIdx) {
             setFormData((prev) => ({ ...prev, user_idx: Number(savedUserIdx) }))
         }

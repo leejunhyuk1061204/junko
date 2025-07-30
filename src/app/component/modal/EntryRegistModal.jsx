@@ -60,8 +60,8 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
     }, [form.customer_name])
 
     const handleSubmit = async () => {
-        const token = sessionStorage.getItem("token");
-        const user_idx = sessionStorage.getItem("user_idx");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
+        const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0);
 
         if (!form.entry_type || !form.amount || !form.entry_date) {
             alert("필수 항목을 입력하세요");
@@ -127,7 +127,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
                     amount: Number(form.amount).toLocaleString(),  // "123,400,000"
                     entry_date: form.entry_date,
                     status: "작성중",
-                    user_name: sessionStorage.getItem("user_name") || "미지정"
+                    user_name: (typeof window !== "undefined" ? sessionStorage.getItem("user_name") : "") || "미지정"
                 }
             });
 

@@ -66,7 +66,7 @@ export default function DocumentManagePage() {
             });
             return;
         }
-        setUserIdx(parseInt(sessionStorage.getItem("user_idx"), 10));
+        setUserIdx(parseInt((typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0), 10));
     }, []);
 
     useEffect(() => {

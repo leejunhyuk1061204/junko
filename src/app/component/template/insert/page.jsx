@@ -9,27 +9,29 @@ import {useRouter} from "next/navigation";
 
 export default function TemplateInsertPage() {
     const router = useRouter();
+    const [user_idx, setUserIdx] = useState(0);
+
+    useEffect(() => {
+        const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0);
+        if (user_idx) {
+            setTemplateData(prev => ({
+                ...prev,
+                user_idx: Number(user_idx),
+            }));
+            setUserIdx(user_idx);
+        }
+    }, []);
 
     const [templateData, setTemplateData] = useState({
         template_name: '',
         template_desc: '',
         category: '',
         html: '',
-        user_idx: user_idx ? parseInt(user_idx) : null,
+        user_idx: user_idx ? Number(user_idx) : null,
     });
 
-    useEffect(() => {
-        const user_idx = sessionStorage.getItem("user_idx");
-        if (user_idx) {
-            setTemplateData(prev => ({
-                ...prev,
-                user_idx: parseInt(user_idx),
-            }));
-        }
-    }, []);
-
     const handleInsertSubmit = async (data) => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             const res = await axios.post('http://192.168.0.122:8080/template/insert', data, {
                 headers: { Authorization: token }

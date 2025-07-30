@@ -18,7 +18,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
     const [showDeptRegist, setShowDeptRegist] = useState(false)
 
     useEffect(() => {
-        const userIdx = sessionStorage.getItem('user_idx')
+        const userIdx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)
         setLoginUserIdx(userIdx)
     }, [entry, open])
 
@@ -32,8 +32,8 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
     const updateStatus = async (newStatus) => {
         try {
-            const token = sessionStorage.getItem("token");
-            const user_idx = sessionStorage.getItem("user_idx");
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
+            const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0);
 
             await axios.patch(`http://192.168.0.122:8080/accountStatusUpdate/${entry.entry_idx}/status`, {
                 status: newStatus,
@@ -162,7 +162,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
                         </div>
                     )}
                     <div>
-                        {entry.status === "제출" && sessionStorage.getItem("user_type") === "admin" && (
+                        {entry.status === "제출" && (typeof window !== "undefined" ? sessionStorage.getItem("user_type") : "") === "admin" && (
                             <>
                                 <button className="entryList-fabBtn blue" onClick={() => updateStatus("확정")}>확정</button>
                                 <button className="entryList-fabBtn red-del" onClick={() => updateStatus("반려")}>반려</button>

@@ -119,7 +119,7 @@ export default function CategoryTree({ data, onReorder, onEdit, onDelete }) {
 
         setItems(buildTree(finalList));
 
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
             const res = await axios.post('http://192.168.0.122:8080/cate/reorder', finalList, {
                 headers: { Authorization: token },

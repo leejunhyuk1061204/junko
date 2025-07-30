@@ -27,8 +27,8 @@ export default function EntryStatusInsertPage() {
 
 
     useEffect(() => {
-        const savedUserIdx = sessionStorage.getItem('user_idx')
-        const savedUserName = sessionStorage.getItem('user_name')
+        const savedUserIdx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)
+        const savedUserName = (typeof window !== "undefined" ? sessionStorage.getItem("user_name") : "")
 
         if (savedUserIdx) {
             setForm(prev => ({
@@ -70,7 +70,7 @@ export default function EntryStatusInsertPage() {
             if (res.data?.list) setApproverList(res.data.list)
         })
 
-        const savedUserIdx = sessionStorage.getItem('user_idx')
+        const savedUserIdx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)
         if (savedUserIdx) {
             setForm((prev) => ({ ...prev, user_idx: Number(savedUserIdx) }))
         }

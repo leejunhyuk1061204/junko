@@ -98,7 +98,7 @@ const CapList = () => {
     };
 
     const handleDelete = async () => {
-        const token = sessionStorage.getItem('token');
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         if (checkedItems.length === 0) return alert('삭제할 항목을 선택하세요.');
         if (!window.confirm(`총 ${checkedItems.length}건 삭제하시겠습니까?`)) return;
 

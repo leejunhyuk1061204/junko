@@ -110,7 +110,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
                     for (const b of body) {
                         const {data} = await axios.post('http://192.168.0.122:8080/waybill/insert', b,{
                             headers: {
-                                Authorization : sessionStorage.getItem("token")
+                                Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                             }
                         });
                         console.log(data);

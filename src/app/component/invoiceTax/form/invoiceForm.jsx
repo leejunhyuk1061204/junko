@@ -36,8 +36,8 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
     }, [])
 
     useEffect(() => {
-        const user_name = sessionStorage.getItem('user_name') || ''
-        const user_idx = sessionStorage.getItem('user_idx') || 0
+        const user_name = (typeof window !== "undefined" ? sessionStorage.getItem("user_name") : "") || ''
+        const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0
         setForm(prev => ({ ...prev, issued_by: user_name, user_idx: Number(user_idx) }))
 
         axios.get('http://192.168.0.122:8080/custom/list')
@@ -69,8 +69,8 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
             axios.get(`http://192.168.0.122:8080/invoice/detail/${invoice_idx}`)
                 .then(res => {
                     if (res.data.success && res.data.data) {
-                        const user_name = sessionStorage.getItem('user_name') || ''
-                        const user_idx = sessionStorage.getItem('user_idx') || 0
+                        const user_name = (typeof window !== "undefined" ? sessionStorage.getItem("user_name") : "") || ''
+                        const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0
                         setForm({
                             ...res.data.data,
                             approver_ids: res.data.data.approver_ids ?? [],
@@ -110,8 +110,8 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
 
     const createDocument = async (invoice_idx) => {
         try {
-            const user_name = sessionStorage.getItem('user_name') || ''
-            const user_idx = sessionStorage.getItem('user_idx') || 0
+            const user_name = (typeof window !== "undefined" ? sessionStorage.getItem("user_name") : "") || ''
+            const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0
             const total = form.total_amount
             const vat = Math.floor(total * 0.1)
             const totalWithVat = total + vat

@@ -82,7 +82,7 @@ export default function DeptManagerList() {
     };
 
     const fetchList = async (page = currentPage, keyword = search) => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         if (!token) {
             openModal({
                 svg: '❗',
@@ -112,7 +112,7 @@ export default function DeptManagerList() {
 
     const fetchDeptList = async () => {
         try {
-            const token = sessionStorage.getItem("token");
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             const res = await axios.get("http://192.168.0.122:8080/dept/list", {
                 headers: { Authorization: token }
             });

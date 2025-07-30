@@ -38,7 +38,7 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
         }
 
         try {
-            const token = sessionStorage.getItem("token");
+            const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
             console.log("✅ 수정 요청 시 session 토큰:", token);
 
             if (!token) {

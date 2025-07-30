@@ -107,7 +107,7 @@ const Header = () => {
     useEffect(() => {
         // 클라이언트에서만 sessionStorage 접근 가능
         if (typeof window !== 'undefined') {
-            setToken(sessionStorage.getItem('token'));
+            setToken((typeof window !== "undefined" ? sessionStorage.getItem("token") : ""));
         }
         curDate();
     }, []);
@@ -121,7 +121,7 @@ const Header = () => {
     const getMsgReceiveList = async () => {
         const {data} = await axios.post('http://192.168.0.122:8080/msg/list',{
             type:'receive',
-            user_idx:sessionStorage.getItem('user_idx') || 0,
+            user_idx:(typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0,
             page:page,
             read_yn:false,
         });
@@ -129,7 +129,7 @@ const Header = () => {
         setMsgList(data.list);
         await axios.post('http://192.168.0.122:8080/msg/list',{
             type:'receive',
-            user_idx:sessionStorage.getItem('user_idx') || 0,
+            user_idx:(typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0,
             read_yn:false,
         }).then((res)=>{
             setMsgCnt(res.data.list.length);
@@ -237,7 +237,7 @@ const Header = () => {
 
                         </>):('')}
                         <div className='cursor-pointer' onClick={handleProfileOpen}><BsPersonCircle/></div>
-                        <div className='header-login-text'>환영합니다  {sessionStorage.getItem('user_name')} 님</div>
+                        <div className='header-login-text'>환영합니다  {(typeof window !== "undefined" ? sessionStorage.getItem("user_name") : "")} 님</div>
                         <button className='cursor-pointer header-login-text' onClick={handleLogout}>로그아웃</button>
                     </div>
                 ):(

@@ -41,7 +41,7 @@ export default function DocumentInsertPage() {
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const user_idx = sessionStorage.getItem("user_idx");
+            const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0);
 
             if (!user_idx) {
                 openModal({
@@ -264,7 +264,7 @@ export default function DocumentInsertPage() {
 
     // 기안서 작성
     const handleInsert = async () => {
-        const user_idx = parseInt(sessionStorage.getItem("user_idx"), 10);
+        const user_idx = parseInt((typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0), 10);
         if (!user_idx) {
             openModal({
                 svg: '❗',

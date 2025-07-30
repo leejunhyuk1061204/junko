@@ -15,7 +15,7 @@ export default function InsertProduct() {
             // 1. 상품 정보 먼저 등록
             const res = await axios.post('http://192.168.0.122:8080/product/insert', formData, {
                 headers: {
-                    Authorization: sessionStorage.getItem("token"),
+                    Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                     'Content-Type': 'multipart/form-data',
                 },
             })
@@ -30,7 +30,7 @@ export default function InsertProduct() {
 
                 await axios.put(`http://192.168.0.122:8080/product/${product_idx}/imgUpdate`, imgFormData, {
                     headers: {
-                        Authorization: sessionStorage.getItem("token"),
+                        Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                         'Content-Type': 'multipart/form-data',
                     },
                 })

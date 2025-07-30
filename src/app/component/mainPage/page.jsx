@@ -38,7 +38,7 @@ const MainPage = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         console.log("토큰있음?",token);
         if (token) {
             fetchChart({})
@@ -59,7 +59,7 @@ const MainPage = () => {
     useEffect(() => {
         const fetchMainSchedule = async () => {
             try {
-                const token = sessionStorage.getItem("token");
+                const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
                 if (!token) return;
 
                 const [personalRes, deptRes, workRes] = await Promise.all([

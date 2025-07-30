@@ -62,7 +62,7 @@ export default function SchedulePage() {
     const workLabels = [2, 3, 5, 6];
 
     const fetchEvents = useCallback(async () => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         if (!token) {
             openModal({
                 svg: '❗',
@@ -160,7 +160,7 @@ export default function SchedulePage() {
 
     // 일정 등록
     const insertEvent = async () => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         const label = parseInt(form.label_idx, 10);
         const titleToSend = workLabels.includes(label) ? '' : form.title?.trim() || '';
 
@@ -217,7 +217,7 @@ export default function SchedulePage() {
 
     // 일정 수정
     const updateEvent = async (event, editData) => {
-        const token = sessionStorage.getItem("token");
+        const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         if (!editData.title || editData.title.trim() === '') {
             setEditForm(prev => ({...prev, title: prev.title || ''}));
             openModal({
@@ -265,7 +265,7 @@ export default function SchedulePage() {
 
     // 일정 삭제
      const deleteEvent = async (schedule_idx, user_idx) => {
-         const token = sessionStorage.getItem("token");
+         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
          openModal({
              svg: '❗',
              msg1: '일정 삭제',
