@@ -62,7 +62,7 @@ const ShipmentPage = () => {
 
     // shipment 리스트 가져오기
     const getShipmentList = async(searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/shipment/list',{
+        const {data} = await axios.post('http://localhost:8080/shipment/list',{
             search:searchText,
             status:selectedStatus.name === '전체'?'':selectedStatus.name,
             orderColumn:selectedSort.orderColumn,

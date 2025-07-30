@@ -36,7 +36,7 @@ export default function DeptRegistModal({ entry_idx, onClose, onSuccess }) {
         try {
             // 1. 분개 등록
             const res = await axios.post(
-                `http://192.168.0.122:8080/accountDeptAdd/${entry_idx}/details`,
+                `http://localhost:8080/accountDeptAdd/${entry_idx}/details`,
                 {
                     as_idx: form.as_idx,
                     amount: form.amount,
@@ -58,7 +58,7 @@ export default function DeptRegistModal({ entry_idx, onClose, onSuccess }) {
                 if (form.file) {
                     const fileData = new FormData()
                     fileData.append("file", form.file)
-                    await axios.post(`http://192.168.0.122:8080/accountDeptFile/${entry_idx}/details/${res.data.dept_idx}`, fileData)
+                    await axios.post(`http://localhost:8080/accountDeptFile/${entry_idx}/details/${res.data.dept_idx}`, fileData)
                 }
 
                 alert("분개 등록 완료")

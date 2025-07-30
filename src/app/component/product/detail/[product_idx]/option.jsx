@@ -60,7 +60,7 @@ export default function OptionManager({ productIdx }) {
             }
         }else {
                 try {
-                    const res = await axios.post('http://192.168.0.122:8080/option/insert', {
+                    const res = await axios.post('http://localhost:8080/option/insert', {
                         option_name: newOption.name,
                         option_value: newOption.value
                     }, {
@@ -68,7 +68,7 @@ export default function OptionManager({ productIdx }) {
                     });
 
                     if (res.data.success) {
-                        const useRes = await axios.post('http://192.168.0.122:8080/option/use', {
+                        const useRes = await axios.post('http://localhost:8080/option/use', {
                             product_idx: productIdx,
                             option_idx: res.data.option_idx
                         }, {
@@ -94,7 +94,7 @@ export default function OptionManager({ productIdx }) {
         };
 
     const handleOptionUnlink = async (using_idx) => {
-        await axios.put(`http://192.168.0.122:8080/option/use/del/${using_idx}`, null, {
+        await axios.put(`http://localhost:8080/option/use/del/${using_idx}`, null, {
             headers: { Authorization: token }
         });
         fetchUsedOptions();
@@ -110,12 +110,12 @@ export default function OptionManager({ productIdx }) {
 
         try {
             if (combinedList.length > 0) {
-                await axios.put(`http://192.168.0.122:8080/option/combined/deleteAll/${productIdx}`, null, {
+                await axios.put(`http://localhost:8080/option/combined/deleteAll/${productIdx}`, null, {
                     headers: { Authorization: token }
                 });
             }
 
-            await axios.post(`http://192.168.0.122:8080/option/combined/auto/${productIdx}`);
+            await axios.post(`http://localhost:8080/option/combined/auto/${productIdx}`);
             await fetchCombinedList();
         } catch (err) {
             console.error('조합 자동 생성 실패:', err);

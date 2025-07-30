@@ -30,7 +30,7 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
     }))
 
     useEffect(() => {
-        axios.post('http://192.168.0.122:8080/users/list', {})
+        axios.post('http://localhost:8080/users/list', {})
             .then(res => setUserList(res.data?.list || []))
             .catch(err => console.error('유저 리스트 불러오기 실패:', err))
     }, [])
@@ -40,17 +40,17 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
         const user_idx = (typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0
         setForm(prev => ({ ...prev, issued_by: user_name, user_idx: Number(user_idx) }))
 
-        axios.get('http://192.168.0.122:8080/custom/list')
+        axios.get('http://localhost:8080/custom/list')
             .then(res => res.data?.list && setCustomers(res.data.list))
 
-        axios.get('http://192.168.0.122:8080/voucher/list', { params: { page: 1, size: 1000 } })
+        axios.get('http://localhost:8080/voucher/list', { params: { page: 1, size: 1000 } })
             .then(async res => {
                 if (!res.data?.list) return
                 const allEntries = res.data.list
 
                 const filteredEntries = await Promise.all(
                     allEntries.map(async entry => {
-                        const usedRes = await axios.get(`http://192.168.0.122:8080/used/${entry.entry_idx}`)
+                        const usedRes = await axios.get(`http://localhost:8080/used/${entry.entry_idx}`)
                         const isUsed = usedRes.data?.used
 
                         // isEdit 상태일 때, 수정 중인 전표는 필터링하지 않음
@@ -66,7 +66,7 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
 
         useEffect(() => {
         if (isEdit && invoice_idx) {
-            axios.get(`http://192.168.0.122:8080/invoice/detail/${invoice_idx}`)
+            axios.get(`http://localhost:8080/invoice/detail/${invoice_idx}`)
                 .then(res => {
                     if (res.data.success && res.data.data) {
                         const user_name = (typeof window !== "undefined" ? sessionStorage.getItem("user_name") : "") || ''
@@ -146,10 +146,10 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
                 document_idx: form.document_idx || null
             }
 
-            const docRes = await axios.post('http://192.168.0.122:8080/document/insert', payload)
+            const docRes = await axios.post('http://localhost:8080/document/insert', payload)
             if (docRes.data.success && docRes.data.document_idx) {
                 const document_idx = docRes.data.document_idx
-                const pdfRes = await axios.post('http://192.168.0.122:8080/document/pdf', { document_idx })
+                const pdfRes = await axios.post('http://localhost:8080/document/pdf', { document_idx })
                 if (!pdfRes.data.success) console.warn('PDF 생성 실패:', pdfRes.data.message || '')
             } else {
                 console.warn('문서 생성 실패:', docRes.data.message || '')
@@ -169,11 +169,11 @@ export default function InvoiceFormPage({ isEdit = false, invoice_idx, onSubmitS
         try {
             console.log('제출 form:', form)
             if (isEdit) {
-                await axios.put('http://192.168.0.122:8080/invoice/update', form)
+                await axios.put('http://localhost:8080/invoice/update', form)
                 await createDocument(form.invoice_idx)
                 alert('수정 완료')
             } else {
-                const res = await axios.post('http://192.168.0.122:8080/invoice/insert', form)
+                const res = await axios.post('http://localhost:8080/invoice/insert', form)
                 const new_idx = res.data?.invoice_idx
                 if (new_idx) await createDocument(new_idx)
                 alert('등록 완료')

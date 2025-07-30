@@ -96,7 +96,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
 
     // 창고 리스트
     const getWarehouse = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
+        const {data} = await axios.post('http://localhost:8080/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
         setWarehouse(data.list);
         // console.log('창고 불러오기');
     }
@@ -116,7 +116,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
 
     // 거래처 리스트
     const getCustom = async (searchText='') => {
-        const {data} = await axios.post(`http://192.168.0.122:8080/custom/list2`,{custom_type:'택배사',search:searchText});
+        const {data} = await axios.post(`http://localhost:8080/custom/list2`,{custom_type:'택배사',search:searchText});
         // 택배사 메서드 하나 만들던가 ;;
         setCustom(data.list);
         console.log(data);
@@ -137,7 +137,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/users/list',{user_name:searchText});
+        const {data} = await axios.post('http://localhost:8080/users/list',{user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -157,14 +157,14 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
 
     // 반품 상품 정보
     const getReturnProductList = async() => {
-        const {data} = await axios.post('http://192.168.0.122:8080/returnProduct/list',{claim_idx : claim.claim_idx||''});
+        const {data} = await axios.post('http://localhost:8080/returnProduct/list',{claim_idx : claim.claim_idx||''});
         setReturnProductList(data.list);
         console.log(data.list);
     }
 
     // 처리 리스트
     const getHandleClaimList = async() => {
-        const {data} = await axios.post('http://192.168.0.122:8080/claimHandle/list',{claim_idx : claim.claim_idx||''});
+        const {data} = await axios.post('http://localhost:8080/claimHandle/list',{claim_idx : claim.claim_idx||''});
         setHandleClaimList(data.list);
         console.log(data.list);
     }
@@ -188,7 +188,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                     closeModal();
                     setTimeout(async ()=>{
                         try {
-                            const {data} = await axios.post('http://192.168.0.122:8080/claimHandle/insert',{
+                            const {data} = await axios.post('http://localhost:8080/claimHandle/insert',{
                                 claim_idx : claim.claim_idx,
                                 user_idx : selectedUser,
                                 handle_detail : handleInsertForm.handle_detail,
@@ -247,7 +247,7 @@ const HandleClaimModal = ({open,onClose,claim,getClaimList}) => {
                     setTimeout(async ()=>{
                         try {
                             console.log(handleInsertForm);
-                            const {data} = await axios.post('http://192.168.0.122:8080/claimHandle/update',{
+                            const {data} = await axios.post('http://localhost:8080/claimHandle/update',{
                                 claim_handle_idx : handleInsertForm.idx,
                                 user_idx : selectedUser,
                                 handle_detail : handleInsertForm.handle_detail,

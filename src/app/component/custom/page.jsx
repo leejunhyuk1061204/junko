@@ -69,7 +69,7 @@ export default function CustomPage() {
 
         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
-            const res = await axios.put("http://192.168.0.122:8080/custom/del", null, {
+            const res = await axios.put("http://localhost:8080/custom/del", null, {
                 headers: { Authorization: token },
                 params: { custom_idx }
             });

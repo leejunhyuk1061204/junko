@@ -114,7 +114,7 @@ const SalesPage = () => {
             msg2: '상태를 변경하시겠습니까?',
             showCancel: true,
             onConfirm: async() => {
-                const {data} = await axios.post('http://192.168.0.122:8080/sales/update',{sales_idx:idx,status:status},{
+                const {data} = await axios.post('http://localhost:8080/sales/update',{sales_idx:idx,status:status},{
                     headers: {
                         Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                     }
@@ -156,7 +156,7 @@ const SalesPage = () => {
 
     // 주문 리스트
     const getSalesList = async () => {
-        const {data} = await axios.post('http://192.168.0.122:8080/sales/list',
+        const {data} = await axios.post('http://localhost:8080/sales/list',
             {
                 page:page,
                 search:search,

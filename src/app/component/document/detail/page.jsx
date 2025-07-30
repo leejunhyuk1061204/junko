@@ -17,8 +17,8 @@ const DocumentDetailModal = ({html, onClose, onApprove, onReject, doc, user_idx}
         const fetchDetailAndApprover = async () => {
             try {
                 const [detailRes, approverRes] = await Promise.all([
-                    axios.get(`http://192.168.0.122:8080/document/detail/${doc.document_idx}`),
-                    axios.get(`http://192.168.0.122:8080/document/currentApprover/${doc.document_idx}`)
+                    axios.get(`http://localhost:8080/document/detail/${doc.document_idx}`),
+                    axios.get(`http://localhost:8080/document/currentApprover/${doc.document_idx}`)
                 ]);
 
                 setDetail(detailRes.data.detail);

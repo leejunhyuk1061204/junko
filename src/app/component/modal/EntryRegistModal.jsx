@@ -153,7 +153,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
                 uploadData.append("file", file);
 
                 const uploadRes = await axios.post(
-                    `http://192.168.0.122:8080/file/upload/account/${voucher_idx}`,
+                    `http://localhost:8080/file/upload/account/${voucher_idx}`,
                     uploadData,
                     {
                         headers: {

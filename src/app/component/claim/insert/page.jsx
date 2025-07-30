@@ -33,7 +33,7 @@ const ClaimInsertPage = () => {
     }
 
     const insertClaim = async() => {
-        const {data} = await axios.post('http://192.168.0.122:8080/claim/insert', {claim:claimForm, products:returnProductForm});
+        const {data} = await axios.post('http://localhost:8080/claim/insert', {claim:claimForm, products:returnProductForm});
         console.log(data);
         if(data.success){
             location.href='/component/claim';

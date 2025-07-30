@@ -17,7 +17,7 @@ export default function EntryStatusUpdatePage() {
 
     useEffect(() => {
         if (!settlement_id) return
-        axios.get(`http://192.168.0.122:8080/settlement/detail/${settlement_id}`)
+        axios.get(`http://localhost:8080/settlement/detail/${settlement_id}`)
             .then(res => {
                 if (res.data.success) {
                     setForm(res.data.data)
@@ -29,7 +29,7 @@ export default function EntryStatusUpdatePage() {
                 alert('오류 발생')
             })
 
-        axios.post('http://192.168.0.122:8080/users/list', {}).then(res => {
+        axios.post('http://localhost:8080/users/list', {}).then(res => {
             if (res.data?.list) setApproverList(res.data.list)
         })
 
@@ -42,7 +42,7 @@ export default function EntryStatusUpdatePage() {
     useEffect(() => {
         if (form && form.entry_idx) {
             const entryIdx = parseInt(form.entry_idx)
-            axios.get(`http://192.168.0.122:8080/entry/settlement/previewAmount?entry_idx=${entryIdx}`)
+            axios.get(`http://localhost:8080/entry/settlement/previewAmount?entry_idx=${entryIdx}`)
                 .then(res => {
                     const total = res.data?.voucher_amount || 0
                     const settled = res.data?.settled_amount || 0
@@ -100,7 +100,7 @@ export default function EntryStatusUpdatePage() {
     const previewDocument = async () => {
         if (!form) return
         try {
-            const res = await axios.post('http://192.168.0.122:8080/settlement/preview', {
+            const res = await axios.post('http://localhost:8080/settlement/preview', {
                 template_idx: 12,
                 variables: {
                     settlement_id: form.settlement_id,
@@ -133,10 +133,10 @@ export default function EntryStatusUpdatePage() {
         }
 
         try {
-            const res = await axios.put('http://192.168.0.122:8080/settlement/update', payload)
+            const res = await axios.put('http://localhost:8080/settlement/update', payload)
             if (res.data.success) {
                 if (form.document_idx) {
-                    const previewRes = await axios.post('http://192.168.0.122:8080/settlement/preview', {
+                    const previewRes = await axios.post('http://localhost:8080/settlement/preview', {
                         template_idx: 12,
                         variables: {
                             settlement_id: form.settlement_id,
@@ -151,7 +151,7 @@ export default function EntryStatusUpdatePage() {
                     })
 
                     if (previewRes.data.success) {
-                        await axios.put('http://192.168.0.122:8080/document/update', {
+                        await axios.put('http://localhost:8080/document/update', {
                             document_idx: form.document_idx,
                             template_idx: 12,
                             variables: previewRes.data.variables,
@@ -162,7 +162,7 @@ export default function EntryStatusUpdatePage() {
                             approver_ids: approvers.map(u => u.user_idx),
                         })
 
-                        await axios.post('http://192.168.0.122:8080/document/pdf', {
+                        await axios.post('http://localhost:8080/document/pdf', {
                             document_idx: form.document_idx,
                         })
                     }

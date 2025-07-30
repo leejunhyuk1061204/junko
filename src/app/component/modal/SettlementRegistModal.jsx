@@ -34,7 +34,7 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
                 setCustomList(customRes.data.list || []);
 
                 // 전표 리스트
-                const res = await axios.get("http://192.168.0.122:8080/entryListForSettlement");
+                const res = await axios.get("http://localhost:8080/entryListForSettlement");
                 setEntryList(res.data.data || []);
             } catch (err) {
                 console.error("초기 데이터 조회 실패:", err);
@@ -53,7 +53,7 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
 
         try {
             const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
-            const res = await axios.post('http://192.168.0.122:8080/psRegister', form, {
+            const res = await axios.post('http://localhost:8080/psRegister', form, {
                 headers: { Authorization: token }
             });
             const { settlement_idx } = res.data.data;
@@ -64,7 +64,7 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
                 formData.append('type', 'settlement');
 
                 await axios.post(
-                    `http://192.168.0.122:8080/settlementFileUpload/${settlement_idx}/attachments`,
+                    `http://localhost:8080/settlementFileUpload/${settlement_idx}/attachments`,
                     formData,
                     {
                         headers: {

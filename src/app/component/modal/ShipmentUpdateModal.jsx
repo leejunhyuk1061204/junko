@@ -52,7 +52,7 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/users/list',{user_name:searchText});
+        const {data} = await axios.post('http://localhost:8080/users/list',{user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -72,7 +72,7 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
 
     // 창고 리스트
     const getWarehouse = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
+        const {data} = await axios.post('http://localhost:8080/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
         setWarehouse(data.list);
         // console.log('창고 불러오기');
     }
@@ -144,7 +144,7 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
 
     // 출고 상품 리스트 가져오기
     const getShipmentProductList = async() => {
-        const {data} = await axios.get(`http://192.168.0.122:8080/shipmentProduct/list/${shipment.shipment_idx}`);
+        const {data} = await axios.get(`http://localhost:8080/shipmentProduct/list/${shipment.shipment_idx}`);
         console.log('shipmentProductList',data);
         setShipmentProductList(data.list);
     }
@@ -156,7 +156,7 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
 
     // 선택된 상품의 재고 정보 가져오기
     const getShipmentProductStockList = async() => {
-        const {data} = await axios.post('http://192.168.0.122:8080/shipmentProductStockList',{
+        const {data} = await axios.post('http://localhost:8080/shipmentProductStockList',{
             product_idx:selectedProduct?.product?.product_idx,
             product_option_idx: typeof selectedProduct?.product?.product_option_idx ==='undefined'? '' : selectedProduct?.product?.product_option_idx,
             warehouse_idx : selectedWarehouse
@@ -199,7 +199,7 @@ const ShipmentUpdateModal = ({open,onClose,shipment,getShipmentList}) => {
                 closeModal();
                 setTimeout(async ()=>{
                     try {
-                        const {data} = await axios.post('http://192.168.0.122:8080/shipment/update', {
+                        const {data} = await axios.post('http://localhost:8080/shipment/update', {
                             shipment_idx: shipment.shipment_idx,
                             status: '출고완료',
                             user_idx: selectedUser,

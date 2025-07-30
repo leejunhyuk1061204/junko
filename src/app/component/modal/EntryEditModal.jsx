@@ -57,7 +57,7 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
             }
 
             if (form.customer_name.trim()) {
-                const { data: salesRes } = await axios.get("http://192.168.0.122:8080/sales/findByName", {
+                const { data: salesRes } = await axios.get("http://localhost:8080/sales/findByName", {
                     params: { name: form.customer_name.trim() }
                 });
                 sales_idx = salesRes?.sales_idx || null;
@@ -65,7 +65,7 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
 
             // 수정 요청
             const res = await axios.put(
-                `http://192.168.0.122:8080/accountUpdate/${entry.entry_idx}`,
+                `http://localhost:8080/accountUpdate/${entry.entry_idx}`,
                 {
                     entry_type: form.entry_type,
                     amount: form.amount,

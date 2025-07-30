@@ -18,7 +18,7 @@ const WorkInOutModal = ({open,onClose}) => {
     },[open])
 
     const getTimeCardList = async() => {
-        const {data} = await axios.post('http://192.168.0.122:8080/timecard/list',{
+        const {data} = await axios.post('http://localhost:8080/timecard/list',{
             user_idx:Number((typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0)),
             work_date: format(today,"yyyy-MM-dd"),
         });
@@ -38,7 +38,7 @@ const WorkInOutModal = ({open,onClose}) => {
         }
 
 
-        const {data} = await axios.post('http://192.168.0.122:8080/timecard/insert',{
+        const {data} = await axios.post('http://localhost:8080/timecard/insert',{
             user_idx:(typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0),
             status:bool?"출근":"퇴근"
         },{

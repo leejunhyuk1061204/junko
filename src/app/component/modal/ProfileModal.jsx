@@ -12,7 +12,7 @@ const ProfileModal = ({onClose}) => {
 
     useEffect(() => {
         if (!token) return;
-        axios.get(`http://192.168.0.122:8080/user/detail/${user_idx}`, {
+        axios.get(`http://localhost:8080/user/detail/${user_idx}`, {
             headers: { Authorization: token }
         }).then(res => {
             const detail = res.data.userDetail;

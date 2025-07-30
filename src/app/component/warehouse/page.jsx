@@ -37,7 +37,7 @@ const WareHousePage = () => {
 
     // 창고 리스트
     const getWarehouse = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{page:1,warehouse_name:searchText});
+        const {data} = await axios.post('http://localhost:8080/warehouse/list',{page:1,warehouse_name:searchText});
         setWarehouse(data.list);
         // console.log('창고 불러오기');
     }
@@ -57,7 +57,7 @@ const WareHousePage = () => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/users/list',{page:1,user_name:searchText});
+        const {data} = await axios.post('http://localhost:8080/users/list',{page:1,user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -76,13 +76,13 @@ const WareHousePage = () => {
     }, [userName]);
 
     const getWarehouseList = async () => {
-        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{});
+        const {data} = await axios.post('http://localhost:8080/warehouse/list',{});
         console.log(data);
         setWarehouseList(data.list);
     }
 
     const getZoneList = async () => {
-        const {data} = await axios.post('http://192.168.0.122:8080/zone/list',{});
+        const {data} = await axios.post('http://localhost:8080/zone/list',{});
         console.log(data);
         setZoneList(data.list);
     }
@@ -117,7 +117,7 @@ const WareHousePage = () => {
                         closeModal();
                         setTimeout(async () => {
                             try {
-                                const {data} = await axios.post('http://192.168.0.122:8080/zone/update', {
+                                const {data} = await axios.post('http://localhost:8080/zone/update', {
                                     zone_idx: selected.zone.zone_idx,
                                     zone_name: zoneForm.zone_name,
                                 },{
@@ -171,7 +171,7 @@ const WareHousePage = () => {
                         closeModal();
                         setTimeout(async () => {
                             try {
-                                const {data} = await axios.post('http://192.168.0.122:8080/warehouse/update', {
+                                const {data} = await axios.post('http://localhost:8080/warehouse/update', {
                                     warehouse_idx: selected.warehouse.warehouse_idx,
                                     warehouse_name: warehouseForm.warehouse_name || '',
                                     warehouse_address: warehouseForm.warehouse_address || '',
@@ -238,7 +238,7 @@ const WareHousePage = () => {
                     closeModal();
                     setTimeout(async () => {
                         try {
-                            const {data} = await axios.post('http://192.168.0.122:8080/warehouse/insert', {
+                            const {data} = await axios.post('http://localhost:8080/warehouse/insert', {
                                 warehouse_name: warehouseForm.warehouse_name || '',
                                 warehouse_address: warehouseForm.warehouse_address || '',
                                 user_idx: warehouseForm.user_idx || 0
@@ -294,7 +294,7 @@ const WareHousePage = () => {
                     closeModal();
                     setTimeout(async () => {
                         try {
-                            const {data} = await axios.post('http://192.168.0.122:8080/zone/insert', {
+                            const {data} = await axios.post('http://localhost:8080/zone/insert', {
                                 warehouse_idx:zoneForm.warehouse_idx||0,
                                 zone_name: zoneForm.zone_name || '',
                             },{
@@ -362,7 +362,7 @@ const WareHousePage = () => {
                     closeModal();
                     setTimeout(async () => {
                         try {
-                            const {data} = await axios.get(`http://192.168.0.122:8080/warehouse/del/${selected.warehouse.warehouse_idx}`);
+                            const {data} = await axios.get(`http://localhost:8080/warehouse/del/${selected.warehouse.warehouse_idx}`);
                             console.log(data);
                             if (!data.success) {
                                 openModal({
@@ -405,7 +405,7 @@ const WareHousePage = () => {
                     closeModal();
                     setTimeout(async () => {
                         try {
-                            const {data} = await axios.get(`http://192.168.0.122:8080/zone/del/${selected.zone.zone_idx}`);
+                            const {data} = await axios.get(`http://localhost:8080/zone/del/${selected.zone.zone_idx}`);
                             console.log(data);
                             if (!data.success) {
                                 openModal({
@@ -677,7 +677,7 @@ const Warehouse = ({warehouse,zoneList,getWarehouseList,getZoneList,onSelect}) =
         accept: 'zone',
         drop:async(item)=>{
             try {
-                const {data} = await axios.post('http://192.168.0.122:8080/zone/update',{
+                const {data} = await axios.post('http://localhost:8080/zone/update',{
                     zone_idx:item.idx,
                     warehouse_idx:warehouse.warehouse_idx
                 },{

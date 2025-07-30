@@ -34,7 +34,7 @@ export default function EntryStatusListPage() {
 
     const fetchData = async () => {
         const params = { page, size, ...filters }
-        const res = await axios.get('http://192.168.0.122:8080/settlement/list', { params })
+        const res = await axios.get('http://localhost:8080/settlement/list', { params })
         if (res.data.success) {
             setList(res.data.list)
             setTotal(res.data.total)
@@ -66,7 +66,7 @@ export default function EntryStatusListPage() {
         if (checkedList.length === 0) return alert('삭제할 항목을 선택하세요')
         if (!confirm('선택 항목을 삭제할까요?')) return
 
-        await Promise.all(checkedList.map(id => axios.put(`http://192.168.0.122:8080/settlement/del/${id}`)))
+        await Promise.all(checkedList.map(id => axios.put(`http://localhost:8080/settlement/del/${id}`)))
         alert('삭제 완료')
 
         fetchData().then(() => {

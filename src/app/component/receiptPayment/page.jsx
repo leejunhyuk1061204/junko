@@ -35,10 +35,10 @@ export default function ReceiptPaymentListPage() {
     ];
 
     const fetchData = async () => {
-        await axios.get('http://192.168.0.122:8080/receipt/list').then(res => {
+        await axios.get('http://localhost:8080/receipt/list').then(res => {
             if (res.data.success) setReceiptList(res.data.list);
         });
-        await axios.get('http://192.168.0.122:8080/payment/list').then(res => {
+        await axios.get('http://localhost:8080/payment/list').then(res => {
             if (res.data.success) setPaymentList(res.data.list);
         });
     };
@@ -79,7 +79,7 @@ export default function ReceiptPaymentListPage() {
         if (!confirm('정말 삭제하시겠습니까?')) return;
 
         for (const id of selectedItems) {
-            await axios.put(`http://192.168.0.122:8080/receipt/del/${id}`);
+            await axios.put(`http://localhost:8080/receipt/del/${id}`);
         }
         alert('삭제 완료');
         setSelectedReceipts([]);

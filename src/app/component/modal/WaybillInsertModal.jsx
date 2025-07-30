@@ -58,7 +58,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
 
     // 창고 리스트
     const getWarehouse = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
+        const {data} = await axios.post('http://localhost:8080/warehouse/list',{page:1,warehouse_name:searchText, custom_type:'택배사'});
         setWarehouse(data.list);
         // console.log('창고 불러오기');
     }
@@ -108,7 +108,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
                 try {
                     let result = [];
                     for (const b of body) {
-                        const {data} = await axios.post('http://192.168.0.122:8080/waybill/insert', b,{
+                        const {data} = await axios.post('http://localhost:8080/waybill/insert', b,{
                             headers: {
                                 Authorization : (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                             }

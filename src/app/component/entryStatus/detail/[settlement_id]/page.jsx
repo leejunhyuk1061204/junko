@@ -17,7 +17,7 @@ export default function EntryStatusDetailPage() {
     useEffect(() => {
         if (!settlement_id) return
 
-        axios.get(`http://192.168.0.122:8080/settlement/detail/${settlement_id}`)
+        axios.get(`http://localhost:8080/settlement/detail/${settlement_id}`)
             .then(res => {
                 if (res.data.success) {
                     const merged = {
@@ -37,7 +37,7 @@ export default function EntryStatusDetailPage() {
                 alert('서버 오류 발생')
             })
 
-        axios.post('http://192.168.0.122:8080/users/list', {}).then(res => {
+        axios.post('http://localhost:8080/users/list', {}).then(res => {
             if (res.data?.list) setApproverList(res.data.list)
         })
 
@@ -50,7 +50,7 @@ export default function EntryStatusDetailPage() {
 
     const previewDocument = async () => {
         try {
-            const res = await axios.post('http://192.168.0.122:8080/settlement/preview', {
+            const res = await axios.post('http://localhost:8080/settlement/preview', {
                 template_idx: 12,
                 variables: {
                     settlement_id: data.settlement_id,
@@ -78,7 +78,7 @@ export default function EntryStatusDetailPage() {
         if (!confirm('문서를 생성하시겠습니까?')) return
 
         try {
-            const variableRes = await axios.post('http://192.168.0.122:8080/settlement/preview', {
+            const variableRes = await axios.post('http://localhost:8080/settlement/preview', {
                 template_idx: 12,
                 variables: {
                     settlement_id: data.settlement_id,
@@ -98,7 +98,7 @@ export default function EntryStatusDetailPage() {
                 return
             }
 
-            const res = await axios.post('http://192.168.0.122:8080/document/insert', {
+            const res = await axios.post('http://localhost:8080/document/insert', {
                 idx: data.settlement_id,
                 type: 'settlement',
                 user_idx: data.user_idx,
@@ -111,12 +111,12 @@ export default function EntryStatusDetailPage() {
 
 
             if (res.data.success && res.data.document_idx) {
-                await axios.post('http://192.168.0.122:8080/document/pdf', {
+                await axios.post('http://localhost:8080/document/pdf', {
                     document_idx: res.data.document_idx,
                 })
 
                 setTimeout(async () => {
-                    const detailRes = await axios.get(`http://192.168.0.122:8080/settlement/detail/${data.settlement_id}`)
+                    const detailRes = await axios.get(`http://localhost:8080/settlement/detail/${data.settlement_id}`)
                     if (detailRes.data.success) {
                         const merged = {
                             ...detailRes.data.data,
@@ -200,7 +200,7 @@ export default function EntryStatusDetailPage() {
                             <div style={{ marginTop: '30px' }}>
                                 {docExists && data.file ? (
                                     <a
-                                        href={`http://192.168.0.122:8080/download/pdf/${data.document_idx}`}
+                                        href={`http://localhost:8080/download/pdf/${data.document_idx}`}
                                         className="template-btn-submit margin-top-10"
                                         target="_blank"
                                     >

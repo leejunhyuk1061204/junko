@@ -56,7 +56,7 @@ const ShipmentPage = () => {
 
     //  리스트 가져오기
     const getTimecardList = async() => {
-        const {data} = await axios.post('http://192.168.0.122:8080/timecard/list',{
+        const {data} = await axios.post('http://localhost:8080/timecard/list',{
             page:page,
             total:total,
             search:search,

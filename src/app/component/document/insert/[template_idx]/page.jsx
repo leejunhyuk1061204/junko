@@ -91,7 +91,7 @@ export default function DocumentInsertPage() {
 
         const fetchTemplate = async () => {
             try {
-                const {data} = await axios.get('http://192.168.0.122:8080/template/detail',
+                const {data} = await axios.get('http://localhost:8080/template/detail',
                     {params: {template_idx}});
                 const html = data.detail.template_html;
 
@@ -119,7 +119,7 @@ export default function DocumentInsertPage() {
         if (!searchName.trim()) return;
 
         try {
-            const {data} = await axios.get('http://192.168.0.122:8080/user/search',
+            const {data} = await axios.get('http://localhost:8080/user/search',
                 {params: {user_name: searchName.trim()}});
 
             if (data.length > 0) {
@@ -161,7 +161,7 @@ export default function DocumentInsertPage() {
             }
 
             try {
-                const {data} = await axios.get('http://192.168.0.122:8080/user/search',
+                const {data} = await axios.get('http://localhost:8080/user/search',
                     {params: {user_name: searchName.trim()}});
 
                 if (data.length === 0) {
@@ -322,7 +322,7 @@ export default function DocumentInsertPage() {
         };
 
         try {
-            const {data} = await axios.post('http://192.168.0.122:8080/document/insert', formData);
+            const {data} = await axios.post('http://localhost:8080/document/insert', formData);
 
             if (data.success) {
                 openModal({

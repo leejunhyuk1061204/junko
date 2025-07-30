@@ -18,14 +18,14 @@ export default function InvoiceDetailPage() {
     }, [])
 
     useEffect(() => {
-        axios.post('http://192.168.0.122:8080/users/list', {})
+        axios.post('http://localhost:8080/users/list', {})
             .then(res => setUserList(res.data?.list || []))
             .catch(err => console.error('유저 리스트 불러오기 실패:', err))
     }, [])
 
     useEffect(() => {
         const fetchData = async () => {
-            const res = await axios.get(`http://192.168.0.122:8080/invoice/detail/${params.invoice_idx}`)
+            const res = await axios.get(`http://localhost:8080/invoice/detail/${params.invoice_idx}`)
             console.log('응답 데이터:', res.data)
             if (res.data.success) setData(res.data.data)
         }
@@ -36,7 +36,7 @@ export default function InvoiceDetailPage() {
         if (!data?.invoice_idx) return
         const fetchPreview = async () => {
             try {
-                const res = await axios.post('http://192.168.0.122:8080/invoice/preview', data)
+                const res = await axios.post('http://localhost:8080/invoice/preview', data)
                 if (res.data?.preview) setPreviewHtml(res.data.preview)
             } catch (err) {
                 console.error('문서 미리보기 오류:', err)
@@ -47,7 +47,7 @@ export default function InvoiceDetailPage() {
 
     const downloadPdf = async () => {
         try {
-            const res = await axios.get(`http://192.168.0.122:8080/download/pdf/${data.document_idx}`, {
+            const res = await axios.get(`http://localhost:8080/download/pdf/${data.document_idx}`, {
                 responseType: 'blob',
             })
 

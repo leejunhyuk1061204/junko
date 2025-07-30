@@ -40,7 +40,7 @@ export default function DeptEditModal({ entry_idx, dept, onClose, onSuccess }) {
 
         try {
             const res = await axios.put(
-                `http://192.168.0.122:8080/accountDeptUpdate/${entry_idx}/details/${dept.dept_idx}`,
+                `http://localhost:8080/accountDeptUpdate/${entry_idx}/details/${dept.dept_idx}`,
                 {
                     as_idx: form.as_idx,
                     amount: form.amount,

@@ -47,7 +47,7 @@ export default function VoucherListPage() {
             order,
             ...filters,
         }
-        const res = await axios.get('http://192.168.0.122:8080/voucher/list', {params})
+        const res = await axios.get('http://localhost:8080/voucher/list', {params})
         if (res.data.success) {
             setList(res.data.list)
             setTotal(res.data.total)
@@ -119,7 +119,7 @@ export default function VoucherListPage() {
         try {
             // 비동기 삭제 요청 병렬 처리
             const deletePromises = checkedList.map((id) =>
-                axios.put(`http://192.168.0.122:8080/voucher/del/${id}`)
+                axios.put(`http://localhost:8080/voucher/del/${id}`)
             )
 
             const results = await Promise.all(deletePromises)
@@ -135,7 +135,7 @@ export default function VoucherListPage() {
 
     const handleStatusChange = async (entry_idx, newStatus) => {
         try {
-            const res = await axios.put(`http://192.168.0.122:8080/voucher/status/update/${entry_idx}`, {
+            const res = await axios.put(`http://localhost:8080/voucher/status/update/${entry_idx}`, {
                 status: newStatus,
             });
 
