@@ -30,7 +30,7 @@ export default function CustomPage() {
 
     const fetchList = async () => {
         const token = sessionStorage.getItem("token");
-        const res = await axios.get("http://localhost:8080/custom/list", {
+        const res = await axios.get("http://192.168.0.122/custom/list", {
             headers: { Authorization: token },
             params: {
                 start: (page - 1) * size,
@@ -69,7 +69,7 @@ export default function CustomPage() {
 
         const token = sessionStorage.getItem("token");
         try {
-            const res = await axios.put("http://localhost:8080/custom/del", null, {
+            const res = await axios.put("http://192.168.0.122/custom/del", null, {
                 headers: { Authorization: token },
                 params: { custom_idx }
             });

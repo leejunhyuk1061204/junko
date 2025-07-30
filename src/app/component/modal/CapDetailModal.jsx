@@ -28,7 +28,7 @@ const CapDetailModal = ({ capIdx, onClose }) => {
 
     const generatePdfPreview = async () => {
         try {
-            const res = await axios.get(`http://localhost:8080/file/latest/pdf`, {
+            const res = await axios.get(`http://192.168.0.122/file/latest/pdf`, {
                 params: {
                     type: 'collection',
                     idx: capIdx
@@ -40,7 +40,7 @@ const CapDetailModal = ({ capIdx, onClose }) => {
                 return;
             }
 
-            const previewUrl = `http://localhost:8080/pdf/preview/${filename}`;
+            const previewUrl = `http://192.168.0.122/pdf/preview/${filename}`;
             setPdfUrl(previewUrl);
         } catch (e) {
             console.error('PDF 미리보기 실패:', e);

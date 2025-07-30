@@ -51,7 +51,7 @@ export default function TemplatePage() {
 
     const fetchCategoryList = async () => {
         try {
-            const res = await axios.get("http://localhost:8080/template/category/list");
+            const res = await axios.get("http://192.168.0.122/template/category/list");
             const fetched = res.data.list || [];
             const formatted = [
                 { id: "", name: "전체 카테고리" },
@@ -68,7 +68,7 @@ export default function TemplatePage() {
     const fetchList = async (page = currentPage) => {
         const token = sessionStorage.getItem("token");
         try {
-            const res = await axios.get("http://localhost:8080/template/list", {
+            const res = await axios.get("http://192.168.0.122/template/list", {
                 headers: { Authorization: token },
                 params: {
                     category,
@@ -120,7 +120,7 @@ export default function TemplatePage() {
             const token = sessionStorage.getItem("token");
             const deleteResults = await Promise.all(
                 checkedItems.map((template_idx) =>
-                    axios.put("http://localhost:8080/template/del", null, {
+                    axios.put("http://192.168.0.122/template/del", null, {
                         params: { template_idx },
                         headers: { Authorization: token },
                     })
@@ -153,7 +153,7 @@ export default function TemplatePage() {
         const token = sessionStorage.getItem("token");
 
         try {
-            const res = await axios.get(`http://localhost:8080/template/preview/${template_idx}`, {
+            const res = await axios.get(`http://192.168.0.122/template/preview/${template_idx}`, {
                 headers: { Authorization: token }
             });
 

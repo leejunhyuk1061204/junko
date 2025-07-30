@@ -24,7 +24,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
     const fetchCustomIdx = async () => {
         if (!form.custom_name) return
         try {
-            const res = await axios.get(`http://localhost:8080/custom/findByName`, {
+            const res = await axios.get(`http://192.168.0.122/custom/findByName`, {
                 params: {name: form.custom_name}
             })
             setCustomIdx(res.data.custom_idx || null)
@@ -36,7 +36,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
     const fetchCustomerIdx = async () => {
         if (!form.customer_name) return
         try {
-            const res = await axios.get(`http://localhost:8080/sales/findByName`, {
+            const res = await axios.get(`http://192.168.0.122/sales/findByName`, {
                 params: {name: form.customer_name}
             })
             setCustomerIdx(res.data.sales_idx || null)
@@ -75,7 +75,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
 
 
         if (form.custom_name) {
-            const res = await axios.get("http://localhost:8080/custom/findByName", {
+            const res = await axios.get("http://192.168.0.122/custom/findByName", {
                 params: {name: form.custom_name.trim()}
             });
             if (res.data.custom_idx !== undefined) {
@@ -87,7 +87,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
         }
 
         if (form.customer_name) {
-            const res = await axios.get("http://localhost:8080/sales/findByName", {
+            const res = await axios.get("http://192.168.0.122/sales/findByName", {
                 params: {name: form.customer_name.trim()}
             });
             if (res.data.sales_idx !== undefined) {
@@ -100,7 +100,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
 
         if (file) data.append("file", file);
 
-        const res = await axios.post("http://localhost:8080/accountRegist", data, {
+        const res = await axios.post("http://192.168.0.122/accountRegist", data, {
             headers: {
                 Authorization: token,
                 user_idx: user_idx
@@ -115,7 +115,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
         if (res.data.success) {
             const voucher_idx = res.data.entry_idx; // 전표 번호
 
-            const documentInsertRes = await axios.post("http://localhost:8080/document/insert", {
+            const documentInsertRes = await axios.post("http://192.168.0.122/document/insert", {
                 template_idx: 10,
                 user_idx: user_idx,
                 variables: {
@@ -134,7 +134,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
             if (documentInsertRes.data.success) {
                 const document_idx = documentInsertRes.data.document_idx;
 
-                const pdfRes = await axios.post("http://localhost:8080/document/pdf", {
+                const pdfRes = await axios.post("http://192.168.0.122/document/pdf", {
                     document_idx: document_idx
                 });
 
@@ -153,7 +153,7 @@ export default function EntryRegistModal({ open, onClose, onSuccess }) {
                 uploadData.append("file", file);
 
                 const uploadRes = await axios.post(
-                    `http://localhost:8080/file/upload/account/${voucher_idx}`,
+                    `http://192.168.0.122/file/upload/account/${voucher_idx}`,
                     uploadData,
                     {
                         headers: {

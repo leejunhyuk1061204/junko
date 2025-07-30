@@ -24,7 +24,7 @@ export default function ReceiptPaymentDetailPage() {
 
         const fetchDetail = async () => {
             try {
-                const res = await axios.get(`http://localhost:8080/receiptPayment/detail/${rp_idx}`);
+                const res = await axios.get(`http://192.168.0.122/receiptPayment/detail/${rp_idx}`);
                 if (res.data.success && res.data.data) {
                     const dto = res.data.data;
                     setData(dto);
@@ -63,7 +63,7 @@ export default function ReceiptPaymentDetailPage() {
     const handleDelete = async () => {
         if (!confirm('정말 삭제하시겠습니까?')) return;
         try {
-            const url = `http://localhost:8080/${data.type === '수금' ? 'receipt' : 'payment'}/del/${rp_idx}`;
+            const url = `http://192.168.0.122/${data.type === '수금' ? 'receipt' : 'payment'}/del/${rp_idx}`;
             const res = await axios.put(url);
             if (res.data.success) {
                 alert('삭제 완료');
@@ -79,7 +79,7 @@ export default function ReceiptPaymentDetailPage() {
 
     const handleDownload = () => {
         if (!documentIdx) return alert('PDF 문서가 없습니다');
-        window.open(`http://localhost:8080/download/pdf/${documentIdx}`, '_blank');
+        window.open(`http://192.168.0.122/download/pdf/${documentIdx}`, '_blank');
     };
 
     if (loading) return <div className="wrap">로딩 중...</div>;

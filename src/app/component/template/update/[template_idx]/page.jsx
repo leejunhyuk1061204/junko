@@ -13,7 +13,7 @@ export default function TemplateUpdatePage() {
 
     useEffect(() => {
         const token = sessionStorage.getItem('token')
-        axios.get(`http://localhost:8080/template/detail`, {
+        axios.get(`http://192.168.0.122/template/detail`, {
             headers: { Authorization: token },
             params: {template_idx: template_idx}
         }).then(res => {
@@ -27,7 +27,7 @@ export default function TemplateUpdatePage() {
     const handleUpdateSubmit = async (updatedData) => {
         const token = sessionStorage.getItem('token')
         try {
-            await axios.put(`http://localhost:8080/template/update`, {
+            await axios.put(`http://192.168.0.122/template/update`, {
                 ...updatedData,
                 template_idx: template_idx, // 이거 추가
             }, {

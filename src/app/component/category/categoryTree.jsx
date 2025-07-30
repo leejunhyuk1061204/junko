@@ -121,7 +121,7 @@ export default function CategoryTree({ data, onReorder, onEdit, onDelete }) {
 
         const token = sessionStorage.getItem('token');
         try {
-            const res = await axios.post('http://localhost:8080/cate/reorder', finalList, {
+            const res = await axios.post('http://192.168.0.122/cate/reorder', finalList, {
                 headers: { Authorization: token },
             });
             if (res.data.success) alert('순서 및 계층 저장 완료');

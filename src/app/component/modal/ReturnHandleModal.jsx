@@ -77,7 +77,7 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
 
     // zone 리스트 가져오기
     const getZoneList = async (searchText='') => {
-        const zone = await axios.post('http://localhost:8080/zone/list',{search:searchText});
+        const zone = await axios.post('http://192.168.0.122/zone/list',{search:searchText});
         console.log('zone',zone.data);
         setZoneList(zone.data.list);
     }
@@ -97,7 +97,7 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://localhost:8080/users/list',{page:1,user_name:searchText});
+        const {data} = await axios.post('http://192.168.0.122/users/list',{page:1,user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -117,7 +117,7 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
 
     // 반품상품 목록
     const getReturnProductList = async() => {
-        const {data} = await axios.get(`http://localhost:8080/returnReceiveProduct/list/${return_receive.claim_idx}`);
+        const {data} = await axios.get(`http://192.168.0.122/returnReceiveProduct/list/${return_receive.claim_idx}`);
         console.log(data);
         setReturnProductList(data.list);
     }
@@ -158,7 +158,7 @@ const ReturnHandleModal = ({open,onClose,return_receive,getReturnList}) => {
                 closeModal();
                 setTimeout(async()=>{
                     try {
-                        const {data} = await axios.post('http://localhost:8080/returnReceive/update',{
+                        const {data} = await axios.post('http://192.168.0.122/returnReceive/update',{
                             return_receive_idx:return_receive.return_receive_idx,
                             status:"반품완료",
                             user_idx:selectedUser,

@@ -53,7 +53,7 @@ export default function OrgChartPage() {
             }
 
             try {
-                const res = await axios.get('http://localhost:8080/orgchart/tree', {
+                const res = await axios.get('http://192.168.0.122/orgchart/tree', {
                     headers: { authorization: token },
                 });
                 const { deptTree, userList } = res.data;

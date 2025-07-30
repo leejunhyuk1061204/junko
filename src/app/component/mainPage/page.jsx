@@ -63,9 +63,9 @@ const MainPage = () => {
                 if (!token) return;
 
                 const [personalRes, deptRes, workRes] = await Promise.all([
-                    axios.post('http://localhost:8080/schedule/list', {type: 'personal'}, {headers: {Authorization: token}}),
-                    axios.post('http://localhost:8080/schedule/list', {type: 'dept'}, {headers: {Authorization: token}}),
-                    axios.post('http://localhost:8080/schedule/list', {type: 'work'}, {headers: {Authorization: token}}),
+                    axios.post('http://192.168.0.122/schedule/list', {type: 'personal'}, {headers: {Authorization: token}}),
+                    axios.post('http://192.168.0.122/schedule/list', {type: 'dept'}, {headers: {Authorization: token}}),
+                    axios.post('http://192.168.0.122/schedule/list', {type: 'work'}, {headers: {Authorization: token}}),
                 ]);
 
                 const allEvents = [

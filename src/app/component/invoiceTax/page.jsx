@@ -41,7 +41,7 @@ export default function InvoiceListPage() {
             order: 'DESC'
         }
 
-        const res = await fetch(`http://localhost:8080/invoice/list?${new URLSearchParams(params)}`)
+        const res = await fetch(`http://192.168.0.122/invoice/list?${new URLSearchParams(params)}`)
         const data = await res.json()
 
         if (data.success) {
@@ -77,7 +77,7 @@ export default function InvoiceListPage() {
 
     const handleStatusChange = async (invoice_idx, newStatus) => {
         try {
-            const res = await axios.put(`http://localhost:8080/invoice/status/${invoice_idx}`, {
+            const res = await axios.put(`http://192.168.0.122/invoice/status/${invoice_idx}`, {
                 status: newStatus
             })
 

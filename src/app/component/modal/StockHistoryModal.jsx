@@ -30,7 +30,7 @@ const StockHistoryModal = ({open,onClose,stock}) => {
     },[page,stock,selectedType])
 
     const getStockHistory = async () => {
-        const {data} = await axios.post('http://localhost:8080/stock/list',{
+        const {data} = await axios.post('http://192.168.0.122/stock/list',{
             page:page,
             product_idx:stock?.product_idx || 0,
             product_option_idx:typeof stock.product_option_idx === 'undefined' ? '':stock.product_option_idx,

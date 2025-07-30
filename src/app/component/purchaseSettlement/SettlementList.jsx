@@ -43,7 +43,7 @@ export default function SettlementList() {
 
     const fetchList = async (pageNum = 1) => {
         try {
-            const res = await axios.get('http://localhost:8080/settlementList', {
+            const res = await axios.get('http://192.168.0.122/settlementList', {
                 params: {
                     status: filter.status,
                     customName: filter.customName,
@@ -72,7 +72,7 @@ export default function SettlementList() {
         if (!window.confirm("정말 삭제하시겠습니까?")) return;
 
         try {
-            const res = await axios.delete(`http://localhost:8080/settlementDel/${selectedData.settlement_idx}`, {
+            const res = await axios.delete(`http://192.168.0.122/settlementDel/${selectedData.settlement_idx}`, {
                 headers: { Authorization: token },
             });
             if (res.data.result === 'success') {

@@ -53,7 +53,7 @@ const SalesInsertPage = () => {
 
     // 상품 리스트
     const getProductList = async (searchText='') => {
-        const {data} = await axios.post('http://localhost:8080/productNoption/list',{search:searchText});
+        const {data} = await axios.post('http://192.168.0.122/productNoption/list',{search:searchText});
         setProductOptionList(data.list);
         const filteredList = data.list.filter((item,index,self)=>index === self.findIndex(v=>v.product_idx===item.product_idx));
         setProductList(filteredList);
@@ -206,7 +206,7 @@ const SalesInsertPage = () => {
 
                 if(salesValid && productValid) {
                     try {
-                        const {data} = await axios.post('http://localhost:8080/sales/insert', {
+                        const {data} = await axios.post('http://192.168.0.122/sales/insert', {
                             sales: salesForm,
                             products: salesProductForm
                         },{
@@ -229,7 +229,7 @@ const SalesInsertPage = () => {
                         const formData = new FormData();
                         formData.append('file', csvFile);
 
-                        const { data } = await axios.post('http://localhost:8080/sales/csv', formData, {
+                        const { data } = await axios.post('http://192.168.0.122/sales/csv', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
                                 Authorization : sessionStorage.getItem("token")

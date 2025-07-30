@@ -15,7 +15,7 @@ const EmployeeDetailModal = ({user_idx, onClose}) => {
     }, [user_idx]);
 
     const getUserDetail = async () => {
-        axios.get(`http://localhost:8080/user/detail/${user_idx}`, {
+        axios.get(`http://192.168.0.122/user/detail/${user_idx}`, {
             headers: { Authorization: token }
         }).then(res => {
             console.log("!!!!!!!!!!!!",res);

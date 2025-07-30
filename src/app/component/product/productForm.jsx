@@ -25,7 +25,7 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
     const router = useRouter();
 
     useEffect(() => {
-        axios.get('http://localhost:8080/cate/list').then(res => {
+        axios.get('http://192.168.0.122/cate/list').then(res => {
             const list = res.data?.list || []
             setCategories([{ category_idx: 0, category_name: '카테고리 선택' }, ...list])
         })
@@ -49,7 +49,7 @@ export default function ProductForm({ onSubmit, initialData = {} }) {
             if (initialData.imageUrls) {
                 const existingImages = initialData.imageUrls.map(fileName => ({
                     file: null,
-                    url: `http://localhost:8080/images/${fileName}`,
+                    url: `http://192.168.0.122/images/${fileName}`,
                     isExisting: true,
                 }))
                 setImages(existingImages)

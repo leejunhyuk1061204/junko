@@ -119,7 +119,7 @@ const Header = () => {
 
     // 안읽은 msg 리스트 가져오기
     const getMsgReceiveList = async () => {
-        const {data} = await axios.post('http://localhost:8080/msg/list',{
+        const {data} = await axios.post('http://192.168.0.122/msg/list',{
             type:'receive',
             user_idx:sessionStorage.getItem('user_idx') || 0,
             page:page,
@@ -127,7 +127,7 @@ const Header = () => {
         });
         // console.log(data);
         setMsgList(data.list);
-        await axios.post('http://localhost:8080/msg/list',{
+        await axios.post('http://192.168.0.122/msg/list',{
             type:'receive',
             user_idx:sessionStorage.getItem('user_idx') || 0,
             read_yn:false,

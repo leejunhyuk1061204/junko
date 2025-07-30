@@ -1,4 +1,4 @@
-'use Client'
+'use client'
 import React, {useState, useEffect} from 'react';
 import { Page, Document, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';

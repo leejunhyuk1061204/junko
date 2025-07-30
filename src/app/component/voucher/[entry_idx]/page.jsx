@@ -16,7 +16,7 @@ export default function VoucherDetailPage() {
 // 전표 데이터 불러오기
     useEffect(() => {
         if (!entry_idx) return
-        axios.get(`http://localhost:8080/voucher/detail/${entry_idx}`)
+        axios.get(`http://192.168.0.122/voucher/detail/${entry_idx}`)
             .then(res => {
                 if (res.data.success) {
                     setVoucher(res.data.data)
@@ -37,7 +37,7 @@ export default function VoucherDetailPage() {
 
         const fetchUsers = async () => {
             try {
-                const res = await axios.post('http://localhost:8080/users/list', {})
+                const res = await axios.post('http://192.168.0.122/users/list', {})
                 if (res.data.success) {
                     const allUsers = res.data.list
 
@@ -73,8 +73,8 @@ export default function VoucherDetailPage() {
             }
 
             const url = previewMode === 'voucher'
-                ? 'http://localhost:8080/voucher/preview'
-                : 'http://localhost:8080/entry-detail/preview'
+                ? 'http://192.168.0.122/voucher/preview'
+                : 'http://192.168.0.122/entry-detail/preview'
 
             const template_idx = previewMode === 'voucher' ? 10 : 14
 
@@ -99,8 +99,8 @@ export default function VoucherDetailPage() {
         try {
             const isVoucher = previewMode === 'voucher'
             const url = isVoucher
-                ? 'http://localhost:8080/voucher/preview'
-                : 'http://localhost:8080/entry-detail/preview'
+                ? 'http://192.168.0.122/voucher/preview'
+                : 'http://192.168.0.122/entry-detail/preview'
             const template_idx = isVoucher ? 10 : 14
 
             const variableRes = await axios.post(url, {
@@ -123,7 +123,7 @@ export default function VoucherDetailPage() {
 
             const variables = variableRes.data.variables
 
-            const res = await axios.post('http://localhost:8080/document/insert', {
+            const res = await axios.post('http://192.168.0.122/document/insert', {
                 idx: voucher.entry_idx,
                 type: isVoucher ? 'voucher' : 'entry_detail',
                 user_idx: voucher.user_idx,
@@ -133,12 +133,12 @@ export default function VoucherDetailPage() {
             })
 
             if (res.data.success && res.data.document_idx) {
-                const pdfRes = await axios.post('http://localhost:8080/document/pdf', {
+                const pdfRes = await axios.post('http://192.168.0.122/document/pdf', {
                     document_idx: res.data.document_idx,
                 })
 
                 if (pdfRes.data.success) {
-                    const detailRes = await axios.get(`http://localhost:8080/voucher/detail/${voucher.entry_idx}`)
+                    const detailRes = await axios.get(`http://192.168.0.122/voucher/detail/${voucher.entry_idx}`)
                     if (detailRes.data.success) setVoucher(detailRes.data.data)
                     alert('문서 생성 완료!')
                 } else {
@@ -159,11 +159,11 @@ export default function VoucherDetailPage() {
 
         if (previewMode === 'voucher') {
             return voucher.document_idx
-                ? `http://localhost:8080/download/pdf/${voucher.document_idx}`
+                ? `http://192.168.0.122/download/pdf/${voucher.document_idx}`
                 : '#'
         } else {
             return voucher.entry_detail_document_idx
-                ? `http://localhost:8080/download/pdf/${voucher.entry_detail_document_idx}`
+                ? `http://192.168.0.122/download/pdf/${voucher.entry_detail_document_idx}`
                 : '#'
         }
     }

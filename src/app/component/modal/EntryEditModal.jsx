@@ -50,14 +50,14 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
             let sales_idx = null;
 
             if (form.custom_name.trim()) {
-                const { data: customRes } = await axios.get("http://localhost:8080/custom/findByName", {
+                const { data: customRes } = await axios.get("http://192.168.0.122/custom/findByName", {
                     params: { name: form.custom_name.trim() }
                 });
                 custom_idx = customRes?.custom_idx || null;
             }
 
             if (form.customer_name.trim()) {
-                const { data: salesRes } = await axios.get("http://localhost:8080/sales/findByName", {
+                const { data: salesRes } = await axios.get("http://192.168.0.122/sales/findByName", {
                     params: { name: form.customer_name.trim() }
                 });
                 sales_idx = salesRes?.sales_idx || null;
@@ -65,7 +65,7 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
 
             // 수정 요청
             const res = await axios.put(
-                `http://localhost:8080/accountUpdate/${entry.entry_idx}`,
+                `http://192.168.0.122/accountUpdate/${entry.entry_idx}`,
                 {
                     entry_type: form.entry_type,
                     amount: form.amount,

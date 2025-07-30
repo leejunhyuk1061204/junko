@@ -17,7 +17,7 @@ const CapFileListModal = ({ capIdx, onClose }) => {
 
     const fetchFiles = async () => {
         try {
-            const res = await axios.get(`http://localhost:8080/file/list/collection/${capIdx}`);
+            const res = await axios.get(`http://192.168.0.122/file/list/collection/${capIdx}`);
             setFiles(res.data.list);
         } catch (e) {
             console.error('파일 조회 실패:', e);
@@ -25,7 +25,7 @@ const CapFileListModal = ({ capIdx, onClose }) => {
     };
 
     const handleDownload = async (file_idx, filename) => {
-        const res = await axios.get(`http://localhost:8080/download/file/${file_idx}`, {
+        const res = await axios.get(`http://192.168.0.122/download/file/${file_idx}`, {
             params: { file_idx: file_idx, type: 'collection' },
             responseType: 'blob'
         });
@@ -40,7 +40,7 @@ const CapFileListModal = ({ capIdx, onClose }) => {
     const handleDelete = async (file_idx) => {
         if (!window.confirm('정말 삭제하시겠습니까?')) return;
         try {
-            await axios.put(`http://localhost:8080/file/del/collection/${file_idx}`);
+            await axios.put(`http://192.168.0.122/file/del/collection/${file_idx}`);
             alert('삭제 완료');
             fetchFiles();
         } catch (e) {

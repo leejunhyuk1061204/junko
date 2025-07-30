@@ -27,7 +27,7 @@ const StockAdjustModal = ({open,onClose,stock,getStockSumList}) => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://localhost:8080/users/list',{page:1,user_name:searchText});
+        const {data} = await axios.post('http://192.168.0.122/users/list',{page:1,user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -64,7 +64,7 @@ const StockAdjustModal = ({open,onClose,stock,getStockSumList}) => {
                 closeModal();
                 setTimeout(async () => {
                     try {
-                        const {data} = await axios.post('http://localhost:8080/stock/insert',{
+                        const {data} = await axios.post('http://192.168.0.122/stock/insert',{
                             product_idx:stock.product_idx,
                             product_option_idx:typeof stock.product_option_idx === 'undefined' ? '':stock.product_option_idx,
                             warehouse_idx:stock.warehouse_idx,

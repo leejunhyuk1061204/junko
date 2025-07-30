@@ -39,12 +39,12 @@ export default function ReceiptPaymentFormPage() {
     };
 
     useEffect(() => {
-        axios.get('http://localhost:8080/custom/list')
+        axios.get('http://192.168.0.122/custom/list')
             .then(res => {
                 if (res.data.list) setCustomerOptions(res.data.list);
             });
 
-        axios.post('http://localhost:8080/users/list',{})
+        axios.post('http://192.168.0.122/users/list',{})
             .then(res => {
                 if (res.data.list) setUserOptions(res.data.list);
             });
@@ -58,9 +58,9 @@ export default function ReceiptPaymentFormPage() {
     useEffect(() => {
         const fetchVouchers = async () => {
             try {
-                let url = 'http://localhost:8080/voucher/list/receivable';
+                let url = 'http://192.168.0.122/voucher/list/receivable';
                 if (form.custom_idx) {
-                    const resCustom = await axios.get(`http://localhost:8080/custom/select?custom_idx=${form.custom_idx}`);
+                    const resCustom = await axios.get(`http://192.168.0.122/custom/select?custom_idx=${form.custom_idx}`);
                     if (resCustom.data.success) {
                         const name = resCustom.data.data.custom_name;
                         url += `?custom_name=${encodeURIComponent(name)}`;
@@ -74,7 +74,7 @@ export default function ReceiptPaymentFormPage() {
                     const exists = vouchers.some(v => String(v.entry_idx) === String(form.entry_idx));
                     if (!exists) {
                         // 전표 상세 API 호출해서 전표 정보 가져오기
-                        const resSingleVoucher = await axios.get(`http://localhost:8080/voucher/detail/${form.entry_idx}`);
+                        const resSingleVoucher = await axios.get(`http://192.168.0.122/voucher/detail/${form.entry_idx}`);
                         if (resSingleVoucher.data.success) {
                             vouchers = [resSingleVoucher.data.data, ...vouchers];
                         }
@@ -94,7 +94,7 @@ export default function ReceiptPaymentFormPage() {
 
     useEffect(() => {
         if (mode === 'update' && rp_idx) {
-            axios.get(`http://localhost:8080/receiptPayment/detail/${rp_idx}`)
+            axios.get(`http://192.168.0.122/receiptPayment/detail/${rp_idx}`)
                 .then(res => {
                     if (res.data.success) {
                         const { data, document } = res.data;
@@ -154,7 +154,7 @@ export default function ReceiptPaymentFormPage() {
 
     const handlePreview = async () => {
         try {
-            const res = await axios.post('http://localhost:8080/document/preview', {
+            const res = await axios.post('http://192.168.0.122/document/preview', {
                 template_idx: type === '수금' ? 15 : 15,
                 variables: formToVariables(form),
             });
@@ -181,14 +181,14 @@ export default function ReceiptPaymentFormPage() {
             };
 
             const res = mode === 'insert'
-                ? await axios.post(`http://localhost:8080/${type === '수금' ? 'receipt' : 'payment'}/insert`, submitData)
-                : await axios.put('http://localhost:8080/receipt/update', submitData);
+                ? await axios.post(`http://192.168.0.122/${type === '수금' ? 'receipt' : 'payment'}/insert`, submitData)
+                : await axios.put('http://192.168.0.122/receipt/update', submitData);
 
             if (res.data.success) {
                 const { variables, data } = res.data;
                 const idx = data?.rp_idx || form.rp_idx;
 
-                const docRes = await axios.post('http://localhost:8080/document/insert', {
+                const docRes = await axios.post('http://192.168.0.122/document/insert', {
                     template_idx: type === '수금' ? 15 : 15,
                     type: 'receipt_payment',
                     idx,
@@ -198,7 +198,7 @@ export default function ReceiptPaymentFormPage() {
                 });
 
                 if (docRes.data.success && docRes.data.document_idx) {
-                    await axios.post('http://localhost:8080/document/pdf', {
+                    await axios.post('http://192.168.0.122/document/pdf', {
                         document_idx: docRes.data.document_idx,
                     });
                 }

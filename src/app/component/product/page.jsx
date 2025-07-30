@@ -88,7 +88,7 @@ export default function OrderList() {
 
     const fetchCategoryOptions = async () => {
         try {
-            const res = await axios.get('http://localhost:8080/cate/list');
+            const res = await axios.get('http://192.168.0.122/cate/list');
             if (res.data?.list) {
                 const options = res.data.list.map(c => ({
                     id: c.category_idx,
@@ -104,7 +104,7 @@ export default function OrderList() {
 
     const fetchOrders = async (page, sortId, categoryId, search = '') => {
         const token = sessionStorage.getItem('token')
-        const url = 'http://localhost:8080/product/list'
+        const url = 'http://192.168.0.122/product/list'
 
         const payload = {
             category_idx: categoryId || 0,
@@ -154,7 +154,7 @@ export default function OrderList() {
             // 병렬 삭제 요청
             const deleteResults = await Promise.all(
                 checkedItems.map(product_idx =>
-                    axios.put(`http://localhost:8080/product/${product_idx}/del`, null, {
+                    axios.put(`http://192.168.0.122/product/${product_idx}/del`, null, {
                         headers: { Authorization: token }
                     }).then(res => {
                         console.log(`상품 ${product_idx} 응답:`, res.data);

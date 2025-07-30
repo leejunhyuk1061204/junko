@@ -13,7 +13,7 @@ export default function CustomDetailPage({ params }) {
     const [showModal, setShowModal] = useState(false)
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/custom/select`, {
+        axios.get(`http://192.168.0.122/custom/select`, {
             params: { custom_idx }
         }).then(res => {
             if (res.data.success) {
@@ -78,7 +78,7 @@ export default function CustomDetailPage({ params }) {
                         onClose={() => setShowModal(false)}
                         onSuccess={() => {
                             setShowModal(false)
-                            axios.get(`http://localhost:8080/custom/select`, {
+                            axios.get(`http://192.168.0.122/custom/select`, {
                                 params: { custom_idx }
                             }).then(res => {
                                 if (res.data.success) {

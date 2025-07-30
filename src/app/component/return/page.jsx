@@ -58,7 +58,7 @@ const ReturnPage = () => {
 
     // 반품입고 리스트 가져오기
     const getReturnList = async () =>{
-        const {data} = await axios.post('http://localhost:8080/returnReceive/list',{
+        const {data} = await axios.post('http://192.168.0.122/returnReceive/list',{
             page:page,
             orderColumn : selectedSort.orderColumn,
             orderDirection: selectedSort.orderDirection,

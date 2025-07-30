@@ -34,7 +34,7 @@ export default function TemplateForm({ onSubmit, initialData = {} }) {
 
     const fetchCategories = async () => {
         try {
-            const res = await axios.get('http://localhost:8080/template/category/list')
+            const res = await axios.get('http://192.168.0.122/template/category/list')
             setCategories(res.data.list || [])
         } catch (err) {
             console.error('카테고리 로딩 실패:', err)

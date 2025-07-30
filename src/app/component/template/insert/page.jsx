@@ -32,7 +32,7 @@ export default function TemplateInsertPage() {
     const handleInsertSubmit = async (data) => {
         const token = sessionStorage.getItem("token");
         try {
-            const res = await axios.post('http://localhost:8080/template/insert', data, {
+            const res = await axios.post('http://192.168.0.122/template/insert', data, {
                 headers: { Authorization: token }
             });
             alert("템플릿 등록 완료");

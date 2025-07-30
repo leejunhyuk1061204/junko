@@ -11,7 +11,7 @@ export default function UpdateProduct() {
     const [initialData, setInitialData] = useState(null)
 
     useEffect(() => {
-        axios.get(`http://localhost:8080/product/detail/${product_idx}`).then(res => {
+        axios.get(`http://192.168.0.122/product/detail/${product_idx}`).then(res => {
             setInitialData(res.data.data)
         })
     }, [product_idx])
@@ -20,7 +20,7 @@ export default function UpdateProduct() {
         try {
             // 이미지 업로드 먼저
             const imgRes = await axios.put(
-                `http://localhost:8080/product/${product_idx}/imgUpdate`,
+                `http://192.168.0.122/product/${product_idx}/imgUpdate`,
                 formData,
                 {
                     headers: {
@@ -42,7 +42,7 @@ export default function UpdateProduct() {
             productFormData.append("min_cnt", formData.get("min_cnt") || "0");
 
             const productRes = await axios.put(
-                `http://localhost:8080/product/update`,
+                `http://192.168.0.122/product/update`,
                 productFormData,
                 {
                     headers: {

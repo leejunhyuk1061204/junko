@@ -35,8 +35,8 @@ export default function CustomModal({ editItem, onClose, onSuccess }) {
         const token = sessionStorage.getItem("token");
 
         const url = editItem
-            ? "http://localhost:8080/custom/update"
-            : "http://localhost:8080/custom/insert";
+            ? "http://192.168.0.122/custom/update"
+            : "http://192.168.0.122/custom/insert";
 
         const method = editItem ? "put" : "post";
 
