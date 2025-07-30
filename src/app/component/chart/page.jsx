@@ -65,6 +65,7 @@ export default function SalesChart() {
     const returnRateRef = useRef(null);
     const marginRateRef = useRef(null);
     const netProfitRef = useRef(null);
+    const productChartRef = useRef(null);
 
     const filteredSubCategories = selectedParent
         ? subCategories.filter(sub => sub.category_parent === selectedParent.category_idx)
@@ -199,54 +200,51 @@ export default function SalesChart() {
         }, 0);
     }, [activeTab, chartData.getSalesByCategory]);
 
-    // 하위 카테고리별 매출 (도넛)
+    // 상품별 매출 (막대)
     useEffect(() => {
-        setIsEmpty(chartData.getSalesByCategory?.length === 0);
+        setIsEmpty(chartData.getSalesByProduct?.length === 0);
 
         setTimeout(() => {
-            if (!selectedParent || !chartData.getSalesByCategory?.length) return;
+            const productData = chartData.getSalesByProduct || [];
 
-            const subData = chartData.getSalesByCategory.filter(item => item.category_parent === selectedParent.category_idx);
-            if (!subData?.length) return;
-            const ctx = document.getElementById("subCate");
+            if (!productData?.length) return;
+            const ctx = document.getElementById("productSalesChart");
             if (!ctx) return;
 
-            subCateRef.current?.destroy();
+            productChartRef.current?.destroy();
 
-            subCateRef.current = new Chart(ctx, {
-                type: 'doughnut',
+            productChartRef.current = new Chart(ctx, {
+                type: 'bar',
                 data: {
-                    labels: subData.map(d => d.category_name),
+                    labels: productData.map(d => d.product_name),
                     datasets: [{
-                        data: subData.map(d => d.sales),
-                        backgroundColor: donutColors.slice(0, subData.length),
+                        label: '상품 매출',
+                        data: productData.map(d => d.sales),
+                        backgroundColor: prodColors.slice(0, productData.length),
+                        barThickness: 28
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {callback: value => value.toLocaleString()},
+                            grid: {display: false}
+                        }
+                    },
                     plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: {
-                                boxWidth: 14,
-                                padding: 12
-                            }
-                        },
                         tooltip: {
                             callbacks: {
-                                label: function (ctx) {
-                                    const value = ctx.raw.toLocaleString();
-                                    const label = ctx.label || '';
-                                    return `${label}: ${value}원`;
-                                }
+                                label: (ctx) => `${ctx.label}: ${ctx.raw.toLocaleString()}원`
                             }
                         }
                     }
                 }
             });
         }, 0);
-    }, [activeTab, selectedParent, chartData.getSalesByCategory]);
+    }, [selectedParent, chartData.getSalesByProduct]);
 
     // 재고 회전율 (가로 막대)
     useEffect(() => {
@@ -732,7 +730,7 @@ export default function SalesChart() {
                                 {isEmpty ? (
                                     <div className="empty-message">해당 데이터가 없습니다.</div>
                                 ) : (
-                                    <canvas id="subCate"></canvas>
+                                    <canvas id="productSalesChart"></canvas>
                                 )}
                             </div>
                         </div>

@@ -58,6 +58,7 @@ export const useChartStore = create((set) => ({
         getShippedToday: [],
         getReceiveThisMonth: [],
         getSalesByCategory: [],
+        getSalesByProduct: [],
     },
     loading: false,
 
