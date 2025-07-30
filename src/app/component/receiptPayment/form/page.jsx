@@ -1,11 +1,11 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import {useState, useEffect, Suspense} from 'react';
 import axios from 'axios';
 import Header from '@/app/header';
 
-export default function ReceiptPaymentFormPage() {
+function UserReportContent() {
     const searchParams = useSearchParams();
     const type = searchParams.get('type') || '수금';
     const mode = searchParams.get('mode') || 'insert';
@@ -340,5 +340,14 @@ export default function ReceiptPaymentFormPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+// 메인 컴포넌트 - Suspense로 래핑
+export default function ReceiptPaymentFormPage() {
+    return (
+        <Suspense fallback={<div>로딩 중...</div>}>
+            <UserReportContent />
+        </Suspense>
     );
 }
