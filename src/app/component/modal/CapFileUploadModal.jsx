@@ -17,7 +17,7 @@ const CapFileUploadModal = ({ capIdx, onClose, onSuccess }) => {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            await axios.post(`http://192.168.0.122:8080/file/upload/collection/${capIdx}`, formData);
+            await axios.post(`http://localhost:8080/file/upload/collection/${capIdx}`, formData);
             alert('파일 업로드 완료!');
             onSuccess();
             onClose();

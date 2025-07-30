@@ -64,7 +64,7 @@ const mainMenus = [
             { label: '정산 현황', href: '/component/entryStatus' },
             // { label: '거래처 / 공급사별 정산', href: '/' },
             { label: '세금 계산서 / 증빙 관리', href: '/component/invoiceTax' },
-            { label: '입금 / 지급 관리', href: '/component/receiptPayment' },
+            { label: '수금 / 지급 관리', href: '/component/receiptPayment' },
             { label: '회계 전표 관리', href: '/component/voucher' },
         ],
         href: '/',
@@ -119,7 +119,7 @@ const Header = () => {
 
     // 안읽은 msg 리스트 가져오기
     const getMsgReceiveList = async () => {
-        const {data} = await axios.post('http://192.168.0.122:8080/msg/list',{
+        const {data} = await axios.post('http://localhost:8080/msg/list',{
             type:'receive',
             user_idx:(typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0,
             page:page,
@@ -127,7 +127,7 @@ const Header = () => {
         });
         // console.log(data);
         setMsgList(data.list);
-        await axios.post('http://192.168.0.122:8080/msg/list',{
+        await axios.post('http://localhost:8080/msg/list',{
             type:'receive',
             user_idx:(typeof window !== "undefined" ? sessionStorage.getItem("user_idx") : 0) || 0,
             read_yn:false,

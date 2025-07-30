@@ -30,7 +30,7 @@ export default function SettlementRegistModal({ onClose, onSuccess }) {
         const fetchInitialData = async () => {
             try {
                 // 거래처 리스트
-                const customRes = await axios.get("http://192.168.0.122:8080/custom/list");
+                const customRes = await axios.get("http://localhost:8080/custom/list");
                 setCustomList(customRes.data.list || []);
 
                 // 전표 리스트

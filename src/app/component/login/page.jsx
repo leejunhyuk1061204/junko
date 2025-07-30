@@ -34,7 +34,7 @@ const LoginPage = () => {
     // 로그인
     const toggleLogin = async () =>{
         try {
-            const {data} = await axios.post('http://192.168.0.122:8080/login',{user_id:login.id,pw:login.pw});
+            const {data} = await axios.post('http://localhost:8080/login',{user_id:login.id,pw:login.pw});
             if(data.success) {
                 sessionStorage.setItem('loginId', login.id);
                 sessionStorage.setItem('token', data.token);

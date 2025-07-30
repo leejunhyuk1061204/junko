@@ -15,7 +15,7 @@ const TaxInvoiceList = () => {
 
     const fetchInvoices = async () => {
         try {
-            const res = await axios.get('http://192.168.0.122:8080/taxInvoiceSearch', {
+            const res = await axios.get('http://localhost:8080/taxInvoiceSearch', {
                 params: {
                     page,
                     search,
@@ -39,7 +39,7 @@ const TaxInvoiceList = () => {
     const handleDelete = async (invoice_idx) => {
         if (!window.confirm('정말 삭제하시겠습니까?')) return;
         try {
-            const res = await axios.delete(`http://192.168.0.122:8080/taxInvoiceDel/${invoice_idx}`, {
+            const res = await axios.delete(`http://localhost:8080/taxInvoiceDel/${invoice_idx}`, {
                 headers: { Authorization: localStorage.getItem('token') },
             });
             if (res.data.success) {

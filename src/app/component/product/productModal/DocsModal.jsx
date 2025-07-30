@@ -12,7 +12,7 @@ export default function DocsModal({ productIdx, onClose }) {
 
     const fetchDocs = async () => {
         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
-        const res = await axios.get(`http://192.168.0.122:8080/product/${productIdx}/docs`, {
+        const res = await axios.get(`http://localhost:8080/product/${productIdx}/docs`, {
             headers: { Authorization: token }
         });
         setDocs(res.data.docs || []);
@@ -25,7 +25,7 @@ export default function DocsModal({ productIdx, onClose }) {
         const formData = new FormData();
         uploadFiles.forEach(file => formData.append('docs', file));
 
-        await axios.post(`http://192.168.0.122:8080/product/${productIdx}/docs`, formData, {
+        await axios.post(`http://localhost:8080/product/${productIdx}/docs`, formData, {
             headers: { Authorization: token }
         });
         setUploadFiles([]);
@@ -34,7 +34,7 @@ export default function DocsModal({ productIdx, onClose }) {
 
     const handleDelete = async (docId) => {
         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
-        await axios.put(`http://192.168.0.122:8080/product/docs/${docId}/del`, null, {
+        await axios.put(`http://localhost:8080/product/docs/${docId}/del`, null, {
             headers: { Authorization: token }
         });
         await fetchDocs();
@@ -46,7 +46,7 @@ export default function DocsModal({ productIdx, onClose }) {
 
     const handleDownload = async (filename, oriFilename) => {
         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
-        const res = await axios.get(`http://192.168.0.122:8080/product/docs/${filename}`, {
+        const res = await axios.get(`http://localhost:8080/product/docs/${filename}`, {
             headers: { Authorization: token },
             responseType: 'blob'
         });
@@ -99,7 +99,7 @@ export default function DocsModal({ productIdx, onClose }) {
                                         <div className="product-dropdown-content">
                                             <button
                                                 onClick={() => {
-                                                    window.open(`http://192.168.0.122:8080/product/docs/${doc.new_filename}`, '_blank');
+                                                    window.open(`http://localhost:8080/product/docs/${doc.new_filename}`, '_blank');
                                                     toggleDropdown(doc.file_idx);
                                                 }}
                                             >

@@ -24,7 +24,7 @@ const ProductModal = ({open,onClose,receive_idx,sales_idx,claim_idx}) => {
     // 입고상품 리스트
     const getReceiveProductList = async() => {
         if(receive_idx === 0 || typeof receive_idx === 'undefined') return;
-        const {data} = await axios.post('http://192.168.0.122:8080/receiveProduct/list',{receive_idx:receive_idx})
+        const {data} = await axios.post('http://localhost:8080/receiveProduct/list',{receive_idx:receive_idx})
         console.log(data);
         setProductList(data.list);
     }

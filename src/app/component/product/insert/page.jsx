@@ -13,7 +13,7 @@ export default function InsertProduct() {
     const handleSubmit = async (formData) => {
         try {
             // 1. 상품 정보 먼저 등록
-            const res = await axios.post('http://192.168.0.122:8080/product/insert', formData, {
+            const res = await axios.post('http://localhost:8080/product/insert', formData, {
                 headers: {
                     Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                     'Content-Type': 'multipart/form-data',
@@ -28,7 +28,7 @@ export default function InsertProduct() {
                 const files = formData.getAll('images')
                 files.forEach(file => imgFormData.append('images', file))
 
-                await axios.put(`http://192.168.0.122:8080/product/${product_idx}/imgUpdate`, imgFormData, {
+                await axios.put(`http://localhost:8080/product/${product_idx}/imgUpdate`, imgFormData, {
                     headers: {
                         Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : ""),
                         'Content-Type': 'multipart/form-data',

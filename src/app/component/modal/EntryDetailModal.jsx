@@ -24,7 +24,7 @@ const EntryDetailModal = ({ open, onClose, entry }) => {
 
     useEffect(() => {
         if (!open || !entry) return
-        axios.get(`http://192.168.0.122:8080/entryFileList/${entry.entry_idx}/upload`)
+        axios.get(`http://localhost:8080/entryFileList/${entry.entry_idx}/upload`)
             .then(res => setFiles(res.data.files || []))
         axios.get(`http://192.168.0.122:8080/accountDeptList/${entry.entry_idx}/detail`)
             .then(res => setDeptList(res.data.data || []))

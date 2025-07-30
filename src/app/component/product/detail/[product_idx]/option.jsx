@@ -16,18 +16,18 @@ export default function OptionManager({ productIdx }) {
     }, [usedOptions]);
 
     const fetchAllOptions = async () => {
-        const res = await axios.get('http://192.168.0.122:8080/option/list');
+        const res = await axios.get('http://localhost:8080/option/list');
         setOptions(res.data.list || []);
     };
 
     const fetchUsedOptions = async () => {
-        const res = await axios.get(`http://192.168.0.122:8080/option/using/${productIdx}`);
+        const res = await axios.get(`http://localhost:8080/option/using/${productIdx}`);
         const filtered = (res.data.list || []).filter(opt => opt.using_idx !== null);
         setUsedOptions(filtered);
     };
 
     const fetchCombinedList = async () => {
-        const res = await axios.get(`http://192.168.0.122:8080/option/combined/list/${productIdx}`);
+        const res = await axios.get(`http://localhost:8080/option/combined/list/${productIdx}`);
         setCombinedList(res.data.list || []);
     };
 
@@ -43,7 +43,7 @@ export default function OptionManager({ productIdx }) {
 
             try{
                 // 기존 옵션 재사용
-                const res = await axios.post('http://192.168.0.122:8080/option/use', {
+                const res = await axios.post('http://localhost:8080/option/use', {
                     product_idx: productIdx,
                     option_idx: selectedId
                 },{

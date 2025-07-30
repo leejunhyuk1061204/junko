@@ -38,7 +38,7 @@ export default function Page() {
 
     const fetchEntries = async (pageNum) => {
         try {
-            const res = await axios.get(`http://192.168.0.122:8080/accountList/${pageNum}`)
+            const res = await axios.get(`http://localhost:8080/accountList/${pageNum}`)
             setEntries(res.data.list || [])
             setTotalCount(res.data.total || 0)
         } catch (error) {
@@ -49,7 +49,7 @@ export default function Page() {
     const handleSearch = async (customFilter = filter) => {
         try {
             setIsSearching(true)
-            const res = await axios.post('http://192.168.0.122:8080/accountListSearch', {
+            const res = await axios.post('http://localhost:8080/accountListSearch', {
                 ...customFilter,
                 page: 1,
                 limit: limit
@@ -64,7 +64,7 @@ export default function Page() {
 
     useEffect(() => {
         if (isSearching) {
-            axios.post('http://192.168.0.122:8080/accountListSearch', {
+            axios.post('http://localhost:8080/accountListSearch', {
                 ...filter,
                 page: page,
                 limit: limit
@@ -92,7 +92,7 @@ export default function Page() {
         try {
             for (const idx of selectedList) {
                 await axios.put(
-                    `http://192.168.0.122:8080/accountDelete/${idx}`,{},{
+                    `http://localhost:8080/accountDelete/${idx}`,{},{
                         headers: {
                             Authorization: token
                         }
@@ -110,7 +110,7 @@ export default function Page() {
 
     const handleEntryClick = async (entry_idx) => {
         try {
-            const res = await axios.get(`http://192.168.0.122:8080/accountDetail/${entry_idx}`)
+            const res = await axios.get(`http://localhost:8080/accountDetail/${entry_idx}`)
             setSelectedEntry(res.data)
         } catch (e) {
             console.error('전표 상세 조회 실패:', e)

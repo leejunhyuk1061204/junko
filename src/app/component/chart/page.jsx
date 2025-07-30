@@ -635,7 +635,7 @@ export default function SalesChart() {
             const params = new URLSearchParams();
             if (categoryIdx) params.append('categoryIdx', categoryIdx);
 
-            const res = await axios.get(`http://192.168.0.122:8080/chart/excel?${params.toString()}`, {
+            const res = await axios.get(`http://localhost:8080/chart/excel?${params.toString()}`, {
                 responseType: "blob",
                 headers: {Authorization: token}
             });
@@ -660,7 +660,7 @@ export default function SalesChart() {
             const params = new URLSearchParams();
             if (categoryIdx) params.append('categoryIdx', categoryIdx);
 
-            const res = await axios.get(`http://192.168.0.122:8080/chart/pdf?${params.toString()}`, {
+            const res = await axios.get(`http://localhost:8080/chart/pdf?${params.toString()}`, {
                 responseType: "blob",
                 headers: {Authorization: token}
             });

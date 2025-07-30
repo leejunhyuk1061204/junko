@@ -17,7 +17,7 @@ const CapFileListModal = ({ capIdx, onClose }) => {
 
     const fetchFiles = async () => {
         try {
-            const res = await axios.get(`http://192.168.0.122:8080/file/list/collection/${capIdx}`);
+            const res = await axios.get(`http://localhost:8080/file/list/collection/${capIdx}`);
             setFiles(res.data.list);
         } catch (e) {
             console.error('파일 조회 실패:', e);

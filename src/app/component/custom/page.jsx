@@ -30,7 +30,7 @@ export default function CustomPage() {
 
     const fetchList = async () => {
         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
-        const res = await axios.get("http://192.168.0.122:8080/custom/list", {
+        const res = await axios.get("http://localhost:8080/custom/list", {
             headers: { Authorization: token },
             params: {
                 start: (page - 1) * size,

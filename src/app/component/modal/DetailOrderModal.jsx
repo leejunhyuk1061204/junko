@@ -34,7 +34,7 @@ const DetailOrderModal = ({open,onClose,idx}) => {
 
     // pdf 다운로드
     const downloadPDF = async() => {
-        const {data, headers} = await axios.get(`http://192.168.0.122:8080/download/pdf?idx=${idx}&type=발주서`,{
+        const {data, headers} = await axios.get(`http://localhost:8080/download/pdf?idx=${idx}&type=발주서`,{
             responseType: 'blob',
         });
         console.log(data);

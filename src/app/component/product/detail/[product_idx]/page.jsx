@@ -26,7 +26,7 @@ export default function ProductDetail() {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                const res = await axios.get(`http://192.168.0.122:8080/product/detail/${product_idx}`, {
+                const res = await axios.get(`http://localhost:8080/product/detail/${product_idx}`, {
                     headers: { Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : "") },
                 });
                 const data = res.data?.data || {};

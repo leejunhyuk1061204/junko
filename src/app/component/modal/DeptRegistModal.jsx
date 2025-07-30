@@ -14,7 +14,7 @@ export default function DeptRegistModal({ entry_idx, onClose, onSuccess }) {
 
     // 계정과목 리스트 불러오기
     useEffect(() => {
-        axios.get("http://192.168.0.122:8080/accountSubjectList")
+        axios.get("http://localhost:8080/accountSubjectList")
             .then(res => setSubjects(res.data || []))
             .catch(err => console.error("계정과목 불러오기 실패", err))
     }, [])

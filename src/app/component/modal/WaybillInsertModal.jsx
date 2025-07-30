@@ -37,7 +37,7 @@ const WaybillInsertModal = ({open,onClose, idxList, getSalesList}) => {
 
     // 거래처 리스트
     const getCustom = async (searchText='') => {
-        const {data} = await axios.post(`http://192.168.0.122:8080/custom/list2`,{custom_type:'택배사',search:searchText});
+        const {data} = await axios.post(`http://localhost:8080/custom/list2`,{custom_type:'택배사',search:searchText});
         // 택배사 메서드 하나 만들던가 ;;
         setCustom(data.list);
         console.log(data);

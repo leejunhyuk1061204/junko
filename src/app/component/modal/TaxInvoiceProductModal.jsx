@@ -32,8 +32,8 @@ const TaxInvoiceProductModal = ({ open, onClose, invoice_idx, detailData, onSave
         try {
             const token = localStorage.getItem('token');
             const url = detailData
-                ? `http://192.168.0.122:8080/prodDetailUpdate/${invoice_idx}/detail/${detailData.detail_idx}`
-                : `http://192.168.0.122:8080/addProdDetail/${invoice_idx}/detail`;
+                ? `http://localhost:8080/prodDetailUpdate/${invoice_idx}/detail/${detailData.detail_idx}`
+                : `http://localhost:8080/addProdDetail/${invoice_idx}/detail`;
             const method = detailData ? 'put' : 'post';
 
             const res = await axios[method](url, item, {

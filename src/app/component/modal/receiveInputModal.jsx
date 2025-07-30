@@ -32,7 +32,7 @@ const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
 
     // user 리스트
     const getUser = async (searchText='') => {
-        const {data} = await axios.post('http://192.168.0.122:8080/users/list',{page:1,user_name:searchText});
+        const {data} = await axios.post('http://localhost:8080/users/list',{page:1,user_name:searchText});
         setUser(data.list);
         // console.log('user',data);
     }
@@ -74,7 +74,7 @@ const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
             onConfirm: async() => {
                 try {
                     console.log(info);
-                    const {data} = await axios.post('http://192.168.0.122:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser},{
+                    const {data} = await axios.post('http://localhost:8080/receive/update', {receive_idx: idx, status: status, stockInfo:info, user_idx:selectedUser},{
                         headers: {
                             Authorization: (typeof window !== "undefined" ? sessionStorage.getItem("token") : "")
                         }
@@ -160,14 +160,14 @@ const receiveInputModal = ({open,onClose,idx,status,getReceiveList}) => {
 
     // idx로 receive_product 가져오기
     const getReceiveProduct = async () => {
-        const {data} = await axios.post('http://192.168.0.122:8080/receiveProduct/list',{receive_idx:idx});
+        const {data} = await axios.post('http://localhost:8080/receiveProduct/list',{receive_idx:idx});
         console.log(idx);
         console.log('입고상품',data);
         setReceiveProducts(data.list);
         let filteredReceiveProduct = data.list.filter((item,index,self)=>self.findIndex(v=>v.product_idx === item.product_idx) === index);
         setProductList(filteredReceiveProduct);
         if(data.list.length > 0){
-            const zone = await axios.post('http://192.168.0.122:8080/zone/list',{warehouse_idx:data.list[0].warehouse_idx});
+            const zone = await axios.post('http://localhost:8080/zone/list',{warehouse_idx:data.list[0].warehouse_idx});
             console.log(zone.data);
             setZoneList(zone.data.list);
         }

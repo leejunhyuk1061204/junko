@@ -13,7 +13,7 @@ export default function CategoryPage() {
 
     useEffect(() => {
         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
-        axios.get("http://192.168.0.122:8080/cate/tree", {
+        axios.get("http://localhost:8080/cate/tree", {
             headers: { Authorization: token },
         })
             .then((res) => {
@@ -38,7 +38,7 @@ export default function CategoryPage() {
     const handleDelete = async (category_idx) => {
         const token = (typeof window !== "undefined" ? sessionStorage.getItem("token") : "");
         try {
-            const res = await axios.delete('http://192.168.0.122:8080/cate/delete', {
+            const res = await axios.delete('http://localhost:8080/cate/delete', {
                 headers: { Authorization: token },
                 data: { category_idx },
             });

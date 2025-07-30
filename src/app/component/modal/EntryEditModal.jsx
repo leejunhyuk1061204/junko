@@ -50,7 +50,7 @@ export default function EntryEditModal({ open, onClose, entry, onSuccess }) {
             let sales_idx = null;
 
             if (form.custom_name.trim()) {
-                const { data: customRes } = await axios.get("http://192.168.0.122:8080/custom/findByName", {
+                const { data: customRes } = await axios.get("http://localhost:8080/custom/findByName", {
                     params: { name: form.custom_name.trim() }
                 });
                 custom_idx = customRes?.custom_idx || null;
