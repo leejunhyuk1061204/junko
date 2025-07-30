@@ -185,11 +185,11 @@ export default function DeptManagerList() {
                 <table className="template-table margin-bottom-20">
                     <thead>
                     <tr>
-                        <th style={{ width: "15%" }}>부서</th>
-                        <th style={{ width: "25%" }}>직급</th>
-                        <th style={{ width: "35%" }}>이름</th>
-                        <th style={{ width: "10%" }}>ID</th>
-                        <th style={{ width: "15%" }}>입사일</th>
+                        <th style={{ width: "23%" }}>부서</th>
+                        <th style={{ width: "20%" }}>직급</th>
+                        <th style={{ width: "20%" }}>이름</th>
+                        <th style={{ width: "17%" }}>ID</th>
+                        <th style={{ width: "22%" }}>입사일</th>
                         <th style={{ width: "15%" }}>상세보기</th>
                     </tr>
                     </thead>
