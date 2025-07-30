@@ -78,7 +78,7 @@ export const useChartStore = create((set) => ({
                 endDate: endDate ?? null,
             };
 
-            const {data} = await axios.post('http://192.168.0.122:8080/list/chart', payload,
+            const {data} = await axios.post('http://192./list/chart', payload,
                 {headers: {Authorization: token}});
 
             if (data.success && data.loginYN) {
