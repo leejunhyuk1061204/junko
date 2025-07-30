@@ -8,7 +8,6 @@ import {router} from "next/client";
 import {useRouter} from "next/navigation";
 
 export default function TemplateInsertPage() {
-    const user_idx = sessionStorage.getItem("user_idx");
     const router = useRouter();
 
     const [templateData, setTemplateData] = useState({
