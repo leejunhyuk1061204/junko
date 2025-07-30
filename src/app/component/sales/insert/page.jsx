@@ -180,7 +180,12 @@ const SalesInsertPage = () => {
         console.log('productValid', productValid);
         console.log(csvFile);
 
-        if(!hasSalesInput || !hasProductInput || !salesValid || !productValid) {
+        if( (!csvFile && !(hasSalesInput && hasProductInput)) || // 파일과 주문정보(주문,상품) 둘 다 없거나
+            (hasSalesInput && !hasProductInput) || // 주문정보는 있는데 상품정보가 없거나
+            (hasProductInput && !hasSalesInput) || // 상품정보는 있는데 주문정보가 없거나
+            (hasSalesInput && !salesValid) || // 주문 정보는 있는데 유효성 검사를 실패하거나
+            (hasProductInput && !productValid) // 상품 정보는 있는데 유효성 검사를 실패하거나
+        ) {
             openModal({
                 svg: '❗',
                 msg1: '입력 오류',
@@ -227,6 +232,7 @@ const SalesInsertPage = () => {
                         const { data } = await axios.post('http://localhost:8080/sales/csv', formData, {
                             headers: {
                                 'Content-Type': 'multipart/form-data',
+                                Authorization : sessionStorage.getItem("token")
                             }
                         });
 
