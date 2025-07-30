@@ -60,7 +60,6 @@ export default function ReceiptPaymentFormPage() {
             try {
                 let url = 'http://localhost:8080/voucher/list/receivable';
                 if (form.custom_idx) {
-                    // 거래처 이름 조회 후 쿼리 파라미터 추가
                     const resCustom = await axios.get(`http://localhost:8080/custom/select?custom_idx=${form.custom_idx}`);
                     if (resCustom.data.success) {
                         const name = resCustom.data.data.custom_name;
@@ -68,8 +67,21 @@ export default function ReceiptPaymentFormPage() {
                     }
                 }
                 const resVoucher = await axios.get(url);
-                if (resVoucher.data.list) setVoucherOptions(resVoucher.data.list);
-                else setVoucherOptions([]);
+                let vouchers = resVoucher.data.list || [];
+
+                // 수정 모드이고 entry_idx가 있으면, voucherOptions에 포함되어 있는지 확인
+                if (mode === 'update' && form.entry_idx) {
+                    const exists = vouchers.some(v => String(v.entry_idx) === String(form.entry_idx));
+                    if (!exists) {
+                        // 전표 상세 API 호출해서 전표 정보 가져오기
+                        const resSingleVoucher = await axios.get(`http://localhost:8080/voucher/detail/${form.entry_idx}`);
+                        if (resSingleVoucher.data.success) {
+                            vouchers = [resSingleVoucher.data.data, ...vouchers];
+                        }
+                    }
+                }
+
+                setVoucherOptions(vouchers);
             } catch (err) {
                 console.error('전표 목록 불러오기 실패:', err);
                 setVoucherOptions([]);
@@ -77,7 +89,7 @@ export default function ReceiptPaymentFormPage() {
         };
 
         fetchVouchers();
-    }, [form.custom_idx]);
+    }, [form.custom_idx, mode, form.entry_idx]);
 
 
     useEffect(() => {
@@ -169,8 +181,8 @@ export default function ReceiptPaymentFormPage() {
             };
 
             const res = mode === 'insert'
-                ? await axios.post(`http://localhost:8080/${type === '수금' ? 'receipt' : 'payment'}/insert`, form)
-                : await axios.put(`http://localhost:8080/${type === '수금' ? 'receipt' : 'payment'}/update`, form);
+                ? await axios.post(`http://localhost:8080/${type === '수금' ? 'receipt' : 'payment'}/insert`, submitData)
+                : await axios.put('http://localhost:8080/receipt/update', submitData);
 
             if (res.data.success) {
                 const { variables, data } = res.data;
@@ -211,7 +223,7 @@ export default function ReceiptPaymentFormPage() {
             </h1>
 
             <div className="template-form-container">
-                <div className="template-form-left" style={{ height: '600px'}}>
+                <div className="template-form-left" style={{ height: '700px'}}>
                     <div className="template-form-group" style={{ marginTop: '40px' }}>
                         <label className="template-label" style={{ fontSize: '18px'}}>거래처</label>
                         <select name="custom_idx" value={form.custom_idx || ''} onChange={handleChange} className="template-input">
@@ -254,23 +266,44 @@ export default function ReceiptPaymentFormPage() {
                         <input type="date" name="transaction_date" value={form.transaction_date || ''} onChange={handleChange} className="template-input" />
                     </div>
 
-                    <div className="template-form-group" style={{ width: '900px', marginBottom: '7px'}}>
-                        <label className="template-label"  style={{minWidth: '40px', fontSize: '18px'}}>결재자</label>
-                        <select className="template-input" onChange={addApprover}>
-                            <option value="">결재자 선택</option>
-                            {userOptions.filter(u => !approvers.some(a => a.user_idx === u.user_idx)).map(user => (
-                                <option key={user.user_idx} value={user.user_idx}>{user.user_name}</option>
-                            ))}
+                    <div className="template-form-group">
+                        <label className="template-label" style={{ fontSize: '18px' }}>상태</label>
+                        <select
+                            name="status"
+                            value={form.status || ''}
+                            onChange={handleChange}
+                            className="template-input"
+                        >
+                            <option value="작성중">작성중</option>
+                            <option value="확정">확정</option>
                         </select>
                     </div>
-                    <div className="selected-approvers"  style={{ justifyContent: 'center', marginLeft: '50px', marginBottom: '10px' }}>
-                        {approvers.map(user => (
-                            <span key={user.user_idx} className="approver-tag">
-                                    {user.user_name}
-                                <button onClick={() => removeApprover(user.user_idx)}>×</button>
-                                </span>
-                        ))}
-                    </div>
+
+                    {form.status === '확정' && (
+                        <>
+                            <div className="template-form-group" style={{ width: '885px', marginBottom: '7px' }}>
+                                <label className="template-label" style={{ minWidth: '40px', fontSize: '18px' }}>결재자</label>
+                                <select className="template-input" onChange={addApprover}>
+                                    <option value="">결재자 선택</option>
+                                    {userOptions
+                                        .filter(u => !approvers.some(a => a.user_idx === u.user_idx))
+                                        .map(user => (
+                                            <option key={user.user_idx} value={user.user_idx}>
+                                                {user.user_name}
+                                            </option>
+                                        ))}
+                                </select>
+                            </div>
+                            <div className="selected-approvers" style={{ justifyContent: 'center', marginLeft: '50px', marginBottom: '10px' }}>
+                                {approvers.map(user => (
+                                    <span key={user.user_idx} className="approver-tag">
+                                        {user.user_name}
+                                        <button onClick={() => removeApprover(user.user_idx)}>×</button>
+                                    </span>
+                                ))}
+                            </div>
+                        </>
+                    )}
 
                     <div className="template-form-group">
                         <label className="template-label" style={{ fontSize: '18px'}}>비고</label>
